@@ -1,19 +1,211 @@
-/* Adjust sidebar for mobile view */
+/* styles.css */
+
+/* Reset default margins and paddings for all elements */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Set base styles for html and body */
+html, body {
+    height: 100%;
+    font-family: Arial, sans-serif;
+    /* Set a background image for the entire page */
+    background: url('Image/lab_background.PNG') no-repeat center center fixed;
+    background-size: cover;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Main container that holds the sidebar and main content */
+.main-container {
+    display: flex;
+    min-height: 100vh; /* Ensure it covers the full viewport height */
+}
+
+/* Sidebar styling */
+.sidebar {
+    width: 250px; /* Fixed width for the sidebar */
+    background-color: rgba(255, 255, 255, 0.95); /* Slightly transparent white background */
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+    position: fixed; /* Fixed position to stay in place during scrolling */
+    height: 100%; /* Full height */
+    overflow-y: auto; /* Enable vertical scrolling if content overflows */
+}
+
+/* Sidebar heading */
+.sidebar h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Remove default list styles */
+.sidebar ul {
+    list-style-type: none;
+}
+
+/* List items in the sidebar */
+.sidebar li {
+    margin: 15px 0;
+}
+
+/* Links within the sidebar */
+.sidebar a {
+    text-decoration: none; /* Remove underline */
+    color: #333;
+    font-size: 1.1em;
+    display: block;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition on hover */
+}
+
+/* Hover effect for sidebar links */
+.sidebar a:hover {
+    background-color: #4CAF50; /* Green background on hover */
+    color: #fff; /* White text on hover */
+}
+
+/* Main content area styling */
+.content {
+    margin-left: 250px; /* Same as sidebar width to prevent overlap */
+    padding: 20px;
+    flex: 1; /* Take up remaining space */
+    background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white background */
+    min-height: 100vh; /* Ensure it covers the full viewport height */
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+}
+
+/* Header section within the main content */
+.header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+/* Profile image in the header */
+.header img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%; /* Make the image circular */
+    object-fit: cover; /* Ensure the image covers the entire area */
+    margin-right: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+}
+
+/* Header title */
+.header h1 {
+    font-size: 2em;
+    color: #333;
+}
+
+/* Subtitle styles */
+.subtitle {
+    font-size: 1.5em;
+    color: #333;
+    margin-top: 30px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #4CAF50; /* Green underline */
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+/* Paragraph styles */
+p {
+    line-height: 1.8;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+/* Emphasized and strong text styles */
+strong, em {
+    color: #333;
+}
+
+/* Section with text and image alignment */
+.section {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 30px;
+    gap: 20px; /* Space between text and image */
+}
+
+/* Text within a section */
+.section .text {
+    flex: 1; /* Take up available space */
+}
+
+/* Image within a section */
+.section .image {
+    flex: 1; /* Take up available space */
+}
+
+/* Styling for images within sections */
+.section .image img {
+    width: 100%; /* Full width */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    object-fit: cover; /* Ensure the image covers the entire area */
+}
+
+/* Donation list styling */
+.donation-list {
+    list-style-type: none; /* Remove default list styles */
+    padding: 0;
+}
+
+/* Individual donation items */
+.donation-list li {
+    background: #f9f9f9; /* Light grey background */
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    border-left: 4px solid #4CAF50; /* Green left border for emphasis */
+    word-break: break-all; /* Break long words or links */
+}
+
+/* Visitor Counter styling */
+.visitor-counter {
+    position: fixed; /* Fixed position on the screen */
+    bottom: 10px; /* 10px from the bottom */
+    right: 10px; /* 10px from the right */
+    background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent white background */
+    padding: 5px 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3); /* Subtle shadow */
+    font-size: 12px;
+    color: #333;
+    z-index: 1000; /* Ensure it stays on top */
+}
+
+/* Responsive adjustments for medium screens */
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 200px; /* Reduce sidebar width */
+    }
+
+    .content {
+        margin-left: 200px; /* Adjust margin to match sidebar */
+    }
+}
+
+/* Responsive adjustments for small screens */
 @media (max-width: 768px) {
     .main-container {
         flex-direction: column; /* Stack sidebar and content vertically */
     }
 
     .sidebar {
-        width: 100%; /* Full width for mobile */
-        height: auto; /* Adjust height automatically */
-        position: fixed; /* Fix sidebar at the top */
-        top: 0; /* Align to top */
-        z-index: 1000; /* Ensure it stays above other elements */
+        width: 100%; /* Full width */
+        height: auto;
+        position: relative; /* Position relative for stacking */
     }
 
     .content {
-        margin-top: 60px; /* Add top margin to content to avoid overlap with fixed sidebar */
+        margin-left: 0; /* Remove left margin */
     }
 
     .header {
