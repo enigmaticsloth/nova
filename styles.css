@@ -151,6 +151,14 @@ strong, em {
     object-fit: cover; /* Ensure the image covers the entire area */
 }
 
+/* Disclaimer styling for illustration purposes text */
+.disclaimer {
+    color: #999; /* Light grey color */
+    font-size: 0.8em; /* Small font size */
+    text-align: center;
+    margin-top: 5px; /* Space above disclaimer */
+}
+
 /* Donation list styling */
 .donation-list {
     list-style-type: none; /* Remove default list styles */
