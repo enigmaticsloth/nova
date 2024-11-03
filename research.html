@@ -1,0 +1,95 @@
+<!-- research.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poor Ph.D. Student's Research - Research</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Detailed overview of research on lung-on-a-chip technology and bioreactor models.">
+    <meta name="keywords" content="lung-on-a-chip, bioreactor, bioengineering, regenerative medicine, lung cancer research">
+</head>
+<body>
+    <div class="main-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <h2>Navigation</h2>
+            <ul>
+                <li><a href="index.html">About Me</a></li>
+                <li><a href="research.html">Research</a></li>
+                <li><a href="donation.html">Donations</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Header Section -->
+            <div class="header">
+                <img src="Image/Poor_PhD_Student.PNG" alt="Portrait of a struggling Ph.D. student">
+                <h1>Research</h1>
+            </div>
+
+            <!-- Research Focus -->
+            <h2 class="subtitle">Research Focus</h2>
+            <p>
+                My research focuses on <strong>lung-on-a-chip</strong> technology, which integrates <strong>organ-on-a-chip</strong> systems with <strong>stem cells</strong> to study lung development and regeneration. This innovative approach aims to develop new therapeutic strategies for <strong>lung adenocarcinoma</strong>, a type of lung cancer.
+            </p>
+
+            <!-- Lung-on-a-chip Model -->
+            <h2 class="subtitle">Lung-on-a-chip Model</h2>
+            <div class="section">
+                <div class="text">
+                    <p>
+                        The development of a lung-on-a-chip model provides a more accurate platform for studying lung diseases by mimicking the physiological environment of the human lung. This technology not only advances our understanding of lung injuries and diseases but also reduces the need for animal testing and lowers the costs associated with clinical trials. Consequently, it accelerates the development of safer and more effective treatments.
+                    </p>
+                </div>
+                <div class="image">
+                    <img src="Image/lung-on-a-chip.PNG" alt="Lung-on-a-chip Image">
+                </div>
+            </div>
+
+            <!-- Bioreactor Model -->
+            <h2 class="subtitle">Bioreactor Model</h2>
+            <div class="section">
+                <div class="text">
+                    <p>
+                        In addition to lung-on-a-chip technology, we utilize a <strong>bioreactor</strong> to culture human lung tissues. This setup allows us to create a controlled environment that mimics the physiological conditions of the human body, facilitating the study of lung development and regeneration. The bioreactor enables precise manipulation of variables such as oxygen levels, nutrient supply, and mechanical forces, which are crucial for understanding the complex processes involved in lung tissue formation and healing. Moreover, the bioreactor model allows us to cultivate artificial organs, providing potential solutions for future transplants and advancing the field of regenerative medicine.
+                    </p>
+                </div>
+                <div class="image">
+                    <img src="Image/bioreactor.PNG" alt="Bioreactor Image">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visitor Counter -->
+    <div class="visitor-counter" id="visitorCounter">
+        Visitors: Loading...
+    </div>
+
+    <!-- JavaScript to handle visitor counter -->
+    <script>
+        // Function to update the visitor counter using CountAPI
+        async function updateVisitorCounter() {
+            const namespace = 'poor-phd-student';
+            const key = 'research-research';
+            const counterElement = document.getElementById('visitorCounter');
+
+            try {
+                // Increment the counter and get the new value
+                const response = await fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`);
+                const data = await response.json();
+                counterElement.textContent = `Visitors: ${data.value}`;
+            } catch (error) {
+                console.error('Error fetching visitor count:', error);
+                counterElement.textContent = 'Visitors: N/A';
+            }
+        }
+
+        // Call the function when the page loads
+        window.onload = updateVisitorCounter;
+    </script>
+</body>
+</html>
