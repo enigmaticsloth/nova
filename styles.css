@@ -154,7 +154,7 @@ strong, em {
 /* Disclaimer styling for illustration purposes text */
 .disclaimer {
     color: #999; /* Light grey color */
-    font-size: 0.8em; /* Small font size */
+    font-size: 0.2em; /* Small font size */
     text-align: center;
     margin-top: 5px; /* Space above disclaimer */
 }
