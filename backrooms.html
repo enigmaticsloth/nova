@@ -13,6 +13,8 @@
             background-color: #f9f9f9;
             font-family: Arial, sans-serif;
             font-size: 1.1em;
+            height: 400px;
+            overflow-y: auto;
         }
         #conversation p {
             margin: 5px 0;
@@ -45,10 +47,17 @@
                 const response = await fetch('https://infinite-backrooms.ngrok.io/generate');
                 const data = await response.json();
                 
-                // Append the latest message
+                // Clear existing conversation and display the entire history
                 const conversationDiv = document.getElementById('conversation');
-                conversationDiv.innerHTML += `<p>${data.response}</p>`;
-                
+                conversationDiv.innerHTML = ""; // Clear previous content
+
+                data.history.forEach(entry => {
+                    // Display each entry with speaker name and message
+                    const messageElement = document.createElement('p');
+                    messageElement.textContent = `${entry.speaker}: ${entry.message}`;
+                    conversationDiv.appendChild(messageElement);
+                });
+
                 // Auto-scroll to the bottom to show the latest message
                 conversationDiv.scrollTop = conversationDiv.scrollHeight;
             } catch (error) {
@@ -58,6 +67,9 @@
 
         // Fetch conversation every 5 seconds
         setInterval(fetchConversation, 5000);
+
+        // Initial fetch on page load
+        fetchConversation();
     </script>
 </body>
 </html>
