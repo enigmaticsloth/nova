@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>對話顯示</title>
+    <style>
+        #conversation {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            font-family: Arial, sans-serif;
+            font-size: 1.1em;
+        }
+        #conversation p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">AI 對話</h1>
+    <div id="conversation"></div>
+
+    <script>
+        async function fetchConversation() {
+            try {
+                const response = await fetch('https://7749-140-109-214-4.ngrok-free.app/generate');
+                const data = await response.json();
+                
+                // 檢查對話區域，並追加最新訊息
+                const conversationDiv = document.getElementById('conversation');
+                conversationDiv.innerHTML += `<p>${data.response}</p>`;
+                
+                // 自動滾動到底部，以顯示最新訊息
+                conversationDiv.scrollTop = conversationDiv.scrollHeight;
+            } catch (error) {
+                console.error('無法取得對話資料:', error);
+            }
+        }
+
+        // 每隔5秒提取一次對話
+        setInterval(fetchConversation, 5000);
+    </script>
+</body>
+</html>
