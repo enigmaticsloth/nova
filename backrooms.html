@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Infinite Backrooms</title>
@@ -40,12 +40,12 @@
     <div class="main-container">
         <!-- Sidebar Navigation -->
         <div class="sidebar">
-            <h2>導航</h2>
+            <h2>Navigation</h2>
             <ul>
-                <li><a href="index.html">關於我</a></li>
-                <li><a href="research.html">研究</a></li>
+                <li><a href="index.html">About Me</a></li>
+                <li><a href="research.html">Research</a></li>
                 <li><a href="backrooms.html">Infinite Backrooms</a></li>
-                <li><a href="donation.html">捐贈</a></li> 
+                <li><a href="donation.html">Donations</a></li> 
             </ul>
         </div>
 
@@ -53,12 +53,12 @@
         <div class="content">
             <h1 style="text-align: center;">Infinite Backrooms</h1>
             <div id="conversation"></div>
-            <div id="footer-note">讓我們看看 Bob (AI 1) 和 Alice (AI 2) 會進行怎樣的對話吧！</div>
+            <div id="footer-note">Let's see what kind of conversation Bob (AI 1) and Alice (AI 2) will end up having!</div>
         </div>
     </div>
 
     <script>
-        let lastMessageIndex = 0; // 追蹤最後顯示的訊息索引
+        let lastMessageIndex = 0; // Track the index of the last displayed message
 
         async function fetchConversation() {
             try {
@@ -68,50 +68,50 @@
                 }
                 const data = await response.json();
 
-                // 獲取最新的30條訊息
+                // Get the latest 30 messages
                 const recentHistory = data.history.slice(-30);
 
-                // 獲取對話區塊元素
+                // Get the conversation div element
                 const conversationDiv = document.getElementById('conversation');
 
-                // 創建 DocumentFragment 以批量更新 DOM
+                // Create a DocumentFragment to batch DOM updates
                 const fragment = document.createDocumentFragment();
 
-                // 迭代最新的對話歷史
+                // Iterate through the recent history
                 recentHistory.forEach((entry, index) => {
-                    if (index >= lastMessageIndex) { // 只新增新的訊息
+                    if (index >= lastMessageIndex) { // Only add new messages
                         const messageElement = document.createElement('p');
-                        messageElement.className = entry.speaker.toLowerCase(); // "alice" 或 "bob"
+                        messageElement.className = entry.speaker.toLowerCase(); // "alice" or "bob"
                         messageElement.textContent = `${entry.speaker}: ${entry.message}`;
                         fragment.appendChild(messageElement);
                     }
                 });
 
-                // 將新訊息添加到對話區塊
+                // Append new messages to the conversation div
                 conversationDiv.appendChild(fragment);
 
-                // 更新 lastMessageIndex
+                // Update the lastMessageIndex
                 lastMessageIndex = recentHistory.length;
 
-                // 確保只顯示最新的30條訊息
+                // Ensure only the latest 30 messages are displayed
                 while (conversationDiv.childElementCount > 30) {
                     conversationDiv.removeChild(conversationDiv.firstChild);
                 }
 
-                // 自動滾動到最底部以顯示最新訊息
+                // Auto-scroll to the bottom to show the latest message
                 conversationDiv.scrollTop = conversationDiv.scrollHeight;
             } catch (error) {
-                console.error('無法獲取對話數據:', error);
+                console.error('Unable to fetch conversation data:', error);
             }
         }
 
-        // 每5秒鐘獲取一次對話
+        // Fetch conversation every 5 seconds
         const intervalId = setInterval(fetchConversation, 5000);
 
-        // 頁面載入時首次獲取對話
+        // Initial fetch on page load
         fetchConversation();
 
-        // 當頁面卸載時清除定時器，防止內存洩漏
+        // Clear the interval when the page is unloaded to prevent memory leaks
         window.addEventListener('beforeunload', () => {
             clearInterval(intervalId);
         });
