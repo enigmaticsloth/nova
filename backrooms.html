@@ -9,12 +9,19 @@
             max-width: 600px;
             margin: 20px auto;
             padding: 10px;
-            border: 1px solid #ddd;
-            background-color: #f9f9f9;
+            border: 1px solid #444;
+            background-color: #000; /* 黑色背景 */
             font-family: Arial, sans-serif;
             font-size: 1.1em;
             height: 400px;
             overflow-y: auto;
+            color: #fff; /* 預設文字顏色為白色 */
+        }
+        #conversation .alice {
+            color: #ffffff; /* Alice 的文字顏色為白色 */
+        }
+        #conversation .bob {
+            color: #00ff00; /* Bob 的文字顏色為綠色 */
         }
         #conversation p {
             margin: 5px 0;
@@ -52,9 +59,13 @@
                 conversationDiv.innerHTML = ""; // Clear previous content
 
                 data.history.forEach(entry => {
-                    // Display each entry with speaker name and message
+                    // Create a new paragraph element for each message
                     const messageElement = document.createElement('p');
+                    
+                    // Set class for styling based on speaker
+                    messageElement.className = entry.speaker.toLowerCase(); // "alice" or "bob"
                     messageElement.textContent = `${entry.speaker}: ${entry.message}`;
+                    
                     conversationDiv.appendChild(messageElement);
                 });
 
