@@ -63,9 +63,6 @@
         async function fetchConversation() {
             try {
                 const response = await fetch('https://infinite-backrooms.ngrok.io/generate');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
                 const data = await response.json();
 
                 // Get the latest 30 messages
@@ -106,15 +103,10 @@
         }
 
         // Fetch conversation every 5 seconds
-        const intervalId = setInterval(fetchConversation, 5000);
+        setInterval(fetchConversation, 2500);
 
         // Initial fetch on page load
         fetchConversation();
-
-        // Clear the interval when the page is unloaded to prevent memory leaks
-        window.addEventListener('beforeunload', () => {
-            clearInterval(intervalId);
-        });
     </script>
 </body>
 </html>
