@@ -1,30 +1,14 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AI Chatbot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poor Ph.D. Student's Research - About Me</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        #chat-container {
-            width: 50%;
-            margin: 0 auto;
-            max-height: 500px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 10px;
-        }
-        .chat-message {
-            margin: 10px 0;
-        }
-        .user-message {
-            text-align: right;
-            color: blue;
-        }
-        .ai-message {
-            text-align: left;
-            color: green;
-        }
-    </style>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="About the poor Ph.D. student and his research on lung-on-a-chip technology.">
+    <meta name="keywords" content="bioengineering, PhD, lung-on-a-chip, biomedical research, donations">
 </head>
 <body>
     <div class="main-container">
@@ -35,48 +19,63 @@
                 <li><a href="index.html">About Me</a></li>
                 <li><a href="research.html">Research</a></li>
                 <li><a href="donation.html">Donations</a></li>
-                <li><a href="backrooms.html">Infinite Backrooms</a></li>
+                <li><a href="infinite_backrooms.html">Infinite Backrooms</a></li>
             </ul>
         </div>
 
         <!-- Main Content -->
         <div class="content">
-            <h2>AI Chat Interface</h2>
-            <div id="chat-container">
-                <!-- Chat messages will appear here -->
+            <!-- Header Section -->
+            <div class="header">
+                <img src="Image/Poor_PhD_Student.PNG" alt="Portrait of a struggling Ph.D. student">
+                <h1>About Me</h1>
             </div>
-            <input type="text" id="user-input" placeholder="Type a message" />
-            <button onclick="sendMessage()">Send</button>
+
+            <!-- About Me Content -->
+            <p>
+                In this absurd reality, there exists a <em>poor Ph.D. student</em> with a grand ambition to change the world of medicine, yet he’s suffocating under the weight of a <strong>meager scholarship</strong>. Every day, rent and living expenses drain him dry, his meals are cobbled together, and his life feels thinner than instant noodles. But despite his hardships, he clings to his dream with determination: designing a groundbreaking technology called <strong>lung-on-a-chip</strong>.
+            </p>
+
+            <p>
+                One late night, as he stared at his computer in exhaustion, inspiration struck—why not let <strong>artificial intelligence (AI)</strong> take a shot? He fed his concepts and data into the AI, letting it handle precise calculations and simulations. Astonishingly, the AI returned a flawless "blueprint." Following this AI-generated model, he crafted a tiny yet realistic lung-on-a-chip that could mimic <strong>lung regeneration and development</strong>, allowing him to conduct in-depth studies on <strong>lung cancer</strong> and test <strong>new drugs</strong>.
+            </p>
+
+            <p>
+                This technology was nothing short of extraordinary. It promised to drastically cut the costs of <strong>clinical trials</strong>, serve as a new <strong>drug screening platform</strong>, and even <strong>replace animal testing</strong>, paving the way for a more humane and efficient approach in medicine. Yet, just as he was on the brink of achieving his dream, reality hit him once more. His funds were drained, and the <strong>meager scholarship</strong> barely let him breathe. Monthly rent alone was a struggle, and even basic sustenance was becoming a daily challenge.
+            </p>
+
+            <p>
+                At this moment, <strong>he urgently needed outside support</strong>—not only for his own survival but to bring this vital technology to life. Each breath he took became a reminder of why he was fighting. He knew that with the right support, the lung-on-a-chip could revolutionize medicine and benefit countless lives.
+            </p>
         </div>
     </div>
 
+    <!-- Visitor Counter -->
+    <div class="visitor-counter" id="visitorCounter">
+        Visitors: Loading...
+    </div>
+
+    <!-- JavaScript to handle visitor counter -->
     <script>
-        async function sendMessage() {
-            const userInput = document.getElementById("user-input").value;
-            if (userInput.trim() === "") return;
+        // Function to update the visitor counter using CountAPI
+        async function updateVisitorCounter() {
+            const namespace = 'poor-phd-student';
+            const key = 'research-about';
+            const counterElement = document.getElementById('visitorCounter');
 
-            appendMessage("user", userInput);
-
-            const response = await fetch("/generate", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ last_message: userInput })
-            });
-
-            const data = await response.json();
-            const aiResponse = data.response;
-            appendMessage("ai", aiResponse);
-            document.getElementById("user-input").value = "";
+            try {
+                // Increment the counter and get the new value
+                const response = await fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`);
+                const data = await response.json();
+                counterElement.textContent = `Visitors: ${data.value}`;
+            } catch (error) {
+                console.error('Error fetching visitor count:', error);
+                counterElement.textContent = 'Visitors: N/A';
+            }
         }
 
-        function appendMessage(sender, message) {
-            const chatContainer = document.getElementById("chat-container");
-            const messageElement = document.createElement("div");
-            messageElement.classList.add("chat-message", sender === "user" ? "user-message" : "ai-message");
-            messageElement.textContent = sender === "user" ? "You: " + message : "AI: " + message;
-            chatContainer.appendChild(messageElement);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
+        // Call the function when the page loads
+        window.onload = updateVisitorCounter;
     </script>
 </body>
 </html>
