@@ -58,42 +58,28 @@
     </div>
 
     <script>
-        let lastMessageIndex = 0; // Track the index of the last displayed message
-
         async function fetchConversation() {
             try {
                 const response = await fetch('https://infinite-backrooms.ngrok.io/generate');
                 const data = await response.json();
 
-                // Get the latest 30 messages
+                // Clear existing conversation and display the last 30 messages only
+                const conversationDiv = document.getElementById('conversation');
+                conversationDiv.innerHTML = ""; // Clear previous content
+
+                // Get the last 30 messages from the history
                 const recentHistory = data.history.slice(-30);
 
-                // Get the conversation div element
-                const conversationDiv = document.getElementById('conversation');
-
-                // Create a DocumentFragment to batch DOM updates
-                const fragment = document.createDocumentFragment();
-
-                // Iterate through the recent history
-                recentHistory.forEach((entry, index) => {
-                    if (index >= lastMessageIndex) { // Only add new messages
-                        const messageElement = document.createElement('p');
-                        messageElement.className = entry.speaker.toLowerCase(); // "alice" or "bob"
-                        messageElement.textContent = `${entry.speaker}: ${entry.message}`;
-                        fragment.appendChild(messageElement);
-                    }
+                recentHistory.forEach(entry => {
+                    // Create a new paragraph element for each message
+                    const messageElement = document.createElement('p');
+                    
+                    // Set class for styling based on speaker
+                    messageElement.className = entry.speaker.toLowerCase(); // "alice" or "bob"
+                    messageElement.textContent = `${entry.speaker}: ${entry.message}`;
+                    
+                    conversationDiv.appendChild(messageElement);
                 });
-
-                // Append new messages to the conversation div
-                conversationDiv.appendChild(fragment);
-
-                // Update the lastMessageIndex
-                lastMessageIndex = recentHistory.length;
-
-                // Ensure only the latest 30 messages are displayed
-                while (conversationDiv.childElementCount > 30) {
-                    conversationDiv.removeChild(conversationDiv.firstChild);
-                }
 
                 // Auto-scroll to the bottom to show the latest message
                 conversationDiv.scrollTop = conversationDiv.scrollHeight;
@@ -103,7 +89,7 @@
         }
 
         // Fetch conversation every 5 seconds
-        setInterval(fetchConversation, 2500);
+        setInterval(fetchConversation, 1000);
 
         // Initial fetch on page load
         fetchConversation();
