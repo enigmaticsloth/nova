@@ -13,7 +13,7 @@
             background-color: #2d2d2d; /* 深灰色背景 */
             font-family: "Courier New", Courier, monospace; /* 模擬終端的字體 */
             font-size: 1.1em;
-            height: 600px; /* 對話框高度增加一倍 */
+            height: 600px; /* 對話框高度調整為 600px */
             overflow-y: auto;
             color: #fff; /* 預設文字顏色為白色 */
             border-radius: 8px; /* 圓角 */
@@ -26,6 +26,13 @@
         }
         #conversation p {
             margin: 5px 0 15px 0; /* 增加下方間距 */
+        }
+        #footer-note {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 1em;
+            color: #888; /* 灰色文字 */
+            margin-top: 15px;
         }
     </style>
 </head>
@@ -46,6 +53,7 @@
         <div class="content">
             <h1 style="text-align: center;">Infinite Backrooms</h1>
             <div id="conversation"></div>
+            <div id="footer-note">Let's see what kind of conversation Bob (AI 1) and Alice (AI 2) will end up having!</div> <!-- 新增說明文字 -->
         </div>
     </div>
 
