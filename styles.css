@@ -10,7 +10,7 @@ html, body {
     height: 100%;
     font-family: Arial, sans-serif;
     background: #121212; /* Dark background */
-    color: #fff; /* White text */
+    color: #ffffff; /* White text */
     overflow-x: hidden;
 }
 
@@ -23,7 +23,7 @@ html, body {
 /* Sidebar styling */
 .sidebar {
     width: 250px;
-    background-color: #1e1e1e;
+    background-color: #1c1c1c; /* Darker sidebar */
     padding: 20px;
     position: fixed;
     height: 100%;
@@ -32,7 +32,7 @@ html, body {
 
 .sidebar h2 {
     text-align: center;
-    color: #fff;
+    color: #ffffff;
     margin-bottom: 20px;
 }
 
@@ -46,7 +46,7 @@ html, body {
 
 .sidebar a {
     text-decoration: none;
-    color: #fff;
+    color: #ffffff;
     display: block;
     padding: 10px;
     border-radius: 5px;
@@ -54,7 +54,7 @@ html, body {
 }
 
 .sidebar a:hover {
-    background-color: #333;
+    background-color: #333333;
     color: #4caf50;
 }
 
@@ -63,7 +63,7 @@ html, body {
     margin-left: 250px;
     padding: 20px;
     flex: 1;
-    background-color: #1a1a1a;
+    background-color: #121212; /* Same dark background */
     min-height: 100vh;
 }
 
@@ -85,7 +85,7 @@ html, body {
 
 .header h1 {
     font-size: 2em;
-    color: #fff;
+    color: #ffffff;
 }
 
 /* Section styles */
