@@ -9,9 +9,9 @@
 html, body {
     height: 100%;
     font-family: Arial, sans-serif;
-    background: url('Image/Forest.PNG') no-repeat center center fixed; /* Background image */
-    background-size: cover; /* Ensure the background covers the entire viewport */
-    color: #ffffff; /* White text */
+    background: url('Image/Forest.PNG') no-repeat center center fixed; /* Display background image */
+    background-size: cover; /* Ensure the background covers the viewport */
+    color: #ffffff; /* White text for readability */
     overflow-x: hidden;
 }
 
@@ -24,11 +24,11 @@ html, body {
 /* Sidebar styling */
 .sidebar {
     width: 250px;
-    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
     padding: 20px;
     position: fixed;
     height: 100%;
     overflow-y: auto;
+    background-color: transparent; /* No background, let the image show through */
 }
 
 .sidebar h2 {
@@ -55,7 +55,7 @@ html, body {
 }
 
 .sidebar a:hover {
-    background-color: #333333;
+    background-color: rgba(255, 255, 255, 0.2); /* Slight hover effect */
     color: #4caf50;
 }
 
@@ -64,10 +64,10 @@ html, body {
     margin-left: 250px;
     padding: 20px;
     flex: 1;
-    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black for better readability */
-    border-radius: 10px; /* Rounded edges for the content area */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
+    background-color: transparent; /* No background, let the image show through */
     min-height: 100vh;
+    color: #ffffff; /* White text for readability */
+    line-height: 1.8; /* Increased line height for better readability */
 }
 
 /* Header styles */
