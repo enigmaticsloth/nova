@@ -37,6 +37,10 @@
         }
         .sidebar a {
             text-decoration: none;
+            color: #333; /* Optional: Add color to links */
+        }
+        .sidebar a:hover {
+            text-decoration: underline; /* Optional: Underline on hover */
         }
         .content {
             flex: 1;
@@ -78,7 +82,7 @@
 
             <!-- Centered Video with Loop and Autoplay -->
             <div class="video-section">
-                <video loop autoplay muted> <!-- Added 'muted' for autoplay to work seamlessly -->
+                <video loop autoplay muted>
                     <source src="Video/NOVA.MP4" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
