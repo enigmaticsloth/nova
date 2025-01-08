@@ -58,6 +58,13 @@
             font-size: 1.2em; /* Adjust the size as needed */
             text-align: center; /* Optional: center the text */
         }
+        /* Style for the copy button */
+        .contract-prompt button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -80,17 +87,21 @@
             <!-- Centered Title Above Video -->
             <h2 class="center-title">NOVA: A Cryptocurrency as Explosive as a Supernova, Unlocking Infinite Potential</h2>
 
-            <!-- Centered Video with Loop and Autoplay -->
+            <!-- Centered Video with Loop and Autoplay Without Controls -->
             <div class="video-section">
-                <video loop autoplay muted>
+                <video loop autoplay muted playsinline preload="auto">
                     <source src="Video/NOVA.MP4" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
             </div>
 
-            <!-- Contract Address Prompt with Enlarged Text -->
+            <!-- Contract Address Prompt with Enlarged Text and Copy Button -->
             <p class="contract-prompt">
-                Search for the contract <strong>7UJH6UbAcMANjoqBvmncVq7UK6jX6qQawDKqWDa4Vj3q</strong> to purchase NOVA.
+                Search for the contract 
+                <strong id="contract-address">7UJH6UbAcMANjoqBvmncVq7UK6jX6qQawDKqWDa4Vj3q</strong> 
+                to purchase NOVA.
+                <button onclick="copyContractAddress()">Copy</button>
+                <span id="copy-message" style="display:none; margin-left:10px; color: green;">Copied!</span>
             </p>
 
             <!-- Detailed Content Without Bold Formatting -->
@@ -118,5 +129,21 @@
             </p>
         </div>
     </div>
+
+    <!-- JavaScript for Copy Functionality -->
+    <script>
+        function copyContractAddress() {
+            var copyText = document.getElementById("contract-address").innerText;
+            navigator.clipboard.writeText(copyText).then(function() {
+                var message = document.getElementById("copy-message");
+                message.style.display = "inline";
+                setTimeout(function() {
+                    message.style.display = "none";
+                }, 2000); // Hide after 2 seconds
+            }, function(err) {
+                alert("Failed to copy: ", err);
+            });
+        }
+    </script>
 </body>
 </html>
