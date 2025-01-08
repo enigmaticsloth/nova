@@ -5,6 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nova</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* 直接在此設定段落行距及間距，或可移至 styles.css */
+        p {
+            line-height: 1.8;       /* 行距 */
+            margin-bottom: 1.5em;   /* 段落間距，可依需要調整 */
+        }
+        .video-section {
+            text-align: center;     /* 影片置中 */
+            margin: 2em 0;          /* 與上下內容留間距 */
+        }
+        .video-section video {
+            max-width: 100%;        /* 保持自適應 */
+            height: auto;
+        }
+        .main-container {
+            display: flex;
+        }
+        .sidebar {
+            width: 200px;
+            padding: 1em;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar li {
+            margin-bottom: 0.5em;
+        }
+        .sidebar a {
+            text-decoration: none;
+        }
+        .content {
+            flex: 1;
+            padding: 1em;
+        }
+        .header h1 {
+            margin-bottom: 1em;
+        }
+    </style>
 </head>
 <body>
     <div class="main-container">
@@ -15,16 +54,20 @@
                 <li><a href="nova.html">Nova</a></li>
             </ul>
         </div>
+
         <!-- Main Content -->
         <div class="content">
             <div class="header">
                 <h1>NOVA</h1>
             </div>
 
-            <!-- 影片嵌入區域 -->
+            <!-- 新增標題 (放在影片上方) -->
+            <h2>NOVA: A Cryptocurrency as Explosive as a Supernova, Unlocking Infinite Potential</h2>
+
+            <!-- 影片置中，自動循環播放 -->
             <div class="video-section">
-                <video controls width="640" height="360">
-                    <!-- 請確認該檔案路徑相對於本檔案的正確性 -->
+                <video loop autoplay controls>
+                    <!-- 注意路徑應與檔案實際位置對應 -->
                     <source src="Video/NOVA.MP4" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
@@ -36,7 +79,6 @@
             </p>
 
             <!-- 新文案內容 -->
-            <h2>NOVA: A Cryptocurrency as Explosive as a Supernova, Unlocking Infinite Potential</h2>
             <p>
                 NOVA is a revolutionary cryptocurrency designed to deliver an unparalleled reward experience while building a vibrant digital economy. Every transaction feels like a supernova explosion, releasing immense value and transformative potential.
             </p>
