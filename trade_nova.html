@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade NOVA</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Paragraph spacing */
+        p {
+            line-height: 1.8;       /* Increased line height */
+            margin-bottom: 1.5em;   /* Increased margin between paragraphs */
+        }
+        /* Section headings */
+        h2, h3 {
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+        /* Layout styling */
+        .main-container {
+            display: flex;
+        }
+        .sidebar {
+            width: 200px;
+            padding: 1em;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar li {
+            margin-bottom: 0.5em;
+        }
+        .sidebar a {
+            text-decoration: none;
+        }
+        .content {
+            flex: 1;
+            padding: 1em;
+        }
+        .header h1 {
+            margin-bottom: 1em;
+        }
+        /* Highlight contract address */
+        .contract-address {
+            background-color: #f0f0f0;
+            padding: 0.5em;
+            border-radius: 5px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <ul>
+                <li><a href="index.html">Enigmatic Sloth</a></li>
+                <li><a href="nova.html">Nova</a></li>
+                <li><a href="trade_nova.html">Trade NOVA</a></li> <!-- Current Page Link -->
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <div class="header">
+                <h1>Trade NOVA</h1>
+            </div>
+
+            <!-- Introduction -->
+            <p>
+                Welcome to the NOVA trading portal! Here, you can learn how to purchase NOVA in a way that unlocks exclusive rewards, ensuring you maximize your benefits while contributing to our vibrant digital economy.
+            </p>
+
+            <!-- Section 1: Contract Functionality Overview -->
+            <h2>1. Contract Functionality Overview</h2>
+            <p>
+                The NOVA smart contract offers the following primary functions to facilitate transparent and trackable transactions:
+            </p>
+            <ul>
+                <li><strong>Buy (`buy`):</strong> Purchase NOVA using SOL and receive additional NOVA rewards based on our dynamic reward mechanism.</li>
+                <li><strong>Sell (`sell`):</strong> Sell NOVA back to the contract in exchange for SOL.</li>
+                <li><strong>Transfer NOVA (`transfer_nova`):</strong> Transfer NOVA between users securely without incurring transaction fees.</li>
+            </ul>
+
+            <!-- Section 2: How to Buy NOVA -->
+            <h2>2. How to Buy NOVA</h2>
+
+            <h3>Purchase Method: `buy`</h3>
+            <p>
+                **Functionality:**
+            </p>
+            <ul>
+                <li>Use this method to buy NOVA with SOL.</li>
+                <li>The method automatically calculates and distributes additional NOVA rewards based on the current transaction phase.</li>
+                <li>A 5% fee is applied to each purchase, which supports the developer reward pool and liquidity pool maintenance.</li>
+            </ul>
+
+            <p>
+                **Parameters:**
+            </p>
+            <ul>
+                <li><strong>`sol_amount`:</strong> The amount of SOL you wish to spend (minimum of 0.0001 SOL).</li>
+                <li><strong>`current_nova_price`:</strong> The current price per NOVA token, typically provided by the contract or user interface.</li>
+            </ul>
+
+            <p>
+                **Execution Process:**
+            </p>
+            <ol>
+                <li>
+                    **Transfer SOL to Liquidity Pool PDA:**
+                    <ul>
+                        <li>Send the specified amount of SOL from your wallet to the contract's Liquidity Pool PDA address.</li>
+                    </ul>
+                </li>
+                <li>
+                    **Receive NOVA Tokens:**
+                    <ul>
+                        <li>Based on the current NOVA price and reward percentage, receive the corresponding amount of NOVA tokens in your wallet.</li>
+                    </ul>
+                </li>
+                <li>
+                    **Fee Deduction:**
+                    <ul>
+                        <li>A 5% fee is deducted from your purchase amount and allocated to the Developer Reward Pool to support ongoing development and liquidity.</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <!-- Section 3: How to Sell NOVA -->
+            <h2>3. How to Sell NOVA</h2>
+
+            <h3>Sell Method: `sell`</h3>
+            <p>
+                **Functionality:**
+            </p>
+            <ul>
+                <li>Sell your NOVA tokens back to the contract in exchange for SOL.</li>
+                <li>A 5% fee is applied to each sale, supporting liquidity pool maintenance.</li>
+            </ul>
+
+            <p>
+                **Parameters:**
+            </p>
+            <ul>
+                <li><strong>`nova_amount`:</strong> The amount of NOVA you wish to sell.</li>
+                <li><strong>`current_nova_price`:</strong> The current price per NOVA token, typically provided by the contract or user interface.</li>
+            </ul>
+
+            <p>
+                **Execution Process:**
+            </p>
+            <ol>
+                <li>
+                    **Transfer NOVA to Treasury:**
+                    <ul>
+                        <li>Send the specified amount of NOVA from your wallet to the contract's Treasury address.</li>
+                    </ul>
+                </li>
+                <li>
+                    **Receive SOL:**
+                    <ul>
+                        <li>Based on the current NOVA price, receive the corresponding amount of SOL in your wallet after a 5% fee deduction.</li>
+                    </ul>
+                </li>
+                <li>
+                    **Fee Deduction:**
+                    <ul>
+                        <li>A 5% fee is deducted from your sale amount and allocated to the Liquidity Pool PDA to support liquidity.</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <!-- Section 4: How to Transfer NOVA -->
+            <h2>4. How to Transfer NOVA</h2>
+
+            <h3>Transfer Method: `transfer_nova`</h3>
+            <p>
+                **Functionality:**
+            </p>
+            <ul>
+                <li>Transfer NOVA tokens between users securely without any transaction fees.</li>
+            </ul>
+
+            <p>
+                **Parameters:**
+            </p>
+            <ul>
+                <li><strong>`from`:</strong> The sender's wallet address (must sign the transaction).</li>
+                <li><strong>`from_nova_account`:</strong> The sender's NOVA Token Account.</li>
+                <li><strong>`to_nova_account`:</strong> The recipient's NOVA Token Account.</li>
+                <li><strong>`amount`:</strong> The amount of NOVA tokens to transfer.</li>
+            </ul>
+
+            <p>
+                **Execution Process:**
+            </p>
+            <ol>
+                <li>
+                    **Verify Balance:**
+                    <ul>
+                        <li>Ensure the sender has sufficient NOVA balance to cover the transfer amount.</li>
+                    </ul>
+                </li>
+                <li>
+                    **Execute Transfer:**
+                    <ul>
+                        <li>Initiate the transfer of the specified NOVA amount from the sender's account to the recipient's account.</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <!-- Section 5: Important Considerations -->
+            <h2>5. Important Considerations</h2>
+            <ul>
+                <li><strong>Reward Mechanism Activation:</strong> Rewards are only triggered when purchasing NOVA through the contract's `buy` method. Purchasing via other methods, such as decentralized exchanges (DEX), will not activate the reward distribution.</li>
+                <li><strong>Fee Allocation:</strong> A 5% fee is applied to all buy and sell transactions. These fees support the Developer Reward Pool and Liquidity Pool to maintain system stability and ongoing development.</li>
+                <li><strong>Minimum Transaction Limits:</strong>
+                    <ul>
+                        <li><strong>Buy:</strong> Minimum of 0.0001 SOL per transaction.</li>
+                        <li><strong>Sell:</strong> Must have a sufficient NOVA balance to cover the sale amount.</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <!-- Section 6: How to Use Our Purchasing Method -->
+            <h2>6. How to Use Our Purchasing Method</h2>
+            <p>
+                To maximize your rewards and support the NOVA ecosystem, follow these steps to purchase NOVA using our official contract:
+            </p>
+            <ol>
+                <li>
+                    <strong>Ensure You Have a Solana Wallet:</strong>
+                    <ul>
+                        <li>Use a compatible Solana wallet such as Phantom or Solflare.</li>
+                        <li>Ensure your wallet contains enough SOL to cover the purchase amount and transaction fees (recommend keeping at least 0.01 SOL as a buffer).</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Interact with the NOVA Smart Contract:</strong>
+                    <ul>
+                        <li>Use a compatible Solana wallet interface or command-line tool to interact directly with the smart contract.</li>
+                        <li>Execute the `buy` method by sending SOL to the contract address: <span class="contract-address">7UJH6UbAcMANjoqBvmncVq7UK6jX6qQawDKqWDa4Vj3q</span>.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Confirm the Transaction:</strong>
+                    <ul>
+                        <li>After initiating the purchase, wait for the transaction to be confirmed on the Solana blockchain.</li>
+                        <li>Once confirmed, your NOVA tokens along with any applicable rewards will be credited to your wallet.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Verify Your Rewards:</strong>
+                    <ul>
+                        <li>Check your wallet to ensure the correct amount of NOVA tokens and rewards have been received.</li>
+                        <li>You can also view transaction details on Solscan by entering your wallet address.</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <!-- Conclusion -->
+            <h2>Join the NOVA Ecosystem Today!</h2>
+            <p>
+                By purchasing NOVA through our official method, you not only earn additional rewards but also contribute to the growth and stability of the NOVA ecosystem. Take advantage of our dynamic reward system and become a vital part of our future-transforming journey.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

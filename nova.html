@@ -6,19 +6,21 @@
     <title>Nova</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* 直接在此設定段落行距及間距，或可移至 styles.css */
+        /* Paragraph spacing */
         p {
-            line-height: 1.8;       /* 行距 */
-            margin-bottom: 1.5em;   /* 段落間距，可依需要調整 */
+            line-height: 1.8;       /* Increased line height */
+            margin-bottom: 1.5em;   /* Increased margin between paragraphs */
         }
+        /* Video section styling */
         .video-section {
-            text-align: center;     /* 影片置中 */
-            margin: 2em 0;          /* 與上下內容留間距 */
+            text-align: center;     /* Center the video */
+            margin: 2em 0;          /* Margin above and below the video */
         }
         .video-section video {
-            max-width: 100%;        /* 保持自適應 */
+            max-width: 100%;        /* Responsive video width */
             height: auto;
         }
+        /* Layout styling */
         .main-container {
             display: flex;
         }
@@ -43,6 +45,15 @@
         .header h1 {
             margin-bottom: 1em;
         }
+        /* Center the h2 title */
+        .center-title {
+            text-align: center;
+        }
+        /* Enlarge the contract prompt text */
+        .contract-prompt {
+            font-size: 1.2em; /* Adjust the size as needed */
+            text-align: center; /* Optional: center the text */
+        }
     </style>
 </head>
 <body>
@@ -52,6 +63,7 @@
             <ul>
                 <li><a href="index.html">Enigmatic Sloth</a></li>
                 <li><a href="nova.html">Nova</a></li>
+                <li><a href="trade_nova.html">Trade NOVA</a></li> <!-- New Link Added -->
             </ul>
         </div>
 
@@ -61,24 +73,23 @@
                 <h1>NOVA</h1>
             </div>
 
-            <!-- 新增標題 (放在影片上方) -->
-            <h2>NOVA: A Cryptocurrency as Explosive as a Supernova, Unlocking Infinite Potential</h2>
+            <!-- Centered Title Above Video -->
+            <h2 class="center-title">NOVA: A Cryptocurrency as Explosive as a Supernova, Unlocking Infinite Potential</h2>
 
-            <!-- 影片置中，自動循環播放 -->
+            <!-- Centered Video with Loop and Autoplay -->
             <div class="video-section">
-                <video loop autoplay controls>
-                    <!-- 注意路徑應與檔案實際位置對應 -->
+                <video loop autoplay muted> <!-- Added 'muted' for autoplay to work seamlessly -->
                     <source src="Video/NOVA.MP4" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
             </div>
 
-            <!-- 提示搜尋合約來購買 -->
-            <p>
+            <!-- Contract Address Prompt with Enlarged Text -->
+            <p class="contract-prompt">
                 Search for the contract <strong>7UJH6UbAcMANjoqBvmncVq7UK6jX6qQawDKqWDa4Vj3q</strong> to purchase NOVA.
             </p>
 
-            <!-- 新文案內容 -->
+            <!-- Detailed Content Without Bold Formatting -->
             <p>
                 NOVA is a revolutionary cryptocurrency designed to deliver an unparalleled reward experience while building a vibrant digital economy. Every transaction feels like a supernova explosion, releasing immense value and transformative potential.
             </p>
