@@ -12,7 +12,7 @@
             margin-bottom: 1.5em;   /* Increased margin between paragraphs */
         }
         /* Section headings */
-        h2, h3 {
+        h2, h3, h4 {
             margin-top: 1.5em;
             margin-bottom: 0.5em;
         }
@@ -56,14 +56,33 @@
         }
         .header h1 {
             margin: 0; /* Remove default margin */
-            color: white; /* Changed from #333 to white */
+            color: #333; /* Set default color for the title */
         }
-        /* Highlight contract address */
+        .nova-title {
+            color: white; /* Set NOVA part to white */
+        }
+        /* Highlight contract address with semi-transparent dark gray background */
         .contract-address {
-            background-color: #f0f0f0;
+            background-color: rgba(64, 64, 64, 0.6); /* Semi-transparent dark gray */
             padding: 0.5em;
             border-radius: 5px;
             word-break: break-all;
+        }
+        /* Code block styling */
+        pre.code-example {
+            background-color: rgba(64, 64, 64, 0.8); /* Dark gray with 80% opacity */
+            color: white; /* White text */
+            font-size: 0.9em; /* Slightly smaller font */
+            padding: 1em;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 1.5em; /* Space below code blocks */
+        }
+        code {
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+            background-color: transparent; /* Remove default background */
+            padding: 0;
+            border-radius: 0;
         }
     </style>
 </head>
@@ -82,16 +101,47 @@
         <div class="content">
             <div class="header">
                 <img src="Image/Nova.PNG" alt="Nova Logo"> <!-- Restored NOVA Logo Image -->
-                <h1>Trade NOVA</h1>
+                <h1>Trade <span class="nova-title">NOVA</span></h1> <!-- "NOVA" in white -->
             </div>
 
-            <!-- Introduction -->
+            <!-- Section 1: How to Use Our Purchasing Method -->
+            <h2>1. How to Use Our Purchasing Method</h2>
             <p>
-                Welcome to the NOVA trading portal! Here, you can learn how to purchase NOVA in a way that unlocks exclusive rewards, ensuring you maximize your benefits while contributing to our vibrant digital economy.
+                To maximize your rewards and support the NOVA ecosystem, follow these steps to purchase NOVA using our official contract:
             </p>
+            <ol>
+                <li>
+                    <strong>Ensure You Have a Solana Wallet:</strong>
+                    <ul>
+                        <li>Use a compatible Solana wallet such as Phantom or Solflare.</li>
+                        <li>Ensure your wallet contains enough SOL to cover the purchase amount and transaction fees (recommend keeping at least 0.01 SOL as a buffer).</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Interact with the NOVA Smart Contract:</strong>
+                    <ul>
+                        <li>Use a compatible Solana wallet interface or command-line tool to interact directly with the smart contract.</li>
+                        <li>Execute the <code>buy</code> method by sending SOL to the contract address: <span class="contract-address">7UJH6UbAcMANjoqBvmncVq7UK6jX6qQawDKqWDa4Vj3q</span>.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Confirm the Transaction:</strong>
+                    <ul>
+                        <li>After initiating the purchase, wait for the transaction to be confirmed on the Solana blockchain.</li>
+                        <li>Once confirmed, your NOVA tokens along with any applicable rewards will be credited to your wallet.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Verify Your Rewards:</strong>
+                    <ul>
+                        <li>Check your wallet to ensure the correct amount of NOVA tokens and rewards have been received.</li>
+                        <li>You can also view transaction details on Solscan by entering your wallet address.</li>
+                    </ul>
+                </li>
+            </ol>
 
-            <!-- Section 1: Contract Functionality Overview -->
-            <h2>1. Contract Functionality Overview</h2>
+            <!-- Section 2: Contract Functionality Overview -->
+            <h2>2. Contract Functionality Overview</h2>
             <p>
                 The NOVA smart contract offers the following primary functions to facilitate transparent and trackable transactions:
             </p>
@@ -101,8 +151,8 @@
                 <li><strong>Transfer NOVA (`transfer_nova`):</strong> Transfer NOVA between users securely without incurring transaction fees.</li>
             </ul>
 
-            <!-- Section 2: How to Buy NOVA -->
-            <h2>2. How to Buy NOVA</h2>
+            <!-- Section 3: How to Buy NOVA -->
+            <h2>3. How to Buy NOVA</h2>
 
             <h3>Purchase Method: `buy`</h3>
             <h4>Functionality:</h4>
@@ -140,8 +190,50 @@
                 </li>
             </ol>
 
-            <!-- Section 3: How to Sell NOVA -->
-            <h2>3. How to Sell NOVA</h2>
+            <!-- Example Usage for `buy` -->
+            <h4>Example Usage:</h4>
+            <p>
+                Below is an example of how to use the <code>buy</code> function using Solana's Web3.js library in a JavaScript environment:
+            </p>
+            <pre class="code-example"><code>
+// Import necessary libraries
+const { Connection, PublicKey, clusterApiUrl, Keypair, Transaction, SystemProgram } = require('@solana/web3.js');
+
+// Initialize connection
+const connection = new Connection(clusterApiUrl('mainnet-beta'), 'confirmed');
+
+// Define the contract address (replace with actual contract PDA)
+const contractAddress = new PublicKey('7UJH6UbAcMANjoqBvmncVq7UK6jX6qQawDKqWDa4Vj3q');
+
+// Buyer wallet keypair (ensure this is securely managed)
+const buyerKeypair = Keypair.fromSecretKey(Uint8Array.from([/* Your Secret Key Here */]));
+
+// Function to buy NOVA
+async function buyNOVA(solAmount, currentNOVAPrice) {
+    const transaction = new Transaction();
+
+    // Transfer SOL to the contract's Liquidity Pool PDA
+    transaction.add(
+        SystemProgram.transfer({
+            fromPubkey: buyerKeypair.publicKey,
+            toPubkey: contractAddress,
+            lamports: solAmount * 1e9, // Convert SOL to lamports
+        })
+    );
+
+    // Sign and send the transaction
+    const signature = await connection.sendTransaction(transaction, [buyerKeypair]);
+    await connection.confirmTransaction(signature, 'confirmed');
+
+    console.log('Purchase transaction successful with signature:', signature);
+}
+
+// Example purchase of 1 SOL
+buyNOVA(1, 0.05); // Replace 0.05 with the actual current NOVA price
+            </code></pre>
+
+            <!-- Section 4: How to Sell NOVA -->
+            <h2>4. How to Sell NOVA</h2>
 
             <h3>Sell Method: `sell`</h3>
             <h4>Functionality:</h4>
@@ -178,8 +270,63 @@
                 </li>
             </ol>
 
-            <!-- Section 4: How to Transfer NOVA -->
-            <h2>4. How to Transfer NOVA</h2>
+            <!-- Example Usage for `sell` -->
+            <h4>Example Usage:</h4>
+            <p>
+                Below is an example of how to use the <code>sell</code> function using Solana's Web3.js library in a JavaScript environment:
+            </p>
+            <pre class="code-example"><code>
+// Import necessary libraries
+const { Connection, PublicKey, clusterApiUrl, Keypair, Transaction, SystemProgram } = require('@solana/web3.js');
+const { Token, TOKEN_PROGRAM_ID } = require('@solana/spl-token');
+
+// Initialize connection
+const connection = new Connection(clusterApiUrl('mainnet-beta'), 'confirmed');
+
+// Define the contract address (replace with actual contract PDA)
+const contractAddress = new PublicKey('7UJH6UbAcMANjoqBvmncVq7UK6jX6qQawDKqWDa4Vj3q');
+
+// Seller wallet keypair (ensure this is securely managed)
+const sellerKeypair = Keypair.fromSecretKey(Uint8Array.from([/* Your Secret Key Here */]));
+
+// Function to sell NOVA
+async function sellNOVA(novaAmount, currentNOVAPrice) {
+    const transaction = new Transaction();
+
+    // Transfer NOVA tokens to the contract's Treasury address
+    // Assuming NOVA is an SPL token, you would use the Token Program to transfer
+    // This requires knowing the token mint address and the associated token accounts
+    // Here's a simplified example:
+
+    // Replace with actual token mint and associated token accounts
+    const tokenMintAddress = new PublicKey('YourNOVA_TokenMintAddress');
+    const senderTokenAccount = new PublicKey('Your_Sender_NOVA_TokenAccount');
+    const receiverTokenAccount = contractAddress; // Treasury address as receiver
+
+    transaction.add(
+        Token.createTransferInstruction(
+            TOKEN_PROGRAM_ID,
+            senderTokenAccount,
+            receiverTokenAccount,
+            sellerKeypair.publicKey,
+            [],
+            novaAmount
+        )
+    );
+
+    // Sign and send the transaction
+    const signature = await connection.sendTransaction(transaction, [sellerKeypair]);
+    await connection.confirmTransaction(signature, 'confirmed');
+
+    console.log('Sale transaction successful with signature:', signature);
+}
+
+// Example sale of 100 NOVA tokens
+sellNOVA(100, 0.05); // Replace 0.05 with the actual current NOVA price
+            </code></pre>
+
+            <!-- Section 5: How to Transfer NOVA -->
+            <h2>5. How to Transfer NOVA</h2>
 
             <h3>Transfer Method: `transfer_nova`</h3>
             <h4>Functionality:</h4>
@@ -211,10 +358,63 @@
                 </li>
             </ol>
 
-            <!-- Section 5: Important Considerations -->
-            <h2>5. Important Considerations</h2>
+            <!-- Example Usage for `transfer_nova` -->
+            <h4>Example Usage:</h4>
+            <p>
+                Below is an example of how to use the <code>transfer_nova</code> function using Solana's Web3.js library in a JavaScript environment:
+            </p>
+            <pre class="code-example"><code>
+// Import necessary libraries
+const { Connection, PublicKey, clusterApiUrl, Keypair, Transaction } = require('@solana/web3.js');
+const { Token, TOKEN_PROGRAM_ID } = require('@solana/spl-token');
+
+// Initialize connection
+const connection = new Connection(clusterApiUrl('mainnet-beta'), 'confirmed');
+
+// Define the NOVA token mint address
+const novaMintAddress = new PublicKey('YourNOVA_TokenMintAddress');
+
+// Sender and recipient token accounts
+const senderTokenAccount = new PublicKey('Sender_NOVA_TokenAccount');
+const recipientTokenAccount = new PublicKey('Recipient_NOVA_TokenAccount');
+
+// Sender wallet keypair (ensure this is securely managed)
+const senderKeypair = Keypair.fromSecretKey(Uint8Array.from([/* Your Secret Key Here */]));
+
+// Function to transfer NOVA tokens
+async function transferNOVA(amount) {
+    const token = new Token(connection, novaMintAddress, TOKEN_PROGRAM_ID, senderKeypair);
+
+    // Create the transaction
+    const transaction = new Transaction();
+
+    // Add transfer instruction
+    transaction.add(
+        Token.createTransferInstruction(
+            TOKEN_PROGRAM_ID,
+            senderTokenAccount,
+            recipientTokenAccount,
+            senderKeypair.publicKey,
+            [],
+            amount
+        )
+    );
+
+    // Sign and send the transaction
+    const signature = await connection.sendTransaction(transaction, [senderKeypair]);
+    await connection.confirmTransaction(signature, 'confirmed');
+
+    console.log('Transfer transaction successful with signature:', signature);
+}
+
+// Example transfer of 50 NOVA tokens
+transferNOVA(50);
+            </code></pre>
+
+            <!-- Section 6: Important Considerations -->
+            <h2>6. Important Considerations</h2>
             <ul>
-                <li><strong>Reward Mechanism Activation:</strong> Rewards are only triggered when purchasing NOVA through the contract's `buy` method. Purchasing via other methods, such as decentralized exchanges (DEX), will not activate the reward distribution.</li>
+                <li><strong>Reward Mechanism Activation:</strong> Rewards are only triggered when purchasing NOVA through the contract's <code>buy</code> method. Purchasing via other methods, such as decentralized exchanges (DEX), will not activate the reward distribution.</li>
                 <li><strong>Fee Allocation:</strong> A 5% fee is applied to all buy and sell transactions. These fees support the Developer Reward Pool and Liquidity Pool to maintain system stability and ongoing development.</li>
                 <li><strong>Minimum Transaction Limits:</strong>
                     <ul>
@@ -224,48 +424,28 @@
                 </li>
             </ul>
 
-            <!-- Section 6: How to Use Our Purchasing Method -->
-            <h2>6. How to Use Our Purchasing Method</h2>
-            <p>
-                To maximize your rewards and support the NOVA ecosystem, follow these steps to purchase NOVA using our official contract:
-            </p>
-            <ol>
-                <li>
-                    <strong>Ensure You Have a Solana Wallet:</strong>
-                    <ul>
-                        <li>Use a compatible Solana wallet such as Phantom or Solflare.</li>
-                        <li>Ensure your wallet contains enough SOL to cover the purchase amount and transaction fees (recommend keeping at least 0.01 SOL as a buffer).</li>
-                    </ul>
-                </li>
-                <li>
-                    <strong>Interact with the NOVA Smart Contract:</strong>
-                    <ul>
-                        <li>Use a compatible Solana wallet interface or command-line tool to interact directly with the smart contract.</li>
-                        <li>Execute the `buy` method by sending SOL to the contract address: <span class="contract-address">7UJH6UbAcMANjoqBvmncVq7UK6jX6qQawDKqWDa4Vj3q</span>.</li>
-                    </ul>
-                </li>
-                <li>
-                    <strong>Confirm the Transaction:</strong>
-                    <ul>
-                        <li>After initiating the purchase, wait for the transaction to be confirmed on the Solana blockchain.</li>
-                        <li>Once confirmed, your NOVA tokens along with any applicable rewards will be credited to your wallet.</li>
-                    </ul>
-                </li>
-                <li>
-                    <strong>Verify Your Rewards:</strong>
-                    <ul>
-                        <li>Check your wallet to ensure the correct amount of NOVA tokens and rewards have been received.</li>
-                        <li>You can also view transaction details on Solscan by entering your wallet address.</li>
-                    </ul>
-                </li>
-            </ol>
-
             <!-- Conclusion -->
-            <h2>Join the NOVA Ecosystem Today!</h2>
+            <h2>7. Join the NOVA Ecosystem Today!</h2>
             <p>
                 By purchasing NOVA through our official method, you not only earn additional rewards but also contribute to the growth and stability of the NOVA ecosystem. Take advantage of our dynamic reward system and become a vital part of our future-transforming journey.
             </p>
         </div>
     </div>
+
+    <!-- JavaScript for Copy Functionality -->
+    <script>
+        function copyContractAddress() {
+            var copyText = document.getElementById("contract-address").innerText;
+            navigator.clipboard.writeText(copyText).then(function() {
+                var message = document.getElementById("copy-message");
+                message.style.display = "inline";
+                setTimeout(function() {
+                    message.style.display = "none";
+                }, 2000); // Hide after 2 seconds
+            }, function(err) {
+                alert("Failed to copy: ", err);
+            });
+        }
+    </script>
 </body>
 </html>
