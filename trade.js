@@ -140,17 +140,11 @@ async function swapNOVA() {
     const latestBlockhash = await connection.getLatestBlockhash();
     transaction.recentBlockhash = latestBlockhash.blockhash;
     
-    // 使用 Phantom 錢包簽署交易（先簽署，再序列化後傳送）
-    const signed = await window.solana.signTransaction(transaction);
-    // ----- 這裡做檢查：如果 signed 物件沒有 serialize 方法，就直接把它當成 Uint8Array 使用
-    let rawTransaction;
-    if (typeof signed.serialize === "function") {
-      rawTransaction = signed.serialize();
-    } else if (signed instanceof Uint8Array) {
-      rawTransaction = signed;
-    } else {
-      throw new Error("Signed transaction is not in expected format.");
-    }
+    // 使用 Phantom 簽署交易
+    // Phantom 會直接修改原始 transaction 物件，而非回傳全新的 transaction
+    await window.solana.signTransaction(transaction);
+    // 直接使用原本傳入的 transaction 呼叫 serialize()
+    const rawTransaction = transaction.serialize();
     
     const signature = await connection.sendRawTransaction(rawTransaction);
     
