@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Trade NOVA</title>
+  <link rel="stylesheet" href="/styles.css" />
   <style>
-    /* 基本樣式 */
+    /* 基本樣式調整 */
     body {
       font-family: Arial, sans-serif;
       background-color: #121212;
@@ -13,87 +14,113 @@
       margin: 0;
       padding: 0;
     }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
+    .main-container {
+      display: flex;
+    }
+    .sidebar {
+      width: 200px;
+      padding: 1em;
+      background-color: #1e1e1e;
+    }
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+    .sidebar li {
+      margin-bottom: 0.5em;
+    }
+    .sidebar a {
+      text-decoration: none;
+      color: #ccc;
+      font-weight: bold;
+    }
+    .sidebar a:hover {
+      color: white;
+    }
+    .content {
+      flex: 1;
       padding: 2em;
     }
-    h1, h2 {
-      text-align: center;
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1em;
     }
-    label {
-      display: block;
-      margin-top: 1em;
+    .header img {
+      width: 50px;
+      height: 50px;
+      margin-right: 15px;
     }
-    input {
-      width: 100%;
-      padding: 0.5em;
-      margin-top: 0.5em;
-      font-size: 1em;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+    .header h1 {
+      margin: 0;
+      font-size: 2em;
+      color: white;
     }
     button {
-      padding: 0.7em 1.2em;
+      padding: 0.6em 1.2em;
       font-size: 1em;
-      margin: 1em 0;
+      margin: 0.5em;
       border: none;
       border-radius: 5px;
+      cursor: pointer;
       background-color: #4CAF50;
       color: white;
-      cursor: pointer;
     }
     button:hover {
       background-color: #45a049;
     }
-    #status, #tradeStatus {
+    input {
+      padding: 0.5em;
+      font-size: 1em;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin: 0.5em;
+      width: 200px;
+    }
+    #walletStatus, #tradeStatus {
       margin-top: 1em;
       padding: 0.5em;
       background-color: #333;
       border-radius: 5px;
-      text-align: center;
     }
   </style>
-  <!-- 1. 先引入 Buffer polyfill -->
-  <script src="https://unpkg.com/buffer@6.0.3/index.js"></script>
-  <script>
-    // 確保 window.Buffer 有定義
-    if (!window.Buffer) {
-      window.Buffer = buffer.Buffer;
-    }
-  </script>
-  <!-- 2. 再引入 Solana Web3.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.84.1/lib/index.iife.min.js"></script>
+  <!-- 注意：在 Vite 中我們使用 ES Module，所以不需要直接透過 <script> 載入 buffer，會在 JS 模組中引入 -->
 </head>
 <body>
-  <div class="container">
-    <h1>Trade NOVA (Swap Interface)</h1>
-    <!-- 錢包連接 -->
-    <button id="connectWalletBtn">Connect Wallet</button>
-    <div id="walletStatus"></div>
-
-    <hr>
-
-    <!-- Buy Section (Swap SOL for NOVA) -->
-    <h2>Buy NOVA</h2>
-    <label for="solInput">Enter SOL amount:</label>
-    <input type="number" id="solInput" placeholder="e.g., 0.1" step="0.0001" min="0">
-    <div>Estimated NOVA: <span id="novaOutput">0</span></div>
-    <button id="buyBtn">Swap SOL for NOVA</button>
-
-    <hr>
-
-    <!-- Sell Section (Swap NOVA for SOL) -->
-    <h2>Sell NOVA</h2>
-    <label for="novaInput">Enter NOVA amount:</label>
-    <input type="number" id="novaInput" placeholder="e.g., 100" step="1" min="0">
-    <div>Estimated SOL: <span id="solOutput">0</span></div>
-    <button id="sellBtn">Swap NOVA for SOL</button>
-
-    <div id="tradeStatus"></div>
+  <div class="main-container">
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+      <ul>
+        <li><a href="/index.html">Enigmatic Sloth</a></li>
+        <li><a href="/nova.html">Nova</a></li>
+        <li><a href="/trade_nova.html">Trade NOVA</a></li>
+      </ul>
+    </div>
+    <!-- Main Content -->
+    <div class="content">
+      <div class="header">
+        <img src="/Image/Nova.PNG" alt="Nova Logo" />
+        <h1>Trade NOVA</h1>
+      </div>
+      <p>
+        Welcome to the official NOVA Trading Platform. Connect your Solana wallet and input the desired amount to Buy or Sell.
+      </p>
+      <!-- 錢包連接 -->
+      <button id="connectWalletBtn">Connect Wallet</button>
+      <div id="walletStatus"></div>
+      <br />
+      <!-- 輸入買入金額 (單位 SOL) -->
+      <input type="number" id="buyAmount" placeholder="Enter amount in SOL" step="0.0001" min="0" />
+      <button id="buyBtn">Buy NOVA</button>
+      <br />
+      <!-- 輸入賣出金額 (單位 NOVA) -->
+      <input type="number" id="sellAmount" placeholder="Enter amount in NOVA" step="1" min="0" />
+      <button id="sellBtn">Sell NOVA</button>
+      <div id="tradeStatus"></div>
+    </div>
   </div>
-
-  <!-- 引入自訂的交易邏輯 -->
-  <script src="trade.js"></script>
+  
+  <!-- 使用 type="module" 載入我們的交易邏輯 -->
+  <script type="module" src="/trade.js"></script>
 </body>
 </html>
