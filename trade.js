@@ -21,24 +21,29 @@ let activeField = null; // "sol" 或 "nova"
 // --- 使用 CoinGecko API 根據合約地址查詢最新價格 ---
 // 這裡使用 Solana 的 coin 查詢格式，請根據 CoinGecko 文件確認
 async function fetchCurrentPrice() {
-  try {
-    // 使用你提供的 Mint PDA 來作為合約地址查詢
-    const contractAddress = "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX";
-    const url = `https://api.coingecko.com/api/v3/coins/solana/contract/${contractAddress}?localization=false`;
-    const response = await fetch(url);
-    const data = await response.json();
-    // 假設 API 回傳中： data.market_data.current_price.sol 為該代幣價格（例如 0.001 SOL）
-    if (data && data.market_data && data.market_data.current_price && data.market_data.current_price.sol) {
-      // 將價格乘以 1e6 作為我們的換算依據（這裡僅作示範）
-      CURRENT_NOVA_PRICE = data.market_data.current_price.sol * 1e6;
-      priceStatus.innerText = `Current NOVA Price updated: ${CURRENT_NOVA_PRICE}`;
-    } else {
-      priceStatus.innerText = "Failed to fetch price, using default value.";
+    try {
+      // 用 Geckoterminal 的 API 端點查詢，請依照實際 API 文件替換 URL 與必要參數
+      const contractAddress = "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX"; // 你的 mint PDA
+      const url = `https://api.geckoterminal.com/api/v1/markets/solana/${contractAddress}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error ${response.status}`);
+      }
+      const data = await response.json();
+      console.log("Geckoterminal API response:", data);
+      
+      if (data && data.data && data.data.price) {
+        // 假設回傳的價格單位是 SOL，乘以 1e6 作為我們的換算依據（僅示範用途）
+        CURRENT_NOVA_PRICE = data.data.price * 1e6;
+        priceStatus.innerText = `Current NOVA Price updated: ${CURRENT_NOVA_PRICE}`;
+      } else {
+        priceStatus.innerText = "Price data missing in Geckoterminal response; using default value.";
+      }
+    } catch (err) {
+      console.error("Price fetch error:", err);
+      priceStatus.innerText = `Price fetch error: ${err.message}`;
     }
-  } catch (err) {
-    priceStatus.innerText = `Price fetch error: ${err.message}`;
-  }
-}
+  }  
 // 頁面載入時先更新價格，並每 5 分鐘更新一次
 fetchCurrentPrice();
 setInterval(fetchCurrentPrice, 5 * 60 * 1000);
