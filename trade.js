@@ -1,8 +1,9 @@
 // trade.js
 
-// 固定 SOL 價格（USD）；這裡假設 SOL 固定 20 美元
-const SOL_USD_PRICE = 20;
+// --- 固定參數 ---
+// 使用 Binance 更新的 SOL_USD_PRICE 全域變數 window.SOL_USD_PRICE
 
+// --- 取得 DOM 元素 ---
 const connectWalletBtn = document.getElementById('connectWalletBtn');
 const walletStatus = document.getElementById('walletStatus');
 const solInput = document.getElementById('solInput');
@@ -25,7 +26,8 @@ function updateNovaFromSOL() {
     novaInput.value = "";
     return;
   }
-  const novaVal = solValue * (SOL_USD_PRICE / window.CURRENT_NOVA_PRICE_USD);
+  // 使用從 Binance 更新的 SOL_USD_PRICE 與從 GeckoTerminal 更新的 CURRENT_NOVA_PRICE_USD
+  const novaVal = solValue * (window.SOL_USD_PRICE / window.CURRENT_NOVA_PRICE_USD);
   novaInput.value = novaVal.toFixed(5);
   activeField = "sol";
 }
@@ -42,7 +44,7 @@ function updateSOLFromNOVA() {
     solInput.value = "";
     return;
   }
-  const solVal = novaValue * (window.CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE);
+  const solVal = novaValue * (window.CURRENT_NOVA_PRICE_USD / window.SOL_USD_PRICE);
   solInput.value = solVal.toFixed(5);
   activeField = "nova";
 }
@@ -77,7 +79,8 @@ async function connectWallet() {
 }
 
 // --- Swap 函式 ---
-// 根據 activeField 判斷，執行模擬買入或賣出交易
+// 根據 activeField 決定執行買入（以 SOL 為基準）或賣出（以 NOVA 為基準）
+// 模擬交易：以 SystemProgram.transfer 轉帳給自己（僅作示範）
 async function swapNOVA() {
   if (!walletPublicKey) {
     tradeStatus.innerText = "Please connect your wallet first.";
@@ -93,13 +96,12 @@ async function swapNOVA() {
         tradeStatus.innerText = "Please enter a valid SOL amount.";
         return;
       }
-      // 根據公式計算預估 NOVA：NOVA = SOL * (SOL_USD_PRICE / CURRENT_NOVA_PRICE_USD)
-      const novaEstimated = solValue * (SOL_USD_PRICE / window.CURRENT_NOVA_PRICE_USD);
+      const novaEstimated = solValue * (window.SOL_USD_PRICE / window.CURRENT_NOVA_PRICE_USD);
       const lamports = Math.round(solValue * 1e9);
       transaction = new solanaWeb3.Transaction().add(
         solanaWeb3.SystemProgram.transfer({
           fromPubkey,
-          toPubkey: fromPubkey, // 模擬買入：轉帳給自己
+          toPubkey: fromPubkey,
           lamports: lamports,
         })
       );
@@ -110,8 +112,7 @@ async function swapNOVA() {
         tradeStatus.innerText = "Please enter a valid NOVA amount.";
         return;
       }
-      // 根據公式計算換回 SOL：SOL = NOVA * (CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE)
-      const solEquivalent = novaValue * (window.CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE);
+      const solEquivalent = novaValue * (window.CURRENT_NOVA_PRICE_USD / window.SOL_USD_PRICE);
       const lamports = Math.round(solEquivalent * 1e9);
       transaction = new solanaWeb3.Transaction().add(
         solanaWeb3.SystemProgram.transfer({
