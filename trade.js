@@ -1,9 +1,7 @@
 // trade.js
 
-// --- 固定參數 ---
-// 使用 Binance 更新的 SOL_USD_PRICE 全域變數 window.SOL_USD_PRICE
+const SOL_USD_PRICE = window.SOL_USD_PRICE;  // 實際值會由 pricing.js 更新
 
-// --- 取得 DOM 元素 ---
 const connectWalletBtn = document.getElementById('connectWalletBtn');
 const walletStatus = document.getElementById('walletStatus');
 const solInput = document.getElementById('solInput');
@@ -14,8 +12,7 @@ const tradeStatus = document.getElementById('tradeStatus');
 let walletPublicKey = null;
 let activeField = null; // "sol" 或 "nova"
 
-// --- 當 SOL 輸入時更新 NOVA 預估值 ---
-// 計算公式： NOVA = SOL * (SOL_USD_PRICE / CURRENT_NOVA_PRICE_USD)
+// 當 SOL 輸入時更新 NOVA 預估值：NOVA = SOL * (SOL_USD_PRICE / CURRENT_NOVA_PRICE_USD)
 function updateNovaFromSOL() {
   if (!solInput.value) {
     novaInput.value = "";
@@ -26,14 +23,12 @@ function updateNovaFromSOL() {
     novaInput.value = "";
     return;
   }
-  // 使用從 Binance 更新的 SOL_USD_PRICE 與從 GeckoTerminal 更新的 CURRENT_NOVA_PRICE_USD
   const novaVal = solValue * (window.SOL_USD_PRICE / window.CURRENT_NOVA_PRICE_USD);
   novaInput.value = novaVal.toFixed(5);
   activeField = "sol";
 }
 
-// --- 當 NOVA 輸入時更新 SOL 預估值 ---
-// 計算公式： SOL = NOVA * (CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE)
+// 當 NOVA 輸入時更新 SOL 預估值：SOL = NOVA * (CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE)
 function updateSOLFromNOVA() {
   if (!novaInput.value) {
     solInput.value = "";
@@ -63,7 +58,7 @@ novaInput.addEventListener('input', () => {
   isUpdating = false;
 });
 
-// --- 連接 Phantom 錢包 ---
+// 連接 Phantom 錢包
 async function connectWallet() {
   if (window.solana && window.solana.isPhantom) {
     try {
@@ -78,9 +73,7 @@ async function connectWallet() {
   }
 }
 
-// --- Swap 函式 ---
-// 根據 activeField 決定執行買入（以 SOL 為基準）或賣出（以 NOVA 為基準）
-// 模擬交易：以 SystemProgram.transfer 轉帳給自己（僅作示範）
+// Swap 函式：依據 activeField 決定模擬買入或賣出
 async function swapNOVA() {
   if (!walletPublicKey) {
     tradeStatus.innerText = "Please connect your wallet first.";
@@ -105,7 +98,7 @@ async function swapNOVA() {
           lamports: lamports,
         })
       );
-      tradeStatus.innerText = `Executing Buy: ${solValue} SOL will convert to ${novaEstimated.toFixed(5)} NOVA (simulated)...\n`;
+      tradeStatus.innerText = `Executing Buy: ${solValue} SOL → ${novaEstimated.toFixed(5)} NOVA (simulated)...\n`;
     } else if (activeField === "nova") {
       const novaValue = parseFloat(novaInput.value);
       if (isNaN(novaValue) || novaValue <= 0) {

@@ -1,8 +1,8 @@
 // pricing.js
 
-// 將 NOVA 價格預設為 0.00123 USD（若查詢失敗則沿用此值）
+// 將 NOVA 價格預設為 0.00123 USD（若查詢失敗沿用此值）
 window.CURRENT_NOVA_PRICE_USD = 0.00123;
-// 預設 SOL 價格（USD），初始為 20 美元，之後會從 Binance 更新
+// 預設 SOL 價格 (USD)
 window.SOL_USD_PRICE = 20;
 
 // 從 GeckoTerminal API v2 取得 NOVA 價格（USD）
@@ -20,8 +20,6 @@ async function fetchNOVA_Price() {
     }
     const data = await response.json();
     console.log("GeckoTerminal API response:", data);
-    // 解析格式：
-    // { "data": { "attributes": { "token_prices": { "<contractAddress>": "237.433210276503" } } } }
     if (
       data &&
       data.data &&
@@ -43,7 +41,6 @@ async function fetchNOVA_Price() {
 // 從 Binance API 取得 SOL-USDT 價格
 async function fetchSOL_Price() {
   try {
-    // Binance REST API: SOLUSDT
     const url = "https://api.binance.com/api/v3/ticker/price?symbol=SOLUSDT";
     const response = await fetch(url);
     if (!response.ok) {
@@ -63,7 +60,6 @@ async function fetchSOL_Price() {
   }
 }
 
-// 更新頁面上價格顯示
 function updatePriceDisplay(message) {
   const priceStatus = document.getElementById('priceStatus');
   if (priceStatus) {
@@ -75,9 +71,8 @@ function updatePriceDisplay(message) {
   }
 }
 
-// 初次呼叫並定時更新
+// 初次呼叫與每 2 秒更新一次（請注意 API 速率限制）
 fetchNOVA_Price();
 fetchSOL_Price();
-// 這裡設為每 2 秒更新一次，注意 API 限制，建議測試時低頻率即可
 setInterval(fetchNOVA_Price, 2 * 1000);
 setInterval(fetchSOL_Price, 2 * 1000);
