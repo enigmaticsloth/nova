@@ -1,10 +1,8 @@
 // trade.js
 
-// --- 設定換算參數（初始預設值，可由 API 更新） ---
-let CURRENT_NOVA_PRICE = 1000000;  // 單位：這裡示範值，之後會更新
-// 換算公式：
-// BUY: NOVA = SOL * (1e9 / CURRENT_NOVA_PRICE)
-// SELL: SOL = NOVA * (CURRENT_NOVA_PRICE / 1e9)
+// --- 初始換算參數 ---
+let CURRENT_NOVA_PRICE_USD = 0.00123;  // 預設值（USD），若 API 回傳會更新
+const SOL_USD_PRICE = 20;              // 假設 SOL 固定 20 美元
 
 // --- 取得 DOM 元素 ---
 const connectWalletBtn = document.getElementById('connectWalletBtn');
@@ -18,37 +16,48 @@ const priceStatus = document.getElementById('priceStatus');
 let walletPublicKey = null;
 let activeField = null; // "sol" 或 "nova"
 
-// --- 使用 CoinGecko API 根據合約地址查詢最新價格 ---
-// 這裡使用 Solana 的 coin 查詢格式，請根據 CoinGecko 文件確認
+// --- 從 Geckoterminal API 取得價格 ---
+// 以 /simple/networks/solana/token_price/{addresses} 查詢
 async function fetchCurrentPrice() {
-    try {
-      // 用 Geckoterminal 的 API 端點查詢，請依照實際 API 文件替換 URL 與必要參數
-      const contractAddress = "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX"; // 你的 mint PDA
-      const url = `https://api.geckoterminal.com/api/v1/markets/solana/${contractAddress}`;
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error ${response.status}`);
-      }
-      const data = await response.json();
-      console.log("Geckoterminal API response:", data);
-      
-      if (data && data.data && data.data.price) {
-        // 假設回傳的價格單位是 SOL，乘以 1e6 作為我們的換算依據（僅示範用途）
-        CURRENT_NOVA_PRICE = data.data.price * 1e6;
-        priceStatus.innerText = `Current NOVA Price updated: ${CURRENT_NOVA_PRICE}`;
-      } else {
-        priceStatus.innerText = "Price data missing in Geckoterminal response; using default value.";
-      }
-    } catch (err) {
-      console.error("Price fetch error:", err);
-      priceStatus.innerText = `Price fetch error: ${err.message}`;
+  try {
+    // 請確認 Geckoterminal API endpoint 與合約地址是否正確
+    const contractAddress = "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX";
+    const url = `https://api.geckoterminal.com/simple/networks/solana/token_price/${contractAddress}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error ${response.status}`);
     }
-  }  
-// 頁面載入時先更新價格，並每 5 分鐘更新一次
+    const data = await response.json();
+    console.log("Geckoterminal API response:", data);
+    // 假設回傳格式：
+    // {
+    //   "data": {
+    //      "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX": { "usd": 0.00123 }
+    //   }
+    // }
+    if (
+      data &&
+      data.data &&
+      data.data[contractAddress] &&
+      data.data[contractAddress].usd
+    ) {
+      CURRENT_NOVA_PRICE_USD = data.data[contractAddress].usd;
+      priceStatus.innerText = `Current NOVA Price: $${CURRENT_NOVA_PRICE_USD.toFixed(6)} USD`;
+    } else {
+      priceStatus.innerText = "Price data missing in API response; using default value.";
+    }
+  } catch (err) {
+    console.error("Price fetch error:", err);
+    priceStatus.innerText = `Failed to fetch price, using default value. Error: ${err.message}`;
+  }
+}
+
+// 每 5 分鐘更新一次價格，頁面載入時先更新
 fetchCurrentPrice();
 setInterval(fetchCurrentPrice, 5 * 60 * 1000);
 
-// --- 當 SOL 輸入時自動更新 NOVA 預估值 ---
+// --- 根據 SOL 輸入更新 NOVA 預估值 ---
+// 計算公式：NOV A = SOL × (SOL_USD_PRICE / CURRENT_NOVA_PRICE_USD)
 function updateNovaFromSOL() {
   if (!solInput.value) {
     novaInput.value = "";
@@ -59,13 +68,13 @@ function updateNovaFromSOL() {
     novaInput.value = "";
     return;
   }
-  // 計算公式： NOVA = SOL * (1e9 / CURRENT_NOVA_PRICE)
-  const novaVal = solValue * (1e9 / CURRENT_NOVA_PRICE);
+  const novaVal = solValue * (SOL_USD_PRICE / CURRENT_NOVA_PRICE_USD);
   novaInput.value = novaVal.toFixed(0);
   activeField = "sol";
 }
 
-// --- 當 NOVA 輸入時自動更新 SOL 預估值 ---
+// --- 根據 NOVA 輸入更新 SOL 預估值 ---
+// 計算公式：SOL = NOVA × (CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE)
 function updateSOLFromNOVA() {
   if (!novaInput.value) {
     solInput.value = "";
@@ -76,13 +85,11 @@ function updateSOLFromNOVA() {
     solInput.value = "";
     return;
   }
-  // 計算公式： SOL = NOVA * (CURRENT_NOVA_PRICE / 1e9)
-  const solVal = novaValue * (CURRENT_NOVA_PRICE / 1e9);
+  const solVal = novaValue * (CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE);
   solInput.value = solVal.toFixed(4);
   activeField = "nova";
 }
 
-// 防止相互觸發
 let isUpdating = false;
 solInput.addEventListener('input', () => {
   if (isUpdating) return;
@@ -113,8 +120,8 @@ async function connectWallet() {
 }
 
 // --- Swap 函式 ---
-// 根據 activeField 決定執行買入（使用 SOL 輸入）或賣出（使用 NOVA 輸入）
-// 模擬的交易：使用 SystemProgram.transfer 將 lamports 轉帳給自己（僅示範）
+// 根據 activeField 決定執行買入（以 SOL 為基準）或賣出（以 NOVA 為基準）
+// 此處示範交易以 SystemProgram.transfer 轉帳給自己（僅作範例）
 async function swapNOVA() {
   if (!walletPublicKey) {
     tradeStatus.innerText = "Please connect your wallet first.";
@@ -124,31 +131,31 @@ async function swapNOVA() {
     const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "processed");
     const fromPubkey = new solanaWeb3.PublicKey(walletPublicKey);
     let transaction;
-    if (activeField === "sol") {
+    if (activeField === "sol") { // 以 SOL 輸入執行買入
       const solValue = parseFloat(solInput.value);
       if (isNaN(solValue) || solValue <= 0) {
         tradeStatus.innerText = "Please enter a valid SOL amount.";
         return;
       }
+      // 以 SOL 來買入 NOVA：根據公式 NOVA = SOL * (SOL_USD_PRICE / CURRENT_NOVA_PRICE_USD)
       const lamports = Math.round(solValue * 1e9);
-      // 模擬買入：以 SOL 輸入對應換算出的 NOVA 數量（僅示範，實際應呼叫合約的 buy 函式）
       transaction = new solanaWeb3.Transaction().add(
         solanaWeb3.SystemProgram.transfer({
           fromPubkey,
-          toPubkey: fromPubkey,
+          toPubkey: fromPubkey,  // 這裡模擬交易將資金傳回自己
           lamports: lamports,
         })
       );
-      tradeStatus.innerText = `Executing Buy: ${solValue} SOL will convert to ${ (solValue * (1e9 / CURRENT_NOVA_PRICE)).toFixed(0) } NOVA (simulated)...\n`;
-    } else if (activeField === "nova") {
+      tradeStatus.innerText = `Executing Buy: ${solValue} SOL will convert to ${ (solValue * (SOL_USD_PRICE / CURRENT_NOVA_PRICE_USD)).toFixed(0) } NOVA (simulated)...\n`;
+    } else if (activeField === "nova") { // 以 NOVA 輸入執行賣出
       const novaValue = parseFloat(novaInput.value);
       if (isNaN(novaValue) || novaValue <= 0) {
         tradeStatus.innerText = "Please enter a valid NOVA amount.";
         return;
       }
-      const solEquivalent = novaValue * (CURRENT_NOVA_PRICE / 1e9);
+      // 根據公式：SOL = NOVA * (CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE)
+      const solEquivalent = novaValue * (CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE);
       const lamports = Math.round(solEquivalent * 1e9);
-      // 模擬賣出：以 NOVA 輸入對應換算回的 SOL 數量（僅示範，實際應呼叫合約的 sell 函式）
       transaction = new solanaWeb3.Transaction().add(
         solanaWeb3.SystemProgram.transfer({
           fromPubkey,
