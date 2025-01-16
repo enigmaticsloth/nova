@@ -1,0 +1,23 @@
+{
+  "name": "nova",
+  "version": "1.0.0",
+  "main": "bufferPolyfill.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/enigmaticsloth/NOVA.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/enigmaticsloth/NOVA/issues"
+  },
+  "homepage": "https://github.com/enigmaticsloth/NOVA#readme",
+  "description": "",
+  "dependencies": {
+    "@solana/web3.js": "^1.98.0"
+  }
+}
