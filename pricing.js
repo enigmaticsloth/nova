@@ -2,13 +2,13 @@
 
 // 將 NOVA 價格預設為 0.00123 USD（若查詢失敗沿用此值）
 window.CURRENT_NOVA_PRICE_USD = 0.00123;
-// 預設 SOL 價格 (USD)
+// 預設 SOL 價格 (USD)，初始為 20 美元
 window.SOL_USD_PRICE = 20;
 
-// 從 GeckoTerminal API v2 取得 NOVA 價格（USD）
 async function fetchNOVA_Price() {
   try {
     const contractAddress = "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX";
+    // GeckoTerminal API v2 的 endpoint，請依據官方文件確認
     const url = `https://api.geckoterminal.com/api/v2/simple/networks/solana/token_price/${contractAddress}`;
     const response = await fetch(url, {
       headers: {
@@ -30,15 +30,14 @@ async function fetchNOVA_Price() {
       window.CURRENT_NOVA_PRICE_USD = parseFloat(data.data.attributes.token_prices[contractAddress]);
       updatePriceDisplay();
     } else {
-      updatePriceDisplay("Price data missing in API response; using default value.");
+      updatePriceDisplay("NOVA price data missing; using default value.");
     }
   } catch (err) {
     console.error("NOVA Price fetch error:", err);
-    updatePriceDisplay(`Failed to fetch NOVA price, using default value. Error: ${err.message}`);
+    updatePriceDisplay(`Failed to fetch NOVA price. Error: ${err.message}`);
   }
 }
 
-// 從 Binance API 取得 SOL-USDT 價格
 async function fetchSOL_Price() {
   try {
     const url = "https://api.binance.com/api/v3/ticker/price?symbol=SOLUSDT";
@@ -56,7 +55,7 @@ async function fetchSOL_Price() {
     }
   } catch (err) {
     console.error("SOL Price fetch error:", err);
-    updatePriceDisplay(`Failed to fetch SOL price, using default value. Error: ${err.message}`);
+    updatePriceDisplay(`Failed to fetch SOL price. Error: ${err.message}`);
   }
 }
 
@@ -71,8 +70,8 @@ function updatePriceDisplay(message) {
   }
 }
 
-// 初次呼叫與每 2 秒更新一次（請注意 API 速率限制）
+// 初次呼叫與每 2 秒更新一次
 fetchNOVA_Price();
 fetchSOL_Price();
-setInterval(fetchNOVA_Price, 2 * 1000);
-setInterval(fetchSOL_Price, 2 * 1000);
+setInterval(fetchNOVA_Price, 2000);
+setInterval(fetchSOL_Price, 2000);
