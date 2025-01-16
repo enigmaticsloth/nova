@@ -1,3 +1,4 @@
+// bufferPolyfill.js
 (function() {
   // 如果 window.Buffer 不存在，則建立一個空物件
   if (typeof window.Buffer === "undefined") {
@@ -12,7 +13,8 @@
         // 若有指定編碼
         if (encoding) {
           var enc = encoding.toLowerCase();
-          if (enc === "utf8") {
+          // 允許 "utf8" 或 "utf-8" 兩種形式
+          if (enc === "utf8" || enc === "utf-8") {
             // 處理 utf8：使用 encodeURIComponent/unescape 來實現簡單的 utf8 轉換
             var utf8 = unescape(encodeURIComponent(input));
             var arr = new Uint8Array(utf8.length);
@@ -41,7 +43,6 @@
           } else {
             // 如果遇到不支援的編碼，顯示警告並使用 utf8 處理
             console.warn("Buffer.from polyfill: Unsupported encoding '" + encoding + "'. Defaulting to 'utf8'.");
-            // 將 encoding 視為 utf8
             var utf8 = unescape(encodeURIComponent(input));
             var arr = new Uint8Array(utf8.length);
             for (var i = 0; i < utf8.length; i++) {
