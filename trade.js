@@ -91,15 +91,21 @@ async function connectWallet() {
 async function getRecentBlockhashWithRetry(connection, retries = 3) {
   for (let i = 0; i < retries; i++) {
     try {
+      console.log(`Fetching blockhash, attempt ${i + 1}`);
       const { blockhash } = await connection.getLatestBlockhash();
+      console.log(`Fetched blockhash: ${blockhash}`);
       return blockhash;
     } catch (error) {
       console.warn(`Attempt ${i + 1} failed: ${error.message}`);
-      if (i === retries - 1) throw error;
+      if (i === retries - 1) {
+        console.error("All attempts to fetch blockhash failed:", error);
+        throw error;
+      }
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
 }
+
 
 // Throttle function to limit the rate of function calls
 function throttle(func, limit) {
