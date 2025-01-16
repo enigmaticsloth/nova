@@ -1,11 +1,22 @@
 // pricing.js
 
-// 預設 NOVA 價格 (USD)
+// Default NOVA price (USD)
 window.CURRENT_NOVA_PRICE_USD = 0.00123;
-// 預設 SOL 價格 (USD)
+// Default SOL price (USD)
 window.SOL_USD_PRICE = 20;
 
+// Cache variables
+let novaPriceLastFetched = 0;
+let solPriceLastFetched = 0;
+const PRICE_CACHE_DURATION = 10000; // 10 seconds
+
 async function fetchNOVA_Price() {
+  const now = Date.now();
+  if (now - novaPriceLastFetched < PRICE_CACHE_DURATION) {
+    console.log("Using cached NOVA price.");
+    return;
+  }
+
   try {
     const contractAddress = "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX";
     const url = `https://api.geckoterminal.com/api/v2/simple/networks/solana/token_price/${contractAddress}`;
@@ -26,6 +37,7 @@ async function fetchNOVA_Price() {
     ) {
       window.CURRENT_NOVA_PRICE_USD = parseFloat(data.data.attributes.token_prices[contractAddress]);
       updatePriceDisplay();
+      novaPriceLastFetched = now;
     } else {
       updatePriceDisplay("NOVA price data missing; using default value.");
     }
@@ -36,6 +48,12 @@ async function fetchNOVA_Price() {
 }
 
 async function fetchSOL_Price() {
+  const now = Date.now();
+  if (now - solPriceLastFetched < PRICE_CACHE_DURATION) {
+    console.log("Using cached SOL price.");
+    return;
+  }
+
   try {
     const url = "https://api.binance.com/api/v3/ticker/price?symbol=SOLUSDT";
     const response = await fetch(url);
@@ -47,6 +65,7 @@ async function fetchSOL_Price() {
     if (data && data.price) {
       window.SOL_USD_PRICE = parseFloat(data.price);
       updatePriceDisplay();
+      solPriceLastFetched = now;
     } else {
       updatePriceDisplay("SOL price data missing; using default value.");
     }
@@ -67,8 +86,8 @@ function updatePriceDisplay(message) {
   }
 }
 
-// 每 2 秒更新一次
+// Initial fetch and set interval to 10 seconds
 fetchNOVA_Price();
 fetchSOL_Price();
-setInterval(fetchNOVA_Price, 2000);
-setInterval(fetchSOL_Price, 2000);
+setInterval(fetchNOVA_Price, PRICE_CACHE_DURATION);
+setInterval(fetchSOL_Price, PRICE_CACHE_DURATION);

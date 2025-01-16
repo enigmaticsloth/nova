@@ -1,10 +1,5 @@
 // trade.js
 
-// Import necessary libraries
-// Ensure you include the SPL Token library in your HTML file
-// Example:
-// <script src="https://unpkg.com/@solana/spl-token@0.2.0/dist/spl-token.min.js"></script>
-
 // Get DOM elements
 const connectWalletBtn = document.getElementById('connectWalletBtn');
 const walletStatus = document.getElementById('walletStatus');
@@ -19,6 +14,17 @@ let activeField = null;  // "sol" or "nova"
 
 // Exchange contract address
 const exchangeContractAddress = "HEAz4vAABHTYdY23JuYD3VTHKSBRXSdyt7Dq8YVGDUWm"; // Replace with your exchange contract address
+
+// Debounce function to limit the rate of function calls
+function debounce(func, delay) {
+  let debounceTimer;
+  return function() {
+    const context = this;
+    const args = arguments;
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => func.apply(context, args), delay);
+  };
+}
 
 // Function to update NOVA estimate based on SOL input
 function updateNovaFromSOL() {
@@ -52,19 +58,12 @@ function updateSOLFromNOVA() {
   activeField = "nova";
 }
 
-let isUpdating = false;
-solInput.addEventListener('input', () => {
-  if (isUpdating) return;
-  isUpdating = true;
-  updateNovaFromSOL();
-  isUpdating = false;
-});
-novaInput.addEventListener('input', () => {
-  if (isUpdating) return;
-  isUpdating = true;
-  updateSOLFromNOVA();
-  isUpdating = false;
-});
+// Debounced versions of the update functions
+const debouncedUpdateNovaFromSOL = debounce(updateNovaFromSOL, 300); // 300ms delay
+const debouncedUpdateSOLFromNOVA = debounce(updateSOLFromNOVA, 300); // 300ms delay
+
+solInput.addEventListener('input', debouncedUpdateNovaFromSOL);
+novaInput.addEventListener('input', debouncedUpdateSOLFromNOVA);
 
 // Function to connect Phantom wallet
 async function connectWallet() {
@@ -95,6 +94,28 @@ async function getRecentBlockhashWithRetry(connection, retries = 3) {
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
+}
+
+// Throttle function to limit the rate of function calls
+function throttle(func, limit) {
+  let lastFunc;
+  let lastRan;
+  return function() {
+    const context = this;
+    const args = arguments;
+    if (!lastRan) {
+      func.apply(context, args);
+      lastRan = Date.now();
+    } else {
+      clearTimeout(lastFunc);
+      lastFunc = setTimeout(function() {
+        if ((Date.now() - lastRan) >= limit) {
+          func.apply(context, args);
+          lastRan = Date.now();
+        }
+      }, limit - (Date.now() - lastRan));
+    }
+  };
 }
 
 // Swap function
@@ -188,6 +209,9 @@ async function swapNOVA() {
   }
 }
 
+// Throttled version of the swap function to prevent excessive calls
+const throttledSwapNOVA = throttle(swapNOVA, 2000); // 2 seconds throttle
+
 // Event listeners
 connectWalletBtn.addEventListener('click', connectWallet);
-swapBtn.addEventListener('click', swapNOVA);
+swapBtn.addEventListener('click', throttledSwapNOVA);
