@@ -1,48 +1,51 @@
 // pricing.js
 
-// 全域價格變數，初始預設值（USD 單位）
+// 將價格存入全域變數，單位為 USD
 window.CURRENT_NOVA_PRICE_USD = 0.00123;
 
-// 預設 SOL 的 USD 價格（你可以另外更新）
-window.SOL_USD_PRICE = 20;
-
-// fetchPrice() 函式：從 Geckoterminal API 查詢價格
-async function fetchPrice() {
+// 從 GeckoTerminal API v2 取得價格
+async function fetchCurrentPrice() {
   try {
-    // 請根據 Geckoterminal API 文件確認 URL 格式與合約地址
     const contractAddress = "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX";
-    const url = `https://api.geckoterminal.com/simple/networks/solana/token_price/${contractAddress}`;
-    
-    const response = await fetch(url);
+    const url = `https://api.geckoterminal.com/api/v2/simple/networks/solana/token_price/${contractAddress}`;
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json;version=20230302"
+      }
+    });
     if (!response.ok) {
       throw new Error(`HTTP error ${response.status}`);
     }
     const data = await response.json();
-    console.log("Geckoterminal API response:", data);
-
-    // 假設 API 回傳格式：
+    console.log("GeckoTerminal API response:", data);
+    // 假設回傳格式：
     // {
     //   "data": {
-    //     "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX": { "usd": 0.00123 }
+    //     "id": "xxx",
+    //     "type": "simple_token_price",
+    //     "attributes": {
+    //       "token_prices": {
+    //         "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX": "237.433210276503"
+    //       }
+    //     }
     //   }
     // }
     if (
       data &&
       data.data &&
-      data.data[contractAddress] &&
-      data.data[contractAddress].usd
+      data.data.attributes &&
+      data.data.attributes.token_prices &&
+      data.data.attributes.token_prices[contractAddress]
     ) {
-      window.CURRENT_NOVA_PRICE_USD = data.data[contractAddress].usd;
-      // 更新頁面上價格顯示
+      window.CURRENT_NOVA_PRICE_USD = parseFloat(data.data.attributes.token_prices[contractAddress]);
       const priceStatus = document.getElementById('priceStatus');
       if (priceStatus) {
         priceStatus.innerText = `Current NOVA Price: $${window.CURRENT_NOVA_PRICE_USD.toFixed(6)} USD`;
       }
     } else {
-      console.warn("Price data missing in API response; using default value.");
       const priceStatus = document.getElementById('priceStatus');
       if (priceStatus) {
-        priceStatus.innerText = "Price data missing; using default value.";
+        priceStatus.innerText = "Price data missing in API response; using default value.";
       }
     }
   } catch (err) {
@@ -54,6 +57,6 @@ async function fetchPrice() {
   }
 }
 
-// 一開始呼叫一次，然後每分鐘更新一次
-fetchPrice();
-setInterval(fetchPrice, 60 * 1000);
+// 初始呼叫與每 2 秒更新一次
+fetchCurrentPrice();
+setInterval(fetchCurrentPrice, 2 * 1000);

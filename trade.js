@@ -1,49 +1,138 @@
-// pricing.js
+// trade.js
 
-// 初始預設價格（USD），若查詢失敗則沿用此值
-window.CURRENT_NOVA_PRICE_USD = 0.00123;
+// 固定 SOL 價格（USD）
+const SOL_USD_PRICE = 20;  // 請根據實際情況調整
 
-// 使用 GeckoTerminal API v2 取得價格
-async function fetchCurrentPrice() {
-  try {
-    // 基本 URL 與版本設定 (根據 API 文件)
-    const contractAddress = "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX"; // 你的 mint pda
-    const url = `https://api.geckoterminal.com/api/v2/simple/networks/solana/token_price/${contractAddress}`;
+// --- 取得 DOM 元素 ---
+const connectWalletBtn = document.getElementById('connectWalletBtn');
+const walletStatus = document.getElementById('walletStatus');
+const solInput = document.getElementById('solInput');
+const novaInput = document.getElementById('novaInput');
+const swapBtn = document.getElementById('swapBtn');
+const tradeStatus = document.getElementById('tradeStatus');
 
-    // 設定 header，指定 API 版本
-    const response = await fetch(url, {
-      headers: {
-        Accept: "application/json;version=20230302"
-      }
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP error ${response.status}`);
+let walletPublicKey = null;
+let activeField = null; // "sol" 或 "nova"
+
+// --- 當 SOL 輸入時更新 NOVA 預估值 ---
+// 計算公式： NOVA = SOL * (SOL_USD_PRICE / CURRENT_NOVA_PRICE_USD)
+function updateNovaFromSOL() {
+  if (!solInput.value) {
+    novaInput.value = "";
+    return;
+  }
+  const solValue = parseFloat(solInput.value);
+  if (isNaN(solValue)) {
+    novaInput.value = "";
+    return;
+  }
+  const novaVal = solValue * (SOL_USD_PRICE / window.CURRENT_NOVA_PRICE_USD);
+  novaInput.value = novaVal.toFixed(0);
+  activeField = "sol";
+}
+
+// --- 當 NOVA 輸入時更新 SOL 預估值 ---
+// 計算公式： SOL = NOVA * (CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE)
+function updateSOLFromNOVA() {
+  if (!novaInput.value) {
+    solInput.value = "";
+    return;
+  }
+  const novaValue = parseFloat(novaInput.value);
+  if (isNaN(novaValue)) {
+    solInput.value = "";
+    return;
+  }
+  const solVal = novaValue * (window.CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE);
+  solInput.value = solVal.toFixed(4);
+  activeField = "nova";
+}
+
+let isUpdating = false;
+solInput.addEventListener('input', () => {
+  if (isUpdating) return;
+  isUpdating = true;
+  updateNovaFromSOL();
+  isUpdating = false;
+});
+novaInput.addEventListener('input', () => {
+  if (isUpdating) return;
+  isUpdating = true;
+  updateSOLFromNOVA();
+  isUpdating = false;
+});
+
+// --- 連接 Phantom 錢包 ---
+async function connectWallet() {
+  if (window.solana && window.solana.isPhantom) {
+    try {
+      const resp = await window.solana.connect();
+      walletPublicKey = resp.publicKey.toString();
+      walletStatus.innerText = `Wallet connected: ${walletPublicKey}`;
+    } catch (err) {
+      walletStatus.innerText = `Connect failed: ${err.message}`;
     }
-    const data = await response.json();
-    console.log("GeckoTerminal API response:", data);
-    // 假設回傳格式：
-    // { "data": { "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX": { "usd": 0.00123 } } }
-    if (data && data.data && data.data[contractAddress] && data.data[contractAddress].usd) {
-      window.CURRENT_NOVA_PRICE_USD = data.data[contractAddress].usd;
-      const priceStatus = document.getElementById('priceStatus');
-      if (priceStatus) {
-        priceStatus.innerText = `Current NOVA Price: $${window.CURRENT_NOVA_PRICE_USD.toFixed(6)} USD`;
-      }
-    } else {
-      const priceStatus = document.getElementById('priceStatus');
-      if (priceStatus) {
-        priceStatus.innerText = "Price data missing in API response; using default value.";
-      }
-    }
-  } catch (err) {
-    console.error("Price fetch error:", err);
-    const priceStatus = document.getElementById('priceStatus');
-    if (priceStatus) {
-      priceStatus.innerText = `Failed to fetch price, using default value. Error: ${err.message}`;
-    }
+  } else {
+    walletStatus.innerText = "Phantom wallet not found. Please install the Phantom extension.";
   }
 }
 
-// 初次呼叫與定時更新（每 1 分鐘更新一次）
-fetchCurrentPrice();
-setInterval(fetchCurrentPrice, 60 * 1000);
+// --- Swap 函式 ---
+// 根據 activeField 決定執行買入或賣出模擬交易
+async function swapNOVA() {
+  if (!walletPublicKey) {
+    tradeStatus.innerText = "Please connect your wallet first.";
+    return;
+  }
+  try {
+    const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "processed");
+    const fromPubkey = new solanaWeb3.PublicKey(walletPublicKey);
+    let transaction;
+    if (activeField === "sol") { // 以 SOL 輸入執行買入
+      const solValue = parseFloat(solInput.value);
+      if (isNaN(solValue) || solValue <= 0) {
+        tradeStatus.innerText = "Please enter a valid SOL amount.";
+        return;
+      }
+      // 根據公式買入的 NOVA 預估值
+      const novaEstimated = solValue * (SOL_USD_PRICE / window.CURRENT_NOVA_PRICE_USD);
+      const lamports = Math.round(solValue * 1e9);
+      transaction = new solanaWeb3.Transaction().add(
+        solanaWeb3.SystemProgram.transfer({
+          fromPubkey,
+          toPubkey: fromPubkey, // 模擬交易：將資金轉回自己
+          lamports: lamports,
+        })
+      );
+      tradeStatus.innerText = `Executing Buy: ${solValue} SOL will convert to ${novaEstimated.toFixed(0)} NOVA (simulated)...\n`;
+    } else if (activeField === "nova") { // 以 NOVA 輸入執行賣出
+      const novaValue = parseFloat(novaInput.value);
+      if (isNaN(novaValue) || novaValue <= 0) {
+        tradeStatus.innerText = "Please enter a valid NOVA amount.";
+        return;
+      }
+      // 根據公式：SOL = NOVA * (CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE)
+      const solEquivalent = novaValue * (window.CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE);
+      const lamports = Math.round(solEquivalent * 1e9);
+      transaction = new solanaWeb3.Transaction().add(
+        solanaWeb3.SystemProgram.transfer({
+          fromPubkey,
+          toPubkey: fromPubkey,
+          lamports: lamports,
+        })
+      );
+      tradeStatus.innerText = `Executing Sell: ${novaValue} NOVA (≈${solEquivalent.toFixed(4)} SOL) (simulated)...\n`;
+    } else {
+      tradeStatus.innerText = "Please enter a value in either SOL or NOVA input.";
+      return;
+    }
+    const { signature } = await window.solana.signAndSendTransaction({ transaction, connection });
+    tradeStatus.innerText += `Transaction sent! Signature: ${signature}`;
+  } catch (err) {
+    tradeStatus.innerText = `Swap transaction error: ${err.message}`;
+  }
+}
+
+// --- 綁定按鈕事件 ---
+connectWalletBtn.addEventListener('click', connectWallet);
+swapBtn.addEventListener('click', swapNOVA);
