@@ -1,7 +1,9 @@
-import { Connection } from "@solana/web3.js";
+// api/rpc-proxy.js
+
+import fetch from 'node-fetch';
 
 export default async function handler(req, res) {
-  // 設置 CORS 標頭，允許指定來源和標頭
+  // 設置 CORS 標頭，僅允許指定來源
   res.setHeader("Access-Control-Allow-Origin", "https://enigmaticsloth.github.io");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, solana-client");
@@ -18,38 +20,31 @@ export default async function handler(req, res) {
     return;
   }
 
+  // QuickNode RPC URL
+  const quicknodeRpcUrl = 'https://intensive-omniscient-asphalt.solana-mainnet.quiknode.pro/61466a6e88d0e1f1f55ea00bf5ec117e22d16849';
+
   try {
-    // 使用 QuickNode 提供的 RPC URL
-    const connection = new Connection(
-      "https://intensive-omniscient-asphalt.solana-mainnet.quiknode.pro/61466a6e88d0e1f1f55ea00bf5ec117e22d16849/",
-      "confirmed"
-    );
+    // 轉發請求到 QuickNode RPC
+    const response = await fetch(quicknodeRpcUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(req.body),
+    });
 
-    // 獲取請求中的方法和參數
-    const { method, params } = req.body;
+    // 獲取回應
+    const data = await response.json();
 
-    let result;
-
-    // 根據方法執行相應操作
-    switch (method) {
-      case "getSlot":
-        result = await connection.getSlot();
-        break;
-      case "getLatestBlockhash":
-        result = await connection.getLatestBlockhash();
-        break;
-      default:
-        throw new Error(`Unsupported method: ${method}`);
+    // 檢查回應是否為有效的 JSON-RPC 回應
+    if (data.jsonrpc !== "2.0") {
+      throw new Error("Invalid JSON-RPC response");
     }
 
-    // 返回結果
-    res.status(200).json({
-      jsonrpc: "2.0",
-      id: req.body.id,
-      result,
-    });
+    // 返回回應給前端
+    res.status(response.status).json(data);
   } catch (error) {
-    console.error("Error in RPC Proxy:", error.message);
+    console.error("Proxy Error:", error.message);
     res.status(500).json({ error: "Internal Server Error", details: error.message });
   }
 }
