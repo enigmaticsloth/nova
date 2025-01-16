@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Trade NOVA</title>
   <link rel="stylesheet" href="styles.css">
@@ -84,11 +84,17 @@
       border-radius: 5px;
     }
   </style>
-  <!-- 引入 Buffer polyfill -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/buffer/6.0.3/buffer.min.js"></script>
+  <!-- 1. 先引入 Buffer polyfill -->
+  <script src="https://unpkg.com/buffer@6.0.3/index.js"></script>
   <script>
-    window.Buffer = window.Buffer || buffer.Buffer;
+    // 確保全域 window.Buffer 存在
+    if (!window.Buffer) {
+      window.Buffer = buffer.Buffer;
+    }
   </script>
+  <!-- 2. 再引入其他需要的庫 -->
+  <!-- 例如：Solana Web3.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.84.1/lib/index.iife.min.js"></script>
 </head>
 <body>
   <div class="main-container">
@@ -124,10 +130,103 @@
       <div id="tradeStatus"></div>
     </div>
   </div>
+
+  <!-- 引入自訂的交易邏輯 -->
+  <script>
+    // 取得頁面上各元素
+    const connectWalletBtn = document.getElementById('connectWalletBtn');
+    const walletStatus = document.getElementById('walletStatus');
+    const buyBtn = document.getElementById('buyBtn');
+    const sellBtn = document.getElementById('sellBtn');
+    const tradeStatus = document.getElementById('tradeStatus');
+    const buyAmountInput = document.getElementById('buyAmount');
+    const sellAmountInput = document.getElementById('sellAmount');
+
+    let walletPublicKey = null;
+
+    // 連接 Phantom 錢包（必須用 HTTP/HTTPS 執行）
+    async function connectWallet() {
+      if (window.solana && window.solana.isPhantom) {
+        try {
+          const resp = await window.solana.connect();
+          walletPublicKey = resp.publicKey.toString();
+          walletStatus.innerText = `Wallet connected: ${walletPublicKey}`;
+        } catch (err) {
+          walletStatus.innerText = `Connect failed: ${err.message}`;
+        }
+      } else {
+        walletStatus.innerText = "Phantom wallet not found. Please install the Phantom extension.";
+      }
+    }
+
+    // Buy 函式
+    async function buyNOVA() {
+      if (!walletPublicKey) {
+        tradeStatus.innerText = "Please connect your wallet first.";
+        return;
+      }
+      let solValue = parseFloat(buyAmountInput.value);
+      if (isNaN(solValue) || solValue <= 0) {
+        tradeStatus.innerText = "Please enter a valid SOL amount.";
+        return;
+      }
+      // 轉換 SOL 至 lamports (1 SOL = 1e9 lamports)
+      const lamports = Math.round(solValue * 1e9);
+      try {
+        const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "processed");
+        const fromPubkey = new solanaWeb3.PublicKey(walletPublicKey);
   
-  <!-- 引入 Solana Web3.js (CDN) -->
-  <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.84.1/lib/index.iife.min.js"></script>
-  <!-- 引入 trade.js -->
-  <script src="trade.js"></script>
+        // 這裡僅示範一筆簡單交易，實際上你應改成呼叫合約的 buy 函式
+        const transaction = new solanaWeb3.Transaction().add(
+          solanaWeb3.SystemProgram.transfer({
+            fromPubkey,
+            toPubkey: fromPubkey, // 示範轉帳給自己
+            lamports: lamports,
+          })
+        );
+  
+        const { signature } = await window.solana.signAndSendTransaction({ transaction, connection });
+        tradeStatus.innerText = `Buy transaction sent! Signature: ${signature}`;
+      } catch (err) {
+        tradeStatus.innerText = `Buy transaction error: ${err.message}`;
+      }
+    }
+  
+    // Sell 函式
+    async function sellNOVA() {
+      if (!walletPublicKey) {
+        tradeStatus.innerText = "Please connect your wallet first.";
+        return;
+      }
+      let novaValue = parseFloat(sellAmountInput.value);
+      if (isNaN(novaValue) || novaValue <= 0) {
+        tradeStatus.innerText = "Please enter a valid NOVA amount.";
+        return;
+      }
+      // 此範例僅示範一筆簡單交易，實際上需依照你的合約邏輯處理 NOVA token 轉帳
+      try {
+        const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "processed");
+        const fromPubkey = new solanaWeb3.PublicKey(walletPublicKey);
+  
+        const transaction = new solanaWeb3.Transaction().add(
+          solanaWeb3.SystemProgram.transfer({
+            fromPubkey,
+            toPubkey: fromPubkey,
+            lamports: 10000,  // 此處示範轉 10000 lamports (0.00001 SOL)
+          })
+        );
+  
+        const { signature } = await window.solana.signAndSendTransaction({ transaction, connection });
+        tradeStatus.innerText = `Sell transaction sent! Signature: ${signature}`;
+      } catch (err) {
+        tradeStatus.innerText = `Sell transaction error: ${err.message}`;
+      }
+    }
+  
+    // 綁定按鈕事件
+    connectWalletBtn.addEventListener('click', connectWallet);
+    buyBtn.addEventListener('click', buyNOVA);
+    sellBtn.addEventListener('click', sellNOVA);
+  </script>
 </body>
 </html>
