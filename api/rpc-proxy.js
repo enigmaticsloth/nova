@@ -2,11 +2,11 @@ import { Connection } from "@solana/web3.js";
 
 export default async function handler(req, res) {
   // 設置 CORS 標頭
-  res.setHeader("Access-Control-Allow-Origin", "https://enigmaticsloth.github.io"); // 允許的來源域名
+  res.setHeader("Access-Control-Allow-Origin", "https://enigmaticsloth.github.io");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // 處理 OPTIONS 預檢請求
+  // 處理 OPTIONS 請求
   if (req.method === "OPTIONS") {
     res.status(204).end();
     return;
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
   try {
     // 使用 QuickNode 提供的 RPC URL
     const connection = new Connection(
-      "https://intensive-omniscient-asphalt.solana-mainnet.quiknode.pro/61466a6e88d0e1f1f55ea00bf5ec117e22d16849/",
+      "https://intensive-omniscient-asphalt.solana-mainnet.quiknode.pro/61466a6e88d0e1f1f55ea00bf5ec117e22d16849",
       "confirmed"
     );
 
