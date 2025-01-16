@@ -1,5 +1,10 @@
 // trade.js
 
+// Import necessary libraries
+// Ensure you include the SPL Token library in your HTML file
+// Example:
+// <script src="https://unpkg.com/@solana/spl-token@0.2.0/dist/spl-token.min.js"></script>
+
 // Get DOM elements
 const connectWalletBtn = document.getElementById('connectWalletBtn');
 const walletStatus = document.getElementById('walletStatus');
@@ -127,8 +132,8 @@ async function swapNOVA() {
 
   try {
     console.log("Starting swap transaction...");
-    // Use Alchemy's RPC endpoint URL
-    const connection = new solanaWeb3.Connection("https://solana-mainnet.g.alchemy.com/v2/LJuWMYUf3DJw0eWVvVgqK3pMGqHU74ga", "confirmed");
+    // Use Cloud Function's RPC endpoint URL
+    const connection = new solanaWeb3.Connection("https://asia-east1-fleet-gamma-448013-t1.cloudfunctions.net/rpc-proxy", "confirmed");
     const fromPubkey = new solanaWeb3.PublicKey(walletPublicKey);
     let transaction;
 
