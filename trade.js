@@ -134,8 +134,19 @@ async function swapNOVA() {
       tradeStatus.innerText = "Please enter a value in either SOL or NOVA input.";
       return;
     }
-    const { signature } = await window.solana.signAndSendTransaction({ transaction, connection });
-    tradeStatus.innerText += `Transaction sent! Signature: ${signature}`;
+    
+    // 設定必要的欄位
+    transaction.feePayer = fromPubkey;
+    const latestBlockhash = await connection.getLatestBlockhash();
+    transaction.recentBlockhash = latestBlockhash.blockhash;
+    
+    // 使用 Phantom 錢包簽署交易（先簽署，再序列化後傳送）
+    const signed = await window.solana.signTransaction(transaction);
+    const rawTransaction = signed.serialize();
+    
+    const signature = await connection.sendRawTransaction(rawTransaction);
+    
+    tradeStatus.innerText += `\nTransaction sent! Signature: ${signature}`;
     console.log("Transaction sent! Signature:", signature);
   } catch (err) {
     console.error("Swap transaction error:", err);
