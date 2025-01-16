@@ -134,7 +134,7 @@ async function swapNOVA() {
     console.log("Starting swap transaction...");
     // Use vercel
     const connection = new solanaWeb3.Connection(
-      "https://nova-enigmaticsloths-projects.vercel.app/api/rpc-proxyy",
+      "https://nova-enigmaticsloths-projects.vercel.app/api/rpc-proxy",
       "confirmed"
     );
     const fromPubkey = new solanaWeb3.PublicKey(walletPublicKey);
