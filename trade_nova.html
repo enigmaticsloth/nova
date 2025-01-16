@@ -1,189 +1,452 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Trade NOVA</title>
-  <link rel="stylesheet" href="styles.css">
-  <style>
-    /* 基本樣式調整 */
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #121212;
-      color: #eee;
-      margin: 0;
-      padding: 0;
-    }
-    .main-container {
-      display: flex;
-    }
-    .sidebar {
-      width: 200px;
-      padding: 1em;
-      background-color: #1e1e1e;
-    }
-    .sidebar ul {
-      list-style: none;
-      padding: 0;
-    }
-    .sidebar li {
-      margin-bottom: 0.5em;
-    }
-    .sidebar a {
-      text-decoration: none;
-      color: #ccc;
-      font-weight: bold;
-    }
-    .sidebar a:hover {
-      color: white;
-    }
-    .content {
-      flex: 1;
-      padding: 2em;
-    }
-    .header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 1em;
-    }
-    .header img {
-      width: 50px;
-      height: 50px;
-      margin-right: 15px;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 2em;
-      color: white;
-    }
-    button {
-      padding: 0.6em 1.2em;
-      font-size: 1em;
-      margin: 0.5em;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      background-color: #4CAF50;
-      color: white;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    #status, #tradeStatus {
-      margin-top: 1em;
-      padding: 0.5em;
-      background-color: #333;
-      border-radius: 5px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade NOVA</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Paragraph spacing */
+        p {
+            line-height: 1.8;       /* Increased line height */
+            margin-bottom: 1.5em;   /* Increased margin between paragraphs */
+        }
+        /* Section headings */
+        h2, h3, h4 {
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+        /* Layout styling */
+        .main-container {
+            display: flex;
+        }
+        .sidebar {
+            width: 200px;
+            padding: 1em;
+            background-color: transparent; /* Set sidebar background to transparent */
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar li {
+            margin-bottom: 0.5em;
+        }
+        .sidebar a {
+            text-decoration: none;
+            color: white; /* Set navigation text color to white */
+            font-weight: bold; /* Optional: Make the text bold for better visibility */
+        }
+        .sidebar a:hover {
+            text-decoration: underline; /* Optional: Underline on hover for better UX */
+        }
+        .content {
+            flex: 1;
+            padding: 1em;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1em;
+        }
+        .header img {
+            width: 50px; /* Adjust the size as needed */
+            height: 50px; /* Adjust the size as needed */
+            margin-right: 15px; /* Space between the image and the title */
+        }
+        .header h1 {
+            margin: 0; /* Remove default margin */
+            color: #333; /* Set default color for the title */
+        }
+        .nova-title {
+            color: white; /* Set NOVA part to white */
+        }
+        /* Highlight contract address with semi-transparent dark gray background */
+        .contract-address {
+            background-color: rgba(64, 64, 64, 0.6); /* Semi-transparent dark gray */
+            padding: 0.5em;
+            border-radius: 5px;
+            word-break: break-all;
+            color: white; /* Ensure text is readable */
+        }
+        /* Code block styling */
+        pre.code-example {
+            background-color: rgba(64, 64, 64, 0.8); /* Dark gray with 80% opacity */
+            color: white; /* White text */
+            font-size: 0.9em; /* Slightly smaller font */
+            padding: 1em;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 1.5em; /* Space below code blocks */
+        }
+        code {
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+            background-color: transparent; /* Remove default background */
+            padding: 0;
+            border-radius: 0;
+        }
+    </style>
 </head>
 <body>
-  <div class="main-container">
-    <!-- Sidebar Navigation -->
-    <div class="sidebar">
-      <ul>
-        <li><a href="index.html">Enigmatic Sloth</a></li>
-        <li><a href="nova.html">Nova</a></li>
-        <li><a href="trade_nova.html">Trade NOVA</a></li>
-      </ul>
+    <div class="main-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <ul>
+                <li><a href="index.html">Enigmatic Sloth</a></li>
+                <li><a href="nova.html">Nova</a></li>
+                <li><a href="trade_nova.html">Trade NOVA</a></li> <!-- Current Page Link -->
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <div class="header">
+                <img src="Image/Nova.PNG" alt="Nova Logo"> <!-- Restored NOVA Logo Image -->
+                <h1><span class="nova-title">Trade</span> <span class="nova-title">NOVA</span></h1> <!-- Both "Trade" and "NOVA" in white -->
+            </div>
+
+            <!-- Section 1: How to Use Our Purchasing Method -->
+            <h2>1. How to Use Our Purchasing Method</h2>
+            <p>
+                To maximize your rewards and support the NOVA ecosystem, follow these steps to purchase NOVA using our official contract:
+            </p>
+            <ol>
+                <li>
+                    <strong>Ensure You Have a Solana Wallet:</strong>
+                    <ul>
+                        <li>Use a compatible Solana wallet such as Phantom or Solflare.</li>
+                        <li>Ensure your wallet contains enough SOL to cover the purchase amount and transaction fees (recommend keeping at least 0.01 SOL as a buffer).</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Interact with the NOVA Smart Contract:</strong>
+                    <ul>
+                        <li>Use a compatible Solana wallet interface or command-line tool to interact directly with the smart contract.</li>
+                        <li>Execute the <code>buy</code> method by sending SOL to the contract address: <span class="contract-address">7UJH6UbAcMANjoqBvmncVq7UK6jX6qQawDKqWDa4Vj3q</span>.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Confirm the Transaction:</strong>
+                    <ul>
+                        <li>After initiating the purchase, wait for the transaction to be confirmed on the Solana blockchain.</li>
+                        <li>Once confirmed, your NOVA tokens along with any applicable rewards will be credited to your wallet.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Verify Your Rewards:</strong>
+                    <ul>
+                        <li>Check your wallet to ensure the correct amount of NOVA tokens and rewards have been received.</li>
+                        <li>You can also view transaction details on Solscan by entering your wallet address.</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <!-- Section 2: Contract Functionality Overview -->
+            <h2>2. Contract Functionality Overview</h2>
+            <p>
+                The NOVA smart contract offers the following primary functions to facilitate transparent and trackable transactions:
+            </p>
+            <ul>
+                <li><strong>Buy (`buy`):</strong> Purchase NOVA using SOL and receive additional NOVA rewards based on our dynamic reward mechanism.</li>
+                <li><strong>Sell (`sell`):</strong> Sell NOVA back to the contract in exchange for SOL.</li>
+                <li><strong>Transfer NOVA (`transfer_nova`):</strong> Transfer NOVA between users securely without incurring transaction fees.</li>
+            </ul>
+
+            <!-- Section 3: How to Buy NOVA -->
+            <h2>3. How to Buy NOVA</h2>
+
+            <h3>Purchase Method: `buy`</h3>
+            <h4>Functionality:</h4>
+            <ul>
+                <li>Use this method to buy NOVA with SOL.</li>
+                <li>The method automatically calculates and distributes additional NOVA rewards based on the current transaction phase.</li>
+                <li>A 5% fee is applied to each purchase, which supports the developer reward pool and liquidity pool maintenance.</li>
+            </ul>
+
+            <h4>Parameters:</h4>
+            <ul>
+                <li><strong>`sol_amount`:</strong> The amount of SOL you wish to spend (minimum of 0.0001 SOL).</li>
+                <li><strong>`current_nova_price`:</strong> The current price per NOVA token, typically provided by the contract or user interface.</li>
+            </ul>
+
+            <h4>Execution Process:</h4>
+            <ol>
+                <li>
+                    <strong>Transfer SOL to Liquidity Pool PDA:</strong>
+                    <ul>
+                        <li>Send the specified amount of SOL from your wallet to the contract's Liquidity Pool PDA address.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Receive NOVA Tokens:</strong>
+                    <ul>
+                        <li>Based on the current NOVA price and reward percentage, receive the corresponding amount of NOVA tokens in your wallet.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Fee Deduction:</strong>
+                    <ul>
+                        <li>A 5% fee is deducted from your purchase amount and allocated to the Developer Reward Pool to support ongoing development and liquidity.</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <!-- Example Usage for `buy` -->
+            <h4>Example Usage:</h4>
+            <p>
+                Below is an example of how to use the <code>buy</code> function using Solana's Web3.js library in a JavaScript environment:
+            </p>
+            <pre class="code-example"><code>
+// Import necessary libraries
+const { Connection, PublicKey, clusterApiUrl, Keypair, Transaction, SystemProgram } = require('@solana/web3.js');
+
+// Initialize connection
+const connection = new Connection(clusterApiUrl('mainnet-beta'), 'confirmed');
+
+// Define the contract address (replace with actual contract PDA)
+const contractAddress = new PublicKey('7UJH6UbAcMANjoqBvmncVq7UK6jX6qQawDKqWDa4Vj3q');
+
+// Buyer wallet keypair (ensure this is securely managed)
+const buyerKeypair = Keypair.fromSecretKey(Uint8Array.from([/* Your Secret Key Here */]));
+
+// Function to buy NOVA
+async function buyNOVA(solAmount, currentNOVAPrice) {
+    const transaction = new Transaction();
+
+    // Transfer SOL to the contract's Liquidity Pool PDA
+    transaction.add(
+        SystemProgram.transfer({
+            fromPubkey: buyerKeypair.publicKey,
+            toPubkey: contractAddress,
+            lamports: solAmount * 1e9, // Convert SOL to lamports
+        })
+    );
+
+    // Sign and send the transaction
+    const signature = await connection.sendTransaction(transaction, [buyerKeypair]);
+    await connection.confirmTransaction(signature, 'confirmed');
+
+    console.log('Purchase transaction successful with signature:', signature);
+}
+
+// Example purchase of 1 SOL
+buyNOVA(1, 0.05); // Replace 0.05 with the actual current NOVA price
+            </code></pre>
+
+            <!-- Section 4: How to Sell NOVA -->
+            <h2>4. How to Sell NOVA</h2>
+
+            <h3>Sell Method: `sell`</h3>
+            <h4>Functionality:</h4>
+            <ul>
+                <li>Sell your NOVA tokens back to the contract in exchange for SOL.</li>
+                <li>A 5% fee is applied to each sale, supporting liquidity pool maintenance.</li>
+            </ul>
+
+            <h4>Parameters:</h4>
+            <ul>
+                <li><strong>`nova_amount`:</strong> The amount of NOVA you wish to sell.</li>
+                <li><strong>`current_nova_price`:</strong> The current price per NOVA token, typically provided by the contract or user interface.</li>
+            </ul>
+
+            <h4>Execution Process:</h4>
+            <ol>
+                <li>
+                    <strong>Transfer NOVA to Treasury:</strong>
+                    <ul>
+                        <li>Send the specified amount of NOVA from your wallet to the contract's Treasury address.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Receive SOL:</strong>
+                    <ul>
+                        <li>Based on the current NOVA price, receive the corresponding amount of SOL in your wallet after a 5% fee deduction.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Fee Deduction:</strong>
+                    <ul>
+                        <li>A 5% fee is deducted from your sale amount and allocated to the Liquidity Pool PDA to support liquidity.</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <!-- Example Usage for `sell` -->
+            <h4>Example Usage:</h4>
+            <p>
+                Below is an example of how to use the <code>sell</code> function using Solana's Web3.js library in a JavaScript environment:
+            </p>
+            <pre class="code-example"><code>
+// Import necessary libraries
+const { Connection, PublicKey, clusterApiUrl, Keypair, Transaction, SystemProgram } = require('@solana/web3.js');
+const { Token, TOKEN_PROGRAM_ID } = require('@solana/spl-token');
+
+// Initialize connection
+const connection = new Connection(clusterApiUrl('mainnet-beta'), 'confirmed');
+
+// Define the contract address (replace with actual contract PDA)
+const contractAddress = new PublicKey('7UJH6UbAcMANjoqBvmncVq7UK6jX6qQawDKqWDa4Vj3q');
+
+// Seller wallet keypair (ensure this is securely managed)
+const sellerKeypair = Keypair.fromSecretKey(Uint8Array.from([/* Your Secret Key Here */]));
+
+// Function to sell NOVA
+async function sellNOVA(novaAmount, currentNOVAPrice) {
+    const transaction = new Transaction();
+
+    // Transfer NOVA tokens to the contract's Treasury address
+    // Assuming NOVA is an SPL token, you would use the Token Program to transfer
+    // This requires knowing the token mint address and the associated token accounts
+    // Here's a simplified example:
+
+    // Replace with actual token mint and associated token accounts
+    const tokenMintAddress = new PublicKey('YourNOVA_TokenMintAddress');
+    const senderTokenAccount = new PublicKey('Your_Sender_NOVA_TokenAccount');
+    const receiverTokenAccount = contractAddress; // Treasury address as receiver
+
+    transaction.add(
+        Token.createTransferInstruction(
+            TOKEN_PROGRAM_ID,
+            senderTokenAccount,
+            receiverTokenAccount,
+            sellerKeypair.publicKey,
+            [],
+            novaAmount
+        )
+    );
+
+    // Sign and send the transaction
+    const signature = await connection.sendTransaction(transaction, [sellerKeypair]);
+    await connection.confirmTransaction(signature, 'confirmed');
+
+    console.log('Sale transaction successful with signature:', signature);
+}
+
+// Example sale of 100 NOVA tokens
+sellNOVA(100, 0.05); // Replace 0.05 with the actual current NOVA price
+            </code></pre>
+
+            <!-- Section 5: How to Transfer NOVA -->
+            <h2>5. How to Transfer NOVA</h2>
+
+            <h3>Transfer Method: `transfer_nova`</h3>
+            <h4>Functionality:</h4>
+            <ul>
+                <li>Transfer NOVA tokens between users securely without any transaction fees.</li>
+            </ul>
+
+            <h4>Parameters:</h4>
+            <ul>
+                <li><strong>`from`:</strong> The sender's wallet address (must sign the transaction).</li>
+                <li><strong>`from_nova_account`:</strong> The sender's NOVA Token Account.</li>
+                <li><strong>`to_nova_account`:</strong> The recipient's NOVA Token Account.</li>
+                <li><strong>`amount`:</strong> The amount of NOVA tokens to transfer.</li>
+            </ul>
+
+            <h4>Execution Process:</h4>
+            <ol>
+                <li>
+                    <strong>Verify Balance:</strong>
+                    <ul>
+                        <li>Ensure the sender has sufficient NOVA balance to cover the transfer amount.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Execute Transfer:</strong>
+                    <ul>
+                        <li>Initiate the transfer of the specified NOVA amount from the sender's account to the recipient's account.</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <!-- Example Usage for `transfer_nova` -->
+            <h4>Example Usage:</h4>
+            <p>
+                Below is an example of how to use the <code>transfer_nova</code> function using Solana's Web3.js library in a JavaScript environment:
+            </p>
+            <pre class="code-example"><code>
+// Import necessary libraries
+const { Connection, PublicKey, clusterApiUrl, Keypair, Transaction } = require('@solana/web3.js');
+const { Token, TOKEN_PROGRAM_ID } = require('@solana/spl-token');
+
+// Initialize connection
+const connection = new Connection(clusterApiUrl('mainnet-beta'), 'confirmed');
+
+// Define the NOVA token mint address
+const novaMintAddress = new PublicKey('YourNOVA_TokenMintAddress');
+
+// Sender and recipient token accounts
+const senderTokenAccount = new PublicKey('Sender_NOVA_TokenAccount');
+const recipientTokenAccount = new PublicKey('Recipient_NOVA_TokenAccount');
+
+// Sender wallet keypair (ensure this is securely managed)
+const senderKeypair = Keypair.fromSecretKey(Uint8Array.from([/* Your Secret Key Here */]));
+
+// Function to transfer NOVA tokens
+async function transferNOVA(amount) {
+    const token = new Token(connection, novaMintAddress, TOKEN_PROGRAM_ID, senderKeypair);
+
+    // Create the transaction
+    const transaction = new Transaction();
+
+    // Add transfer instruction
+    transaction.add(
+        Token.createTransferInstruction(
+            TOKEN_PROGRAM_ID,
+            senderTokenAccount,
+            recipientTokenAccount,
+            senderKeypair.publicKey,
+            [],
+            amount
+        )
+    );
+
+    // Sign and send the transaction
+    const signature = await connection.sendTransaction(transaction, [senderKeypair]);
+    await connection.confirmTransaction(signature, 'confirmed');
+
+    console.log('Transfer transaction successful with signature:', signature);
+}
+
+// Example transfer of 50 NOVA tokens
+transferNOVA(50);
+            </code></pre>
+
+            <!-- Section 6: Important Considerations -->
+            <h2>6. Important Considerations</h2>
+            <ul>
+                <li><strong>Reward Mechanism Activation:</strong> Rewards are only triggered when purchasing NOVA through the contract's <code>buy</code> method. Purchasing via other methods, such as decentralized exchanges (DEX), will not activate the reward distribution.</li>
+                <li><strong>Fee Allocation:</strong> A 5% fee is applied to all buy and sell transactions. These fees support the Developer Reward Pool and Liquidity Pool to maintain system stability and ongoing development.</li>
+                <li><strong>Minimum Transaction Limits:</strong>
+                    <ul>
+                        <li><strong>Buy:</strong> Minimum of 0.0001 SOL per transaction.</li>
+                        <li><strong>Sell:</strong> Must have a sufficient NOVA balance to cover the sale amount.</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <!-- Conclusion -->
+            <h2>7. Join the NOVA Ecosystem Today!</h2>
+            <p>
+                By purchasing NOVA through our official method, you not only earn additional rewards but also contribute to the growth and stability of the NOVA ecosystem. Take advantage of our dynamic reward system and become a vital part of our future-transforming journey.
+            </p>
+        </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="content">
-      <div class="header">
-        <img src="Image/Nova.PNG" alt="Nova Logo">
-        <h1>Trade NOVA</h1>
-      </div>
-      <p>
-        Welcome to the official NOVA Trading Platform. Connect your Solana wallet and start trading NOVA now.
-      </p>
-      <!-- 錢包連接 -->
-      <button id="connectWalletBtn">Connect Wallet</button>
-      <div id="walletStatus"></div>
-      <br>
-      <!-- 交易按鈕 -->
-      <button id="buyBtn">Buy NOVA</button>
-      <button id="sellBtn">Sell NOVA</button>
-      <div id="tradeStatus"></div>
-    </div>
-  </div>
-
-  <!-- 引入 Solana Web3.js (CDN) -->
-  <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.84.1/lib/index.iife.min.js"></script>
-  <script>
-    // 取得元件
-    const connectWalletBtn = document.getElementById('connectWalletBtn');
-    const walletStatus = document.getElementById('walletStatus');
-    const buyBtn = document.getElementById('buyBtn');
-    const sellBtn = document.getElementById('sellBtn');
-    const tradeStatus = document.getElementById('tradeStatus');
-
-    let walletPublicKey = null;
-
-    // 連接 Phantom 錢包（注意：必須透過 HTTP/HTTPS 執行）
-    connectWalletBtn.addEventListener('click', async () => {
-      if (window.solana && window.solana.isPhantom) {
-        try {
-          const resp = await window.solana.connect();
-          walletPublicKey = resp.publicKey.toString();
-          walletStatus.innerText = `Wallet connected: ${walletPublicKey}`;
-        } catch (err) {
-          walletStatus.innerText = `Connect failed: ${err.message}`;
+    <!-- JavaScript for Copy Functionality -->
+    <script>
+        function copyContractAddress() {
+            var copyText = document.getElementById("contract-address").innerText;
+            navigator.clipboard.writeText(copyText).then(function() {
+                var message = document.getElementById("copy-message");
+                message.style.display = "inline";
+                setTimeout(function() {
+                    message.style.display = "none";
+                }, 2000); // Hide after 2 seconds
+            }, function(err) {
+                alert("Failed to copy: ", err);
+            });
         }
-      } else {
-        walletStatus.innerText = "Phantom wallet not found. Please install the Phantom extension.";
-      }
-    });
-
-    // 簡單示範 - Buy NOVA (此處僅示範自動發送一筆系統轉帳交易至自己的地址)
-    // 請根據實際需求替換成你的合約交易指令
-    buyBtn.addEventListener('click', async () => {
-      if (!walletPublicKey) {
-        tradeStatus.innerText = "Please connect your wallet first.";
-        return;
-      }
-      try {
-        const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "processed");
-        const fromPubkey = new solanaWeb3.PublicKey(walletPublicKey);
-
-        // 這裡建立一筆示範用的交易 (轉帳 0.00001 SOL 給自己，僅作為示範)
-        const transaction = new solanaWeb3.Transaction().add(
-          solanaWeb3.SystemProgram.transfer({
-            fromPubkey,
-            toPubkey: fromPubkey,
-            lamports: 10000
-          })
-        );
-        const { signature } = await window.solana.signAndSendTransaction({ transaction, connection });
-        tradeStatus.innerText = `Buy transaction sent! Signature: ${signature}`;
-      } catch (err) {
-        tradeStatus.innerText = `Buy transaction error: ${err.message}`;
-      }
-    });
-
-    // 簡單示範 - Sell NOVA (同上，此處僅模擬一筆交易)
-    sellBtn.addEventListener('click', async () => {
-      if (!walletPublicKey) {
-        tradeStatus.innerText = "Please connect your wallet first.";
-        return;
-      }
-      try {
-        const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "processed");
-        const fromPubkey = new solanaWeb3.PublicKey(walletPublicKey);
-
-        const transaction = new solanaWeb3.Transaction().add(
-          solanaWeb3.SystemProgram.transfer({
-            fromPubkey,
-            toPubkey: fromPubkey,
-            lamports: 10000
-          })
-        );
-        const { signature } = await window.solana.signAndSendTransaction({ transaction, connection });
-        tradeStatus.innerText = `Sell transaction sent! Signature: ${signature}`;
-      } catch (err) {
-        tradeStatus.innerText = `Sell transaction error: ${err.message}`;
-      }
-    });
-  </script>
+    </script>
 </body>
 </html>
