@@ -69,6 +69,10 @@
       margin: 0.5em 0;
       width: 200px;
     }
+    /* 設定支援小數點後 5 位 */
+    input[type="number"] {
+      step: 0.00001;
+    }
     button {
       padding: 0.6em 1.2em;
       font-size: 1em;
@@ -118,7 +122,7 @@
       </div>
       <p>
         Welcome to the official NOVA Trading Platform.
-        Connect your wallet and input the desired amount to swap.
+        Connect your wallet and input the desired amounts to swap.
       </p>
       <!-- 錢包連接 -->
       <button id="connectWalletBtn">Connect Wallet</button>
@@ -130,11 +134,11 @@
       <!-- Swap 介面 -->
       <div>
         <label for="solInput">SOL:</label>
-        <input type="number" id="solInput" placeholder="Enter SOL amount" step="0.0001" min="0" />
+        <input type="number" id="solInput" placeholder="Enter SOL amount" />
       </div>
       <div>
         <label for="novaInput">NOVA:</label>
-        <input type="number" id="novaInput" placeholder="Estimated NOVA" step="1" min="0" />
+        <input type="number" id="novaInput" placeholder="Estimated NOVA" />
       </div>
       <button id="swapBtn">Swap</button>
       <div id="tradeStatus"></div>

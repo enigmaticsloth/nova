@@ -1,9 +1,8 @@
 // trade.js
 
-// 固定 SOL 價格（USD）
-const SOL_USD_PRICE = 20;  // 請根據實際情況調整
+// 固定 SOL 價格（USD）；這裡假設 SOL 固定 20 美元
+const SOL_USD_PRICE = 20;
 
-// --- 取得 DOM 元素 ---
 const connectWalletBtn = document.getElementById('connectWalletBtn');
 const walletStatus = document.getElementById('walletStatus');
 const solInput = document.getElementById('solInput');
@@ -27,7 +26,7 @@ function updateNovaFromSOL() {
     return;
   }
   const novaVal = solValue * (SOL_USD_PRICE / window.CURRENT_NOVA_PRICE_USD);
-  novaInput.value = novaVal.toFixed(0);
+  novaInput.value = novaVal.toFixed(5);
   activeField = "sol";
 }
 
@@ -44,7 +43,7 @@ function updateSOLFromNOVA() {
     return;
   }
   const solVal = novaValue * (window.CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE);
-  solInput.value = solVal.toFixed(4);
+  solInput.value = solVal.toFixed(5);
   activeField = "nova";
 }
 
@@ -78,7 +77,7 @@ async function connectWallet() {
 }
 
 // --- Swap 函式 ---
-// 根據 activeField 決定執行買入或賣出模擬交易
+// 根據 activeField 判斷，執行模擬買入或賣出交易
 async function swapNOVA() {
   if (!walletPublicKey) {
     tradeStatus.innerText = "Please connect your wallet first.";
@@ -88,30 +87,30 @@ async function swapNOVA() {
     const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "processed");
     const fromPubkey = new solanaWeb3.PublicKey(walletPublicKey);
     let transaction;
-    if (activeField === "sol") { // 以 SOL 輸入執行買入
+    if (activeField === "sol") {
       const solValue = parseFloat(solInput.value);
       if (isNaN(solValue) || solValue <= 0) {
         tradeStatus.innerText = "Please enter a valid SOL amount.";
         return;
       }
-      // 根據公式買入的 NOVA 預估值
+      // 根據公式計算預估 NOVA：NOVA = SOL * (SOL_USD_PRICE / CURRENT_NOVA_PRICE_USD)
       const novaEstimated = solValue * (SOL_USD_PRICE / window.CURRENT_NOVA_PRICE_USD);
       const lamports = Math.round(solValue * 1e9);
       transaction = new solanaWeb3.Transaction().add(
         solanaWeb3.SystemProgram.transfer({
           fromPubkey,
-          toPubkey: fromPubkey, // 模擬交易：將資金轉回自己
+          toPubkey: fromPubkey, // 模擬買入：轉帳給自己
           lamports: lamports,
         })
       );
-      tradeStatus.innerText = `Executing Buy: ${solValue} SOL will convert to ${novaEstimated.toFixed(0)} NOVA (simulated)...\n`;
-    } else if (activeField === "nova") { // 以 NOVA 輸入執行賣出
+      tradeStatus.innerText = `Executing Buy: ${solValue} SOL will convert to ${novaEstimated.toFixed(5)} NOVA (simulated)...\n`;
+    } else if (activeField === "nova") {
       const novaValue = parseFloat(novaInput.value);
       if (isNaN(novaValue) || novaValue <= 0) {
         tradeStatus.innerText = "Please enter a valid NOVA amount.";
         return;
       }
-      // 根據公式：SOL = NOVA * (CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE)
+      // 根據公式計算換回 SOL：SOL = NOVA * (CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE)
       const solEquivalent = novaValue * (window.CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE);
       const lamports = Math.round(solEquivalent * 1e9);
       transaction = new solanaWeb3.Transaction().add(
@@ -121,7 +120,7 @@ async function swapNOVA() {
           lamports: lamports,
         })
       );
-      tradeStatus.innerText = `Executing Sell: ${novaValue} NOVA (≈${solEquivalent.toFixed(4)} SOL) (simulated)...\n`;
+      tradeStatus.innerText = `Executing Sell: ${novaValue} NOVA (≈${solEquivalent.toFixed(5)} SOL) (simulated)...\n`;
     } else {
       tradeStatus.innerText = "Please enter a value in either SOL or NOVA input.";
       return;
@@ -133,6 +132,5 @@ async function swapNOVA() {
   }
 }
 
-// --- 綁定按鈕事件 ---
 connectWalletBtn.addEventListener('click', connectWallet);
 swapBtn.addEventListener('click', swapNOVA);

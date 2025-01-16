@@ -1,12 +1,12 @@
 // pricing.js
 
 // 將價格存入全域變數，單位為 USD
-window.CURRENT_NOVA_PRICE_USD = 0.00123;
+window.CURRENT_NOVA_PRICE_USD = 0.00123;  // 預設值
 
-// 從 GeckoTerminal API v2 取得價格
 async function fetchCurrentPrice() {
   try {
     const contractAddress = "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX";
+    // GeckoTerminal API v2 endpoint（請參考文件）
     const url = `https://api.geckoterminal.com/api/v2/simple/networks/solana/token_price/${contractAddress}`;
     const response = await fetch(url, {
       headers: {
@@ -18,18 +18,8 @@ async function fetchCurrentPrice() {
     }
     const data = await response.json();
     console.log("GeckoTerminal API response:", data);
-    // 假設回傳格式：
-    // {
-    //   "data": {
-    //     "id": "xxx",
-    //     "type": "simple_token_price",
-    //     "attributes": {
-    //       "token_prices": {
-    //         "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX": "237.433210276503"
-    //       }
-    //     }
-    //   }
-    // }
+    // 解析回傳資料：
+    // data.data.attributes.token_prices[contractAddress] 為字串 "237.433210276503"
     if (
       data &&
       data.data &&
@@ -57,6 +47,6 @@ async function fetchCurrentPrice() {
   }
 }
 
-// 初始呼叫與每 2 秒更新一次
+// 初次呼叫及每 2 秒更新一次（請留意 API 速率限制）
 fetchCurrentPrice();
 setInterval(fetchCurrentPrice, 2 * 1000);
