@@ -1,0 +1,22 @@
+{
+  "name": "NOVA Token",
+  "symbol": "NOVA",
+  "description": "NOVA Token is a utility token designed for the NOVA ecosystem. NOVA is in the SOL system.",
+  "image": "https://raw.githubusercontent.com/enigmaticsloth/nova/250cc361c7e58ffe156f90baecce9694f16bd71e/Image/Nova_Solana_logo.png",
+  "seller_fee_basis_points": 0,
+  "attributes": [
+    { "trait_type": "Category", "value": "Utility" },
+    { "trait_type": "Ecosystem", "value": "DeFi" },
+    { "trait_type": "Tags", "value": "reward, defi, exchange" }
+  ],
+  "external_url": "https://enigmaticsloth.github.io/nova/nova.html",
+  "properties": {
+    "files": [
+      {
+        "uri": "https://raw.githubusercontent.com/enigmaticsloth/nova/250cc361c7e58ffe156f90baecce9694f16bd71e/Image/Nova_Solana_logo.png",
+        "type": "image/png"
+      }
+    ],
+    "category": "image"
+  }
+}
