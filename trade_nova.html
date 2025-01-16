@@ -82,7 +82,7 @@
     button:hover {
       background-color: #45a049;
     }
-    #walletStatus, #tradeStatus {
+    #walletStatus, #tradeStatus, #priceStatus {
       margin-top: 1em;
       padding: 0.5em;
       background-color: #333;
@@ -93,7 +93,6 @@
   <!-- 1. 先引入 Buffer polyfill -->
   <script src="https://unpkg.com/buffer@6.0.3/index.js"></script>
   <script>
-    // 確保全域 window.Buffer 存在
     if (!window.Buffer) {
       window.Buffer = buffer.Buffer;
     }
@@ -120,24 +119,30 @@
       </div>
       <p>
         Welcome to the official NOVA Trading Platform.
-        Connect your wallet and enter the amount to swap.
+        Connect your wallet, and input the amount to swap.
       </p>
       <!-- 錢包連接 -->
       <button id="connectWalletBtn">Connect Wallet</button>
       <div id="walletStatus"></div>
       <br>
+      <!-- 顯示最新匯率 -->
+      <div id="priceStatus">Loading price...</div>
+      <br>
       <!-- Swap 介面 -->
-      <label for="solInput">SOL:</label>
-      <input type="number" id="solInput" placeholder="Enter SOL amount" step="0.0001" min="0" />
-      <br>
-      <label for="novaInput">NOVA:</label>
-      <input type="number" id="novaInput" placeholder="Estimated NOVA" step="1" min="0" />
-      <br>
+      <div>
+        <label for="solInput">SOL:</label>
+        <input type="number" id="solInput" placeholder="Enter SOL amount" step="0.0001" min="0" />
+      </div>
+      <div>
+        <label for="novaInput">NOVA:</label>
+        <input type="number" id="novaInput" placeholder="Estimated NOVA" step="1" min="0" />
+      </div>
       <button id="swapBtn">Swap</button>
       <div id="tradeStatus"></div>
     </div>
   </div>
+  
   <!-- 引入自訂的交易邏輯 -->
   <script src="trade.js"></script>
 </body>
-</html> 
+</html>
