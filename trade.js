@@ -73,6 +73,20 @@ async function connectWallet() {
   }
 }
 
+// 重試獲取 Blockhash
+async function getRecentBlockhashWithRetry(connection, retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const { blockhash } = await connection.getLatestBlockhash();
+      return blockhash;
+    } catch (error) {
+      console.warn(`Attempt ${i + 1} failed: ${error.message}`);
+      if (i === retries - 1) throw error;
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+}
+
 // Swap 函式
 async function swapNOVA() {
   if (!walletPublicKey) {
@@ -82,7 +96,7 @@ async function swapNOVA() {
 
   try {
     console.log("Starting swap transaction...");
-    const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "processed");
+    const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
     const fromPubkey = new solanaWeb3.PublicKey(walletPublicKey);
     let transaction;
 
@@ -92,16 +106,14 @@ async function swapNOVA() {
         tradeStatus.innerText = "Please enter a valid SOL amount.";
         return;
       }
-
       const lamports = Math.round(solValue * 1e9);
       transaction = new solanaWeb3.Transaction().add(
         solanaWeb3.SystemProgram.transfer({
           fromPubkey,
-          toPubkey: fromPubkey,  // 模擬交易
+          toPubkey: fromPubkey,
           lamports: lamports,
         })
       );
-
       tradeStatus.innerText = `Executing Buy: ${solValue} SOL → Estimated NOVA...\n`;
     } else if (activeField === "nova") {
       const novaValue = parseFloat(novaInput.value);
@@ -109,45 +121,28 @@ async function swapNOVA() {
         tradeStatus.innerText = "Please enter a valid NOVA amount.";
         return;
       }
-
       const solEquivalent = novaValue * (window.CURRENT_NOVA_PRICE_USD / window.SOL_USD_PRICE);
       const lamports = Math.round(solEquivalent * 1e9);
-
       transaction = new solanaWeb3.Transaction().add(
         solanaWeb3.SystemProgram.transfer({
           fromPubkey,
-          toPubkey: fromPubkey,  // 模擬交易
+          toPubkey: fromPubkey,
           lamports: lamports,
         })
       );
-
       tradeStatus.innerText = `Executing Sell: ${novaValue} NOVA → Estimated SOL...\n`;
-    } else {
-      tradeStatus.innerText = "Please enter a value in either SOL or NOVA input.";
-      return;
     }
 
-    // 設定 feePayer 和 blockhash
     transaction.feePayer = fromPubkey;
-    const { blockhash } = await connection.getLatestBlockhash();
+    const blockhash = await getRecentBlockhashWithRetry(connection);
     transaction.recentBlockhash = blockhash;
 
-    // Phantom 錢包簽署交易
     await window.solana.signTransaction(transaction);
-
-    // **修正重點：直接使用 transaction 物件的 serialize()**
-    if (typeof transaction.serialize !== "function") {
-      throw new Error("Transaction object is invalid. Cannot serialize.");
-    }
-
     const rawTransaction = transaction.serialize();
 
-    // 傳送交易
     const signature = await connection.sendRawTransaction(rawTransaction);
     tradeStatus.innerText += `Transaction sent! Signature: ${signature}`;
     console.log("Transaction sent! Signature:", signature);
-
-    // 確認交易
     await connection.confirmTransaction(signature, 'confirmed');
     tradeStatus.innerText += "\nTransaction confirmed!";
 
@@ -157,6 +152,5 @@ async function swapNOVA() {
   }
 }
 
-// 綁定按鈕
 connectWalletBtn.addEventListener('click', connectWallet);
 swapBtn.addEventListener('click', swapNOVA);
