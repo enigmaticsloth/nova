@@ -8,9 +8,10 @@
 
   if (typeof window.Buffer.from !== 'function') {
     window.Buffer.from = function(input, encoding) {
-      // 如果是字串，僅支援 utf8 編碼
+      // 僅支援 utf8 編碼
       if (typeof input === "string") {
         if (encoding && encoding.toLowerCase() !== "utf8") {
+          console.error("Buffer.from polyfill: Only 'utf8' encoding is supported. Received encoding:", encoding);
           throw new Error("Buffer.from: Only 'utf8' encoding is supported in this polyfill.");
         }
         var utf8 = unescape(encodeURIComponent(input));
@@ -22,10 +23,11 @@
       } else if (Array.isArray(input)) {
         return new Uint8Array(input);
       } else {
+        console.error("Buffer.from polyfill: Unsupported input type.", input);
         throw new Error("Buffer.from: Unsupported input type.");
       }
     };
-    console.log("Custom Buffer.from polyfill defined.");
+    console.log("Buffer.from polyfill defined.");
   } else {
     console.log("Buffer.from already defined.");
   }

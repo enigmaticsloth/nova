@@ -1,6 +1,5 @@
 // trade.js
 
-// 取得 DOM 元素
 const connectWalletBtn = document.getElementById('connectWalletBtn');
 const walletStatus = document.getElementById('walletStatus');
 const solInput = document.getElementById('solInput');
@@ -66,21 +65,31 @@ async function connectWallet() {
       const resp = await window.solana.connect();
       walletPublicKey = resp.publicKey.toString();
       walletStatus.innerText = `Wallet connected: ${walletPublicKey}`;
+      console.log("Wallet connected:", walletPublicKey);
     } catch (err) {
       walletStatus.innerText = `Connect failed: ${err.message}`;
+      console.error("Connect failed:", err);
     }
   } else {
     walletStatus.innerText = "Phantom wallet not found. Please install the Phantom extension.";
   }
 }
 
-// Swap 函式：根據 activeField 判斷模擬買入或賣出
+// 模擬獎勵計算
+// 假設獎勵百分比為 5%（僅示範用途）
+function calculateReward(baseNova) {
+  const rewardPercent = 0.05;
+  return baseNova * rewardPercent;
+}
+
+// Swap 函式：根據 activeField 判斷執行買入或賣出
 async function swapNOVA() {
   if (!walletPublicKey) {
     tradeStatus.innerText = "Please connect your wallet first.";
     return;
   }
   try {
+    console.log("Starting swap transaction...");
     const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "processed");
     const fromPubkey = new solanaWeb3.PublicKey(walletPublicKey);
     let transaction;
@@ -90,16 +99,20 @@ async function swapNOVA() {
         tradeStatus.innerText = "Please enter a valid SOL amount.";
         return;
       }
-      const novaEstimated = solValue * (window.SOL_USD_PRICE / window.CURRENT_NOVA_PRICE_USD);
+      // 根據公式計算買入的 NOVA 預估量
+      const baseNova = solValue * (window.SOL_USD_PRICE / window.CURRENT_NOVA_PRICE_USD);
+      const rewardNova = calculateReward(baseNova);
+      const totalNova = baseNova + rewardNova;
       const lamports = Math.round(solValue * 1e9);
       transaction = new solanaWeb3.Transaction().add(
         solanaWeb3.SystemProgram.transfer({
           fromPubkey,
-          toPubkey: fromPubkey, // 模擬交易：將資金轉回自己
+          toPubkey: fromPubkey, // 模擬交易：資金轉回自己
           lamports: lamports,
         })
       );
-      tradeStatus.innerText = `Executing Buy: ${solValue} SOL → ${novaEstimated.toFixed(5)} NOVA (simulated)...\n`;
+      tradeStatus.innerText = `Executing Buy: ${solValue} SOL → ${baseNova.toFixed(5)} NOVA (base) + ${rewardNova.toFixed(5)} NOVA (reward) = ${totalNova.toFixed(5)} NOVA (simulated)...\n`;
+      console.log("Buy: SOL", solValue, "-> Base NOVA:", baseNova, "Reward:", rewardNova, "Total NOVA:", totalNova);
     } else if (activeField === "nova") {
       const novaValue = parseFloat(novaInput.value);
       if (isNaN(novaValue) || novaValue <= 0) {
@@ -116,13 +129,16 @@ async function swapNOVA() {
         })
       );
       tradeStatus.innerText = `Executing Sell: ${novaValue} NOVA (≈${solEquivalent.toFixed(5)} SOL) (simulated)...\n`;
+      console.log("Sell: NOVA", novaValue, "-> SOL equivalent:", solEquivalent);
     } else {
       tradeStatus.innerText = "Please enter a value in either SOL or NOVA input.";
       return;
     }
     const { signature } = await window.solana.signAndSendTransaction({ transaction, connection });
     tradeStatus.innerText += `Transaction sent! Signature: ${signature}`;
+    console.log("Transaction sent! Signature:", signature);
   } catch (err) {
+    console.error("Swap transaction error:", err);
     tradeStatus.innerText = `Swap transaction error: ${err.message}`;
   }
 }

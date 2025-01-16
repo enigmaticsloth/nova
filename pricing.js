@@ -1,19 +1,16 @@
 // pricing.js
 
-// 將 NOVA 價格預設為 0.00123 USD（若查詢失敗沿用此值）
+// 預設 NOVA 價格 (USD)
 window.CURRENT_NOVA_PRICE_USD = 0.00123;
-// 預設 SOL 價格 (USD)，初始為 20 美元
+// 預設 SOL 價格 (USD)
 window.SOL_USD_PRICE = 20;
 
 async function fetchNOVA_Price() {
   try {
     const contractAddress = "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX";
-    // GeckoTerminal API v2 endpoint，請依據官方文件確認
     const url = `https://api.geckoterminal.com/api/v2/simple/networks/solana/token_price/${contractAddress}`;
     const response = await fetch(url, {
-      headers: {
-        Accept: "application/json;version=20230302"
-      }
+      headers: { Accept: "application/json;version=20230302" }
     });
     if (!response.ok) {
       throw new Error(`HTTP error ${response.status}`);
@@ -70,7 +67,7 @@ function updatePriceDisplay(message) {
   }
 }
 
-// 初次呼叫與每 2 秒更新一次
+// 每 2 秒更新一次
 fetchNOVA_Price();
 fetchSOL_Price();
 setInterval(fetchNOVA_Price, 2000);
