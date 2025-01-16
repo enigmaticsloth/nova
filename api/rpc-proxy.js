@@ -2,11 +2,11 @@ import { Connection } from "@solana/web3.js";
 
 export default async function handler(req, res) {
   // 設置 CORS 標頭
-  res.setHeader("Access-Control-Allow-Origin", "*"); // 或指定域名，例如 'https://enigmaticsloth.github.io'
+  res.setHeader("Access-Control-Allow-Origin", "https://enigmaticsloth.github.io"); // 允許的來源域名
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // 處理 OPTIONS 請求
+  // 處理 OPTIONS 預檢請求
   if (req.method === "OPTIONS") {
     res.status(204).end();
     return;
