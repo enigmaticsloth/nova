@@ -1,5 +1,11 @@
 // trade.js
 
+// Import necessary libraries
+// Ensure you include the SPL Token library in your HTML file
+// Example:
+// <script src="https://unpkg.com/@solana/spl-token@0.2.0/dist/spl-token.min.js"></script>
+
+// Get DOM elements
 const connectWalletBtn = document.getElementById('connectWalletBtn');
 const walletStatus = document.getElementById('walletStatus');
 const solInput = document.getElementById('solInput');
@@ -7,10 +13,14 @@ const novaInput = document.getElementById('novaInput');
 const swapBtn = document.getElementById('swapBtn');
 const tradeStatus = document.getElementById('tradeStatus');
 
+// Global variables
 let walletPublicKey = null;
-let activeField = null;  // "sol" 或 "nova"
+let activeField = null;  // "sol" or "nova"
 
-// 當 SOL 輸入時更新 NOVA 預估值
+// Exchange contract address
+const exchangeContractAddress = "HEAz4vAABHTYdY23JuYD3VTHKSBRXSdyt7Dq8YVGDUWm"; // Replace with your exchange contract address
+
+// Function to update NOVA estimate based on SOL input
 function updateNovaFromSOL() {
   if (!solInput.value) {
     novaInput.value = "";
@@ -26,7 +36,7 @@ function updateNovaFromSOL() {
   activeField = "sol";
 }
 
-// 當 NOVA 輸入時更新 SOL 預估值
+// Function to update SOL estimate based on NOVA input
 function updateSOLFromNOVA() {
   if (!novaInput.value) {
     solInput.value = "";
@@ -56,24 +66,24 @@ novaInput.addEventListener('input', () => {
   isUpdating = false;
 });
 
-// 連接 Phantom 錢包
+// Function to connect Phantom wallet
 async function connectWallet() {
   if (window.solana && window.solana.isPhantom) {
     try {
       const resp = await window.solana.connect();
       walletPublicKey = resp.publicKey.toString();
-      walletStatus.innerText = `Wallet connected: ${walletPublicKey}`;
+      walletStatus.innerText = `Wallet Connected: ${walletPublicKey}`;
       console.log("Wallet connected:", walletPublicKey);
     } catch (err) {
-      walletStatus.innerText = `Connect failed: ${err.message}`;
-      console.error("Connect failed:", err);
+      walletStatus.innerText = `Connection Failed: ${err.message}`;
+      console.error("Connection failed:", err);
     }
   } else {
     walletStatus.innerText = "Phantom wallet not found. Please install the Phantom extension.";
   }
 }
 
-// 重試獲取 Blockhash
+// Function to retry fetching the recent blockhash
 async function getRecentBlockhashWithRetry(connection, retries = 3) {
   for (let i = 0; i < retries; i++) {
     try {
@@ -87,7 +97,7 @@ async function getRecentBlockhashWithRetry(connection, retries = 3) {
   }
 }
 
-// Swap 函式
+// Swap function
 async function swapNOVA() {
   if (!walletPublicKey) {
     tradeStatus.innerText = "Please connect your wallet first.";
@@ -96,7 +106,8 @@ async function swapNOVA() {
 
   try {
     console.log("Starting swap transaction...");
-    const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
+    // Use Alchemy's RPC endpoint URL
+    const connection = new solanaWeb3.Connection("https://solana-mainnet.g.alchemy.com/v2/LJuWMYUf3DJw0eWVvVgqK3pMGqHU74ga", "confirmed");
     const fromPubkey = new solanaWeb3.PublicKey(walletPublicKey);
     let transaction;
 
@@ -110,7 +121,7 @@ async function swapNOVA() {
       transaction = new solanaWeb3.Transaction().add(
         solanaWeb3.SystemProgram.transfer({
           fromPubkey,
-          toPubkey: fromPubkey,
+          toPubkey: new solanaWeb3.PublicKey(exchangeContractAddress),  // Exchange contract address
           lamports: lamports,
         })
       );
@@ -121,28 +132,53 @@ async function swapNOVA() {
         tradeStatus.innerText = "Please enter a valid NOVA amount.";
         return;
       }
-      const solEquivalent = novaValue * (window.CURRENT_NOVA_PRICE_USD / window.SOL_USD_PRICE);
-      const lamports = Math.round(solEquivalent * 1e9);
+
+      // Assuming NOVA is an SPL Token, use @solana/spl-token to transfer NOVA
+      // Ensure you have included the SPL Token library in your HTML
+      const { Token, TOKEN_PROGRAM_ID } = splToken; // Assuming @solana/spl-token is loaded as splToken
+      const novaMintAddress = "YOUR_NOVA_MINT_ADDRESS"; // Replace with your NOVA Token Mint Address
+
+      // Create Token instance
+      const novaToken = new Token(
+        connection,
+        new solanaWeb3.PublicKey(novaMintAddress),
+        TOKEN_PROGRAM_ID,
+        fromPubkey
+      );
+
+      // Get user's NOVA Token Account
+      const userTokenAccount = await novaToken.getOrCreateAssociatedAccountInfo(fromPubkey);
+
+      // Transfer NOVA to exchange contract address
       transaction = new solanaWeb3.Transaction().add(
-        solanaWeb3.SystemProgram.transfer({
+        Token.createTransferInstruction(
+          TOKEN_PROGRAM_ID,
+          userTokenAccount.address,
+          new solanaWeb3.PublicKey(exchangeContractAddress),  // Exchange contract address
           fromPubkey,
-          toPubkey: fromPubkey,
-          lamports: lamports,
-        })
+          [],
+          novaValue * 1e9 // Assuming NOVA has 9 decimal places
+        )
       );
       tradeStatus.innerText = `Executing Sell: ${novaValue} NOVA → Estimated SOL...\n`;
     }
 
+    // Set fee payer
     transaction.feePayer = fromPubkey;
+    // Get the latest blockhash
     const blockhash = await getRecentBlockhashWithRetry(connection);
     transaction.recentBlockhash = blockhash;
 
-    await window.solana.signTransaction(transaction);
-    const rawTransaction = transaction.serialize();
+    // Sign the transaction
+    const signedTransaction = await window.solana.signTransaction(transaction);
+    // Serialize the transaction
+    const rawTransaction = signedTransaction.serialize();
 
+    // Send the transaction
     const signature = await connection.sendRawTransaction(rawTransaction);
     tradeStatus.innerText += `Transaction sent! Signature: ${signature}`;
     console.log("Transaction sent! Signature:", signature);
+    // Confirm the transaction
     await connection.confirmTransaction(signature, 'confirmed');
     tradeStatus.innerText += "\nTransaction confirmed!";
 
@@ -152,5 +188,6 @@ async function swapNOVA() {
   }
 }
 
+// Event listeners
 connectWalletBtn.addEventListener('click', connectWallet);
 swapBtn.addEventListener('click', swapNOVA);
