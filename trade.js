@@ -132,9 +132,9 @@ async function swapNOVA() {
 
   try {
     console.log("Starting swap transaction...");
-    // Use QuickNode's RPC endpoint URL directly
+    // Use vercel
     const connection = new solanaWeb3.Connection(
-      "https://intensive-omniscient-asphalt.solana-mainnet.quiknode.pro/61466a6e88d0e1f1f55ea00bf5ec117e22d16849",
+      "https://nova.vercel.app/api/rpc-proxy",
       "confirmed"
     );
     const fromPubkey = new solanaWeb3.PublicKey(walletPublicKey);
