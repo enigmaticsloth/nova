@@ -8,7 +8,7 @@ window.SOL_USD_PRICE = 20;
 async function fetchNOVA_Price() {
   try {
     const contractAddress = "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX";
-    // GeckoTerminal API v2 的 endpoint，請依據官方文件確認
+    // GeckoTerminal API v2 endpoint，請依據官方文件確認
     const url = `https://api.geckoterminal.com/api/v2/simple/networks/solana/token_price/${contractAddress}`;
     const response = await fetch(url, {
       headers: {

@@ -1,6 +1,6 @@
 // trade.js
 
-// 固定 SOL 價格將由 window.SOL_USD_PRICE 更新（由 pricing.js 更新）
+// 取得 DOM 元素
 const connectWalletBtn = document.getElementById('connectWalletBtn');
 const walletStatus = document.getElementById('walletStatus');
 const solInput = document.getElementById('solInput');
@@ -12,7 +12,7 @@ let walletPublicKey = null;
 let activeField = null; // "sol" 或 "nova"
 
 // 當 SOL 輸入時更新 NOVA 預估值
-// 公式： NOVA = SOL * (SOL_USD_PRICE / CURRENT_NOVA_PRICE_USD)
+// 公式：NOVA = SOL * (SOL_USD_PRICE / CURRENT_NOVA_PRICE_USD)
 function updateNovaFromSOL() {
   if (!solInput.value) {
     novaInput.value = "";
@@ -29,7 +29,7 @@ function updateNovaFromSOL() {
 }
 
 // 當 NOVA 輸入時更新 SOL 預估值
-// 公式： SOL = NOVA * (CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE)
+// 公式：SOL = NOVA * (CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE)
 function updateSOLFromNOVA() {
   if (!novaInput.value) {
     solInput.value = "";
@@ -74,7 +74,7 @@ async function connectWallet() {
   }
 }
 
-// Swap 函式：根據 activeField 判斷執行模擬買入或賣出
+// Swap 函式：根據 activeField 判斷模擬買入或賣出
 async function swapNOVA() {
   if (!walletPublicKey) {
     tradeStatus.innerText = "Please connect your wallet first.";
@@ -95,7 +95,7 @@ async function swapNOVA() {
       transaction = new solanaWeb3.Transaction().add(
         solanaWeb3.SystemProgram.transfer({
           fromPubkey,
-          toPubkey: fromPubkey,
+          toPubkey: fromPubkey, // 模擬交易：將資金轉回自己
           lamports: lamports,
         })
       );
