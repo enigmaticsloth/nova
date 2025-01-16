@@ -132,8 +132,8 @@ async function swapNOVA() {
 
   try {
     console.log("Starting swap transaction...");
-    // Use Cloud Function's RPC endpoint URL
-    const connection = new solanaWeb3.Connection("https://asia-east1-fleet-gamma-448013-t1.cloudfunctions.net/rpc-proxy", "confirmed");
+    // Use Vercel Serverless Function's RPC endpoint URL
+    const connection = new solanaWeb3.Connection("https://your-project-name.vercel.app/api/rpc-proxy", "confirmed");
     const fromPubkey = new solanaWeb3.PublicKey(walletPublicKey);
     let transaction;
 
@@ -162,7 +162,7 @@ async function swapNOVA() {
       // Assuming NOVA is an SPL Token, use @solana/spl-token to transfer NOVA
       // Ensure you have included the SPL Token library in your HTML
       const { Token, TOKEN_PROGRAM_ID } = splToken; // Assuming @solana/spl-token is loaded as splToken
-      const novaMintAddress = "YOUR_NOVA_MINT_ADDRESS"; // Replace with your NOVA Token Mint Address
+      const novaMintAddress = "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX"; // Replace with your NOVA Token Mint Address
 
       // Create Token instance
       const novaToken = new Token(
