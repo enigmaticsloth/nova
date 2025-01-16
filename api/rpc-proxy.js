@@ -1,7 +1,5 @@
 // api/rpc-proxy.js
 
-import fetch from 'node-fetch';
-
 export default async function handler(req, res) {
   // 設置 CORS 標頭，僅允許指定來源
   res.setHeader("Access-Control-Allow-Origin", "https://enigmaticsloth.github.io");
