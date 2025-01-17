@@ -6,7 +6,7 @@
   <title>Trade NOVA</title>
   <link rel="stylesheet" href="styles.css">
   <style>
-    /* Basic Style Adjustments */
+    /* 基本樣式調整 */
     body {
       font-family: Arial, sans-serif;
       background-color: #121212;
@@ -16,12 +16,11 @@
     }
     .main-container {
       display: flex;
-      min-height: 100vh;
     }
     .sidebar {
       width: 200px;
       padding: 1em;
-      /* Semi-transparent background */
+      /* 半透明背景 */
       background-color: rgba(30, 30, 30, 0.5);
     }
     .sidebar ul {
@@ -63,20 +62,6 @@
       margin-top: 0.5em;
       font-weight: bold;
     }
-    .label-with-balance {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .label-with-balance span.balance {
-      margin-left: 10px;
-      color: #4CAF50;
-      font-weight: normal;
-    }
-    input, button {
-      height: 2.5em; /* Fixed height */
-      box-sizing: border-box; /* Include padding and border */
-    }
     input {
       padding: 0.5em;
       font-size: 1em;
@@ -84,6 +69,7 @@
       border: 1px solid #ccc;
       margin: 0.5em 0;
       width: 100%;
+      box-sizing: border-box;
     }
     input[type="number"] {
       step: 0.00001;
@@ -91,20 +77,17 @@
     button {
       padding: 0.6em 1.2em;
       font-size: 1em;
-      margin: 0.5em 0; /* Top and bottom margin */
+      margin: 0.5em 0;
       border: none;
       border-radius: 5px;
       cursor: pointer;
       background-color: #4CAF50;
       color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
     button:hover {
       background-color: #45a049;
     }
-    /* Semi-transparent background with fixed minimum height of 50px */
+    /* 半透明背景欄且固定最小高度 50px */
     #walletStatus, #tradeStatus, #priceStatus {
       margin-top: 1em;
       padding: 0.5em;
@@ -113,7 +96,7 @@
       white-space: pre-wrap;
       min-height: 50px;
     }
-    /* Additional Styles */
+    /* 新增的樣式 */
     #walletContainer {
       display: flex;
       align-items: center;
@@ -122,7 +105,7 @@
     }
     .swap-section {
       display: flex;
-      align-items: center; /* Vertically center */
+      align-items: center;
       gap: 1em;
       margin-top: 2em;
       flex-wrap: wrap;
@@ -132,41 +115,36 @@
       flex-direction: column;
       width: 200px;
     }
-    /* Swap Inputs Button */
     #swapInputsBtn {
-      font-size: 1.2em;
+      padding: 0.6em 1.2em;
+      font-size: 1em;
       border: none;
       border-radius: 5px;
       cursor: pointer;
       background-color: #4CAF50;
       color: white;
-      height: 2.5em; /* Same height as input fields */
-      width: 2.5em; /* Square button */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0; /* Remove extra margin */
+      height: 2.5em;
     }
     #swapInputsBtn:hover {
       background-color: #45a049;
     }
-    /* Swap Button */
     #swapBtn {
-      height: 2.5em; /* Same height as input fields */
+      height: fit-content;
+      align-self: flex-end;
     }
     @media (max-width: 600px) {
       .swap-section {
         flex-direction: column;
         align-items: stretch;
       }
-      #swapBtn, #swapInputsBtn {
+      #swapBtn {
         align-self: stretch;
       }
     }
   </style>
-  <!-- Load Buffer Polyfill First -->
+  <!-- 1. 先載入 Buffer polyfill -->
   <script src="bufferPolyfill.js"></script>
-  <!-- Then Load Solana Web3.js -->
+  <!-- 2. 再載入 Solana Web3.js -->
   <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.84.1/lib/index.iife.min.js"></script>
 </head>
 <body>
@@ -188,7 +166,7 @@
         Please connect your wallet, then enter your desired amounts to swap.
       </p>
       
-      <!-- Wallet Connection Section -->
+      <!-- 錢包連接區域 -->
       <div id="walletContainer">
         <button id="connectWalletBtn">Connect Wallet</button>
         <div id="walletStatus">Please connect your wallet.</div>
@@ -196,27 +174,19 @@
       
       <div id="priceStatus">Loading price...</div>
       
-      <!-- Trade Section -->
+      <!-- 交易區域 -->
       <div class="swap-section">
         <div class="input-group">
           <label>You pay</label>
-          <div class="label-with-balance">
-            <label for="solInput">SOL:</label>
-            <span class="balance" id="solBalance">0</span>
-          </div>
+          <label for="solInput">SOL:</label>
           <input type="number" id="solInput" placeholder="Enter SOL amount" />
         </div>
         
-        <button id="swapInputsBtn" title="Swap Inputs" aria-label="Swap Inputs">
-          &#8646; <!-- Left-Right Arrow Icon -->
-        </button>
+        <button id="swapInputsBtn" title="Swap Inputs">Swap</button>
         
         <div class="input-group">
           <label>You receive</label>
-          <div class="label-with-balance">
-            <label for="novaInput">NOVA:</label>
-            <span class="balance" id="novaBalance">0</span>
-          </div>
+          <label for="novaInput">NOVA:</label>
           <input type="number" id="novaInput" placeholder="Enter NOVA amount" />
         </div>
         
@@ -226,197 +196,34 @@
       <div id="tradeStatus"></div>
     </div>
   </div>
-  <!-- Load pricing.js First -->
+  <!-- 先引入 pricing.js -->
   <script src="pricing.js"></script>
-  <!-- Then Load Trade Logic -->
+  <!-- 再引入交易邏輯 -->
   <script src="trade.js"></script>
   
-  <!-- Add Swap Inputs Functionality -->
+  <!-- 添加對調輸入欄位的功能 -->
   <script>
     document.getElementById('swapInputsBtn').addEventListener('click', function() {
       const solInput = document.getElementById('solInput');
       const novaInput = document.getElementById('novaInput');
       
-      // Swap input values
       const tempValue = solInput.value;
       solInput.value = novaInput.value;
       novaInput.value = tempValue;
       
-      // Swap labels
-      const solLabel = solInput.previousElementSibling.querySelector('label');
-      const novaLabel = novaInput.previousElementSibling.querySelector('label');
+      // 交換標籤文字
+      const solLabel = solInput.previousElementSibling;
+      const novaLabel = novaInput.previousElementSibling;
       
       const tempLabel = solLabel.textContent;
       solLabel.textContent = novaLabel.textContent;
       novaLabel.textContent = tempLabel;
       
-      // Swap balances
-      const solBalance = document.getElementById('solBalance').textContent;
-      const novaBalance = document.getElementById('novaBalance').textContent;
-      
-      document.getElementById('solBalance').textContent = novaBalance;
-      document.getElementById('novaBalance').textContent = solBalance;
-      
-      // Swap placeholders
+      // 交換浮水印
       const tempPlaceholder = solInput.placeholder;
       solInput.placeholder = novaInput.placeholder;
       novaInput.placeholder = tempPlaceholder;
     });
-
-    // Function to update balances
-    function updateBalances(solBalance, novaBalance) {
-      document.getElementById('solBalance').textContent = solBalance;
-      document.getElementById('novaBalance').textContent = novaBalance;
-    }
-
-    // Function to connect Phantom wallet
-    async function connectWallet() {
-      if (window.solana && window.solana.isPhantom) {
-        try {
-          const response = await window.solana.connect();
-          const walletPublicKey = response.publicKey.toString();
-          document.getElementById('walletStatus').textContent = `Connected: ${walletPublicKey}`;
-          console.log("Wallet connected:", walletPublicKey);
-          
-          // Fetch SOL balance
-          const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
-          const balance = await connection.getBalance(response.publicKey);
-          const solBalance = balance / solanaWeb3.LAMPORTS_PER_SOL;
-          
-          // Fetch NOVA balance (Replace with actual logic)
-          const novaBalance = 100; // Replace with actual NOVA balance fetching logic
-          
-          updateBalances(solBalance, novaBalance);
-        } catch (err) {
-          console.error(err);
-          document.getElementById('walletStatus').textContent = 'Failed to connect wallet.';
-        }
-      } else {
-        alert('Phantom Wallet not found. Please install it.');
-      }
-    }
-
-    // Function to retry fetching the recent blockhash
-    async function getRecentBlockhashWithRetry(connection, retries = 3) {
-      for (let i = 0; i < retries; i++) {
-        try {
-          console.log(`Fetching blockhash, attempt ${i + 1}`);
-          const { blockhash } = await connection.getLatestBlockhash();
-          console.log(`Fetched blockhash: ${blockhash}`);
-          return blockhash;
-        } catch (error) {
-          console.warn(`Attempt ${i + 1} failed: ${error.message}`);
-          if (i === retries - 1) {
-            console.error("All attempts to fetch blockhash failed:", error);
-            throw error;
-          }
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-      }
-    }
-
-    // Throttle function to limit the rate of function calls
-    function throttle(func, limit) {
-      let lastFunc;
-      let lastRan;
-      return function() {
-        const context = this;
-        const args = arguments;
-        if (!lastRan) {
-          func.apply(context, args);
-          lastRan = Date.now();
-        } else {
-          clearTimeout(lastFunc);
-          lastFunc = setTimeout(function() {
-            if ((Date.now() - lastRan) >= limit) {
-              func.apply(context, args);
-              lastRan = Date.now();
-            }
-          }, limit - (Date.now() - lastRan));
-        }
-      };
-    }
-
-    // Swap function
-    async function swapNOVA() {
-      if (!walletPublicKey) {
-        tradeStatus.innerText = "Please connect your wallet first.";
-        return;
-      }
-
-      try {
-        console.log("Starting swap transaction...");
-        const connection = new solanaWeb3.Connection(
-          "https://nova-enigmaticsloths-projects.vercel.app/api/rpc-proxy",
-          "confirmed"
-        );
-        const fromPubkey = new solanaWeb3.PublicKey(walletPublicKey);
-        let transaction;
-
-        if (activeField === "sol") {
-          const solValue = parseFloat(solInput.value);
-          if (isNaN(solValue) || solValue <= 0) {
-            tradeStatus.innerText = "Please enter a valid SOL amount.";
-            return;
-          }
-          const lamports = Math.round(solValue * 1e9);
-          
-          // Replace with your actual Program ID
-          const programId = new solanaWeb3.PublicKey("YourActualProgramIDHere"); // <--- Correct this
-
-          // Replace with actual instruction data as per your program
-          const instruction = new solanaWeb3.TransactionInstruction({
-            keys: [
-              { pubkey: fromPubkey, isSigner: true, isWritable: true },
-              { pubkey: new solanaWeb3.PublicKey(exchangeContractAddress), isSigner: false, isWritable: true },
-              // Add more necessary accounts
-            ],
-            programId: programId, // Use the corrected Program ID
-            data: Buffer.from([0x01]), // Example: 0x01 might represent "swap SOL to NOVA"
-          });
-
-          transaction = new solanaWeb3.Transaction().add(instruction);
-          tradeStatus.innerText = `Executing Buy: ${solValue} SOL → Estimated NOVA...\n`;
-          console.log("Transaction Instructions:", transaction.instructions);
-        }
-
-        // Set fee payer
-        transaction.feePayer = fromPubkey;
-        console.log("Fetching latest blockhash...");
-        const blockhash = await getRecentBlockhashWithRetry(connection);
-        console.log("Latest blockhash:", blockhash);
-        transaction.recentBlockhash = blockhash;
-
-        // Sign the transaction
-        console.log("Signing transaction...");
-        const signedTransaction = await window.solana.signTransaction(transaction);
-        const rawTransaction = signedTransaction.serialize();
-        console.log("Raw transaction:", rawTransaction);
-
-        // Send the transaction
-        console.log("Sending transaction...");
-        const signature = await connection.sendRawTransaction(rawTransaction);
-        tradeStatus.innerText += `Transaction sent! Signature: ${signature}`;
-        console.log("Transaction sent! Signature:", signature);
-
-        // Confirm the transaction
-        console.log("Confirming transaction...");
-        await connection.confirmTransaction(signature, 'confirmed');
-        tradeStatus.innerText += "\nTransaction confirmed!";
-        console.log("Transaction confirmed!");
-
-      } catch (err) {
-        console.error("Swap transaction error:", err);
-        tradeStatus.innerText = `Swap transaction error: ${err.message}`;
-      }
-    }
-
-    // Throttled version of the swap function to prevent excessive calls
-    const throttledSwapNOVA = throttle(swapNOVA, 2000); // 2 seconds throttle
-
-    // Event listeners
-    connectWalletBtn.addEventListener('click', connectWallet);
-    swapBtn.addEventListener('click', throttledSwapNOVA);
   </script>
 </body>
 </html>
