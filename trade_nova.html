@@ -88,7 +88,7 @@
       background-color: #45a049;
     }
     /* Semi-transparent status bars with fixed minimum height */
-    #walletStatus, #tradeStatus, #priceStatus {
+    #walletStatus, #tradeStatus, #priceStatus, #warningStatus {
       margin-top: 1em;
       padding: 0.5em;
       background-color: rgba(51, 51, 51, 0.5);
@@ -172,6 +172,11 @@
         <div id="walletStatus">Please connect your wallet.</div>
       </div>
       
+      <!-- Warning Status Area -->
+      <div id="warningStatus" style="display: none; color: #ff4d4d;">
+        Please connect your wallet to proceed with the trade.
+      </div>
+      
       <div id="priceStatus">Loading price...</div>
       
       <!-- Trading Area -->
@@ -226,6 +231,52 @@
       novaInput.placeholder = tempPlaceholder;
     });
 
+    // Connect Wallet Functionality
+    document.getElementById('connectWalletBtn').addEventListener('click', async () => {
+      const walletStatus = document.getElementById('walletStatus');
+      const warningStatus = document.getElementById('warningStatus');
+      
+      if (window.solana && window.solana.isPhantom) {
+        try {
+          // Request wallet connection
+          const response = await window.solana.connect();
+          walletStatus.textContent = `Wallet Connected: ${response.publicKey.toString()}`;
+          warningStatus.style.display = 'none';
+          console.log('Connected with public key:', response.publicKey.toString());
+          
+          // Optionally, you can trigger any other functions after successful connection
+        } catch (err) {
+          console.error('Connection error:', err);
+          walletStatus.textContent = 'Failed to connect wallet.';
+          warningStatus.style.display = 'block';
+          warningStatus.textContent = 'Failed to connect wallet. Please try again.';
+        }
+      } else {
+        // If Phantom is not installed, prompt to install
+        walletStatus.innerHTML = 'Solana wallet not found. Please install <a href="https://phantom.app/" target="_blank" style="color: #4CAF50; text-decoration: underline;">Phantom Wallet</a> or the Phantom browser extension.';
+        warningStatus.style.display = 'block';
+        warningStatus.textContent = 'Solana wallet not found. Please install Phantom Wallet to proceed.';
+        alert('Solana object not found! Please install Phantom Wallet 👻');
+      }
+    });
+
+    // Auto-connect if wallet is already connected
+    window.addEventListener('load', async () => {
+      const walletStatus = document.getElementById('walletStatus');
+      const warningStatus = document.getElementById('warningStatus');
+      
+      if (window.solana && window.solana.isPhantom) {
+        try {
+          const response = await window.solana.connect({ onlyIfTrusted: true });
+          walletStatus.textContent = `Wallet Connected: ${response.publicKey.toString()}`;
+          warningStatus.style.display = 'none';
+          console.log('Already connected with public key:', response.publicKey.toString());
+        } catch (err) {
+          console.log('Not connected to wallet yet.');
+        }
+      }
+    });
+
     // Auto-calculate NOVA when SOL is input
     document.getElementById('solInput').addEventListener('input', function() {
       const solAmount = parseFloat(this.value);
@@ -243,8 +294,8 @@
         return;
       }
       
-      // Calculate NOVA amount: NOVA = SOL * (SOL_USD_PRICE / CURRENT_NOVA_PRICE_USD)
-      const novaAmount = solAmount * (window.SOL_USD_PRICE / window.CURRENT_NOVA_PRICE_USD);
+      // Calculate NOVA amount: NOVA = (SOL * SOL_USD_PRICE) / CURRENT_NOVA_PRICE_USD
+      const novaAmount = (solAmount * window.SOL_USD_PRICE) / window.CURRENT_NOVA_PRICE_USD;
       novaInput.value = novaAmount.toFixed(5); // Keep 5 decimal places
     });
 
@@ -265,8 +316,8 @@
         return;
       }
       
-      // Calculate SOL amount: SOL = NOVA * (CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE)
-      const solAmount = novaAmount * (window.CURRENT_NOVA_PRICE_USD / window.SOL_USD_PRICE);
+      // Calculate SOL amount: SOL = (NOVA * CURRENT_NOVA_PRICE_USD) / SOL_USD_PRICE
+      const solAmount = (novaAmount * window.CURRENT_NOVA_PRICE_USD) / window.SOL_USD_PRICE;
       solInput.value = solAmount.toFixed(5); // Keep 5 decimal places
     });
   </script>
