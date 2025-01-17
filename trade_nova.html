@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Trade NOVA</title>
+
+  <!-- 載入主要 CSS (可放外部檔案，也可 inline) -->
   <link rel="stylesheet" href="styles.css">
+
   <style>
-    /* 基本樣式調整 */
+    /* ------------------------------------------------
+       這些是你原本的基本樣式
+       ------------------------------------------------ */
     body {
       font-family: Arial, sans-serif;
       background-color: #121212;
@@ -20,7 +25,6 @@
     .sidebar {
       width: 200px;
       padding: 1em;
-      /* 半透明背景 */
       background-color: rgba(30, 30, 30, 0.5);
     }
     .sidebar ul {
@@ -87,7 +91,6 @@
     button:hover {
       background-color: #45a049;
     }
-    /* 半透明背景欄且固定最小高度 50px */
     #walletStatus, #tradeStatus, #priceStatus {
       margin-top: 1em;
       padding: 0.5em;
@@ -96,7 +99,6 @@
       white-space: pre-wrap;
       min-height: 50px;
     }
-    /* 新增的樣式 */
     #walletContainer {
       display: flex;
       align-items: center;
@@ -142,13 +144,20 @@
       }
     }
   </style>
-  <!-- 1. 先載入 Buffer polyfill -->
+
+  <!-- 1. bufferPolyfill -->
   <script src="bufferPolyfill.js"></script>
-  <!-- 2. 再載入 Solana Web3.js -->
+
+  <!-- 2. Solana Web3.js -->
   <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.84.1/lib/index.iife.min.js"></script>
+
+  <!-- 3. @solana/spl-token UMD bundle (用來建立 / 檢查 ATA) -->
+  <script src="https://unpkg.com/@solana/spl-token@latest/dist/spl-token.umd.js"></script>
 </head>
+
 <body>
   <div class="main-container">
+    <!-- 左側選單 -->
     <div class="sidebar">
       <ul>
         <li><a href="index.html">Enigmatic Sloth</a></li>
@@ -156,6 +165,8 @@
         <li><a href="trade_nova.html">Trade NOVA</a></li>
       </ul>
     </div>
+
+    <!-- 主要內容區 -->
     <div class="content">
       <div class="header">
         <img src="Image/Nova.PNG" alt="Nova Logo">
@@ -172,9 +183,10 @@
         <div id="walletStatus">Please connect your wallet.</div>
       </div>
       
+      <!-- 動態顯示價格 -->
       <div id="priceStatus">Loading price...</div>
       
-      <!-- 交易區域 -->
+      <!-- 交易區域：可以輸入SOL或NOVA -->
       <div class="swap-section">
         <div class="input-group">
           <label>You pay</label>
@@ -196,34 +208,9 @@
       <div id="tradeStatus"></div>
     </div>
   </div>
-  <!-- 先引入 pricing.js -->
+
+  <!-- 先引入 pricing.js (若要顯示動態價格; 若不需要，可刪) -->
   <script src="pricing.js"></script>
-  <!-- 再引入交易邏輯 -->
-  <script src="trade.js"></script>
-  
-  <!-- 添加對調輸入欄位的功能 -->
+
+  <!-- 再引入交易邏輯 trade.js（完整） -->
   <script>
-    document.getElementById('swapInputsBtn').addEventListener('click', function() {
-      const solInput = document.getElementById('solInput');
-      const novaInput = document.getElementById('novaInput');
-      
-      const tempValue = solInput.value;
-      solInput.value = novaInput.value;
-      novaInput.value = tempValue;
-      
-      // 交換標籤文字
-      const solLabel = solInput.previousElementSibling;
-      const novaLabel = novaInput.previousElementSibling;
-      
-      const tempLabel = solLabel.textContent;
-      solLabel.textContent = novaLabel.textContent;
-      novaLabel.textContent = tempLabel;
-      
-      // 交換浮水印
-      const tempPlaceholder = solInput.placeholder;
-      solInput.placeholder = novaInput.placeholder;
-      novaInput.placeholder = tempPlaceholder;
-    });
-  </script>
-</body>
-</html>
