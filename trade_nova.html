@@ -237,52 +237,6 @@
       novaInput.placeholder = tempPlaceholder;
     });
 
-    // Connect Wallet Functionality
-    document.getElementById('connectWalletBtn').addEventListener('click', async () => {
-      const walletStatus = document.getElementById('walletStatus');
-      const warningStatus = document.getElementById('warningStatus');
-      
-      if (window.solana && window.solana.isPhantom) {
-        try {
-          // Request wallet connection
-          const response = await window.solana.connect();
-          walletStatus.textContent = `Wallet Connected: ${response.publicKey.toString()}`;
-          warningStatus.style.display = 'none';
-          console.log('Connected with public key:', response.publicKey.toString());
-          
-          // Optionally, trigger any other functions after successful connection
-        } catch (err) {
-          console.error('Connection error:', err);
-          walletStatus.textContent = 'Failed to connect wallet.';
-          warningStatus.style.display = 'block';
-          warningStatus.textContent = 'Failed to connect wallet. Please try again.';
-        }
-      } else {
-        // If Phantom is not installed, prompt to install
-        walletStatus.innerHTML = 'Solana wallet not found. Please install <a href="https://phantom.app/" target="_blank" style="color: #4CAF50; text-decoration: underline;">Phantom Wallet</a> or the Phantom browser extension.';
-        warningStatus.style.display = 'block';
-        warningStatus.textContent = 'Solana wallet not found. Please install Phantom Wallet to proceed.';
-        alert('Solana object not found! Please install Phantom Wallet 👻');
-      }
-    });
-
-    // Auto-connect if wallet is already connected
-    window.addEventListener('load', async () => {
-      const walletStatus = document.getElementById('walletStatus');
-      const warningStatus = document.getElementById('warningStatus');
-      
-      if (window.solana && window.solana.isPhantom) {
-        try {
-          const response = await window.solana.connect({ onlyIfTrusted: true });
-          walletStatus.textContent = `Wallet Connected: ${response.publicKey.toString()}`;
-          warningStatus.style.display = 'none';
-          console.log('Already connected with public key:', response.publicKey.toString());
-        } catch (err) {
-          console.log('Not connected to wallet yet.');
-        }
-      }
-    });
-
     // Auto-calculate NOVA when SOL is input
     document.getElementById('solInput').addEventListener('input', function() {
       const solAmount = parseFloat(this.value);
