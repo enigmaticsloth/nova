@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -223,6 +223,46 @@
       const tempPlaceholder = solInput.placeholder;
       solInput.placeholder = novaInput.placeholder;
       novaInput.placeholder = tempPlaceholder;
+    });
+
+    // 添加 Connect Wallet 的功能
+    document.getElementById('connectWalletBtn').addEventListener('click', async () => {
+      const walletStatus = document.getElementById('walletStatus');
+      
+      try {
+        // 檢查是否有注入 Solana 物件（例如 Phantom）
+        const { solana } = window;
+
+        if (solana && solana.isPhantom) {
+          // 請求錢包連接
+          const response = await solana.connect();
+          walletStatus.textContent = `Connected: ${response.publicKey.toString()}`;
+          
+          // 你可以在此處添加更多與錢包相關的操作，例如獲取餘額
+          console.log('Connected with public key:', response.publicKey.toString());
+        } else {
+          walletStatus.textContent = 'Solana wallet not found. Please install Phantom Wallet.';
+          alert('Solana 物件未找到！請安裝 Phantom Wallet 👻');
+        }
+      } catch (err) {
+        console.error('Connection error:', err);
+        walletStatus.textContent = 'Failed to connect wallet.';
+      }
+    });
+
+    // 自動連接已經連接的錢包（可選）
+    window.addEventListener('load', async () => {
+      const { solana } = window;
+
+      if (solana && solana.isPhantom) {
+        try {
+          const response = await solana.connect({ onlyIfTrusted: true });
+          document.getElementById('walletStatus').textContent = `Connected: ${response.publicKey.toString()}`;
+          console.log('Already connected with public key:', response.publicKey.toString());
+        } catch (err) {
+          console.log('Not connected to wallet yet.');
+        }
+      }
     });
   </script>
 </body>
