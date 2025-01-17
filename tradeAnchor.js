@@ -4,10 +4,6 @@ import { getOrCreateAssociatedTokenAccount, TOKEN_PROGRAM_ID } from 'https://esm
 import idl from './nova.json' assert { type: 'json' };
 
 // DOM Elements
-const connectWalletBtn = document.getElementById("connectWalletBtn");
-const walletStatus = document.getElementById("walletStatus");
-const solInput = document.getElementById("solInput");
-const novaInput = document.getElementById("novaInput");
 const swapBtn = document.getElementById("swapBtn");
 const tradeStatus = document.getElementById("tradeStatus");
 
@@ -67,6 +63,7 @@ async function swapNOVA() {
   }
 
   // (1) Read the amount of SOL entered by the user
+  const solInput = document.getElementById("solInput");
   const solValue = parseFloat(solInput.value);
   if (isNaN(solValue) || solValue <= 0) {
     tradeStatus.innerText = "Please enter a valid SOL amount.";
@@ -77,6 +74,10 @@ async function swapNOVA() {
 
   // Get current NOVA price from pricing.js
   const currentNovaPrice = window.CURRENT_NOVA_PRICE_USD; // Assuming pricing.js sets this
+  if (!currentNovaPrice || currentNovaPrice <= 0) {
+    tradeStatus.innerText = "NOVA price data unavailable.";
+    return;
+  }
 
   tradeStatus.innerText = `Executing Buy: ${solValue} SOL → Estimated NOVA...\n`;
 
@@ -120,5 +121,5 @@ async function swapNOVA() {
   }
 }
 
-// Bind events
+// Bind Swap button event
 swapBtn.addEventListener("click", swapNOVA);
