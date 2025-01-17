@@ -144,7 +144,7 @@
   </style>
   <!-- 1. 先載入 Buffer polyfill -->
   <script src="bufferPolyfill.js"></script>
-  <!-- 2. 再載入 Solana Web3.js -->
+  <!-- 2. 再載入 Solana Web3.js (IIFE) -->
   <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.84.1/lib/index.iife.min.js"></script>
 </head>
 <body>
@@ -172,6 +172,7 @@
         <div id="walletStatus">Please connect your wallet.</div>
       </div>
       
+      <!-- 顯示動態價格 -->
       <div id="priceStatus">Loading price...</div>
       
       <!-- 交易區域 -->
@@ -182,7 +183,8 @@
           <input type="number" id="solInput" placeholder="Enter SOL amount" />
         </div>
         
-        <button id="swapInputsBtn" title="Swap Inputs">Swap</button>
+        <!-- 交換按鈕：用左右箭頭 ⇄ 表示 -->
+        <button id="swapInputsBtn" title="Swap Inputs">⇄</button>
         
         <div class="input-group">
           <label>You receive</label>
@@ -196,12 +198,13 @@
       <div id="tradeStatus"></div>
     </div>
   </div>
-  <!-- 先引入 pricing.js -->
-  <script src="pricing.js"></script>
-  <!-- 再引入交易邏輯 -->
-  <script src="tradeAnchor.js"></script>
   
-  <!-- 添加對調輸入欄位的功能 -->
+  <!-- 引入 pricing.js (動態抓價格) -->
+  <script src="pricing.js"></script>
+  <!-- 引入 Anchor 交易邏輯 -->
+  <script type="module" src="tradeAnchor.js"></script>
+
+  <!-- 對調交易對事件監聽 -->
   <script>
     document.getElementById('swapInputsBtn').addEventListener('click', function() {
       const solInput = document.getElementById('solInput');
@@ -219,7 +222,7 @@
       solLabel.textContent = novaLabel.textContent;
       novaLabel.textContent = tempLabel;
       
-      // 交換浮水印
+      // 交換浮水印 (placeholder)
       const tempPlaceholder = solInput.placeholder;
       solInput.placeholder = novaInput.placeholder;
       novaInput.placeholder = tempPlaceholder;
