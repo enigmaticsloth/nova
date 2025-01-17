@@ -1,0 +1,1009 @@
+{
+  "version": "0.1.0",
+  "name": "nova",
+  "instructions": [
+    {
+      "name": "initializeGlobalState",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "developerRewardPoolAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "PDA for developer reward pool, we only do seed check"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initMint",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "PDA for mint authority"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "decimals",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "initTreasury",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authorityNovaAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "PDA for mint authority"
+          ]
+        },
+        {
+          "name": "novaTreasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initLiquidityPool",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidityPoolPdaAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "PDA for the liquidity pool, only do seed check"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "buy",
+      "accounts": [
+        {
+          "name": "buyer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "buyerNovaAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "novaTreasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "PDA for mint authority"
+          ]
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidityPoolPdaAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "PDA for liquidity pool"
+          ]
+        },
+        {
+          "name": "feeRecipient",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Freed-floating address for fee"
+          ]
+        },
+        {
+          "name": "developerRewardPoolAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "PDA for developer reward pool"
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "solAmount",
+          "type": "u64"
+        },
+        {
+          "name": "currentNovaPrice",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "sell",
+      "accounts": [
+        {
+          "name": "seller",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "sellerNovaAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "novaTreasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "PDA for mint authority"
+          ]
+        },
+        {
+          "name": "liquidityPoolPdaAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "PDA for liquidity pool"
+          ]
+        },
+        {
+          "name": "feeRecipient",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Freed-floating address for fee"
+          ]
+        },
+        {
+          "name": "developerRewardPoolAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "PDA for developer reward"
+          ]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "novaAmount",
+          "type": "u64"
+        },
+        {
+          "name": "currentNovaPrice",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "transferNova",
+      "accounts": [
+        {
+          "name": "from",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "fromNovaAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "toNovaAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "upgrade",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "airdrop",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "recipientAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "novaTreasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "PDA for mint authority"
+          ]
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "developerRewardPoolAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "PDA for developer reward pool"
+          ]
+        },
+        {
+          "name": "liquidityPoolPdaAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "PDA for liquidity pool"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "pauseContract",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "unpauseContract",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "withdrawLiquidityFees",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidityPoolPdaAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "PDA for liquidity pool"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawDeveloperRewards",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "developerRewardPoolAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "PDA for developer reward"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawLiquidityFeesTo",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "liquidityPoolPdaAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "PDA for liquidity pool"
+          ]
+        },
+        {
+          "name": "recipient",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Freed-floating recipient"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawDeveloperRewardsTo",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "developerRewardPoolAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "PDA for developer reward"
+          ]
+        },
+        {
+          "name": "recipient",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Freed-floating recipient"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "transferDeveloperRewards",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "developerRewardPoolAccount",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "PDA for developer reward"
+          ]
+        },
+        {
+          "name": "recipient",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Freed-floating recipient"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "manualMint",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "PDA for mint authority"
+          ]
+        },
+        {
+          "name": "recipientAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "manualBurn",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "PDA for mint authority"
+          ]
+        },
+        {
+          "name": "burnAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "createTokenMetadata",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "globalState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Freed-floating address for metadata account"
+          ]
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "PDA for mint authority"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "symbol",
+          "type": "string"
+        },
+        {
+          "name": "uri",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "GlobalState",
+      "docs": [
+        "全域狀態"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "isPaused",
+            "type": "bool"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "totalSupply",
+            "type": "u64"
+          },
+          {
+            "name": "currentSupply",
+            "type": "u64"
+          },
+          {
+            "name": "purchaseCount",
+            "type": "u64"
+          },
+          {
+            "name": "lastRewardPercentage",
+            "type": "u64"
+          },
+          {
+            "name": "reentrancyGuard",
+            "type": "bool"
+          },
+          {
+            "name": "burnPhase",
+            "type": "u64"
+          },
+          {
+            "name": "burnPaused",
+            "type": "bool"
+          },
+          {
+            "name": "rewardResetCounter",
+            "type": "u64"
+          },
+          {
+            "name": "mintBump",
+            "type": "u8"
+          },
+          {
+            "name": "liquidityPoolPda",
+            "type": "publicKey"
+          },
+          {
+            "name": "lastLiqPoolBalance",
+            "type": "u64"
+          },
+          {
+            "name": "liqPoolBump",
+            "type": "u8"
+          },
+          {
+            "name": "emergencyMintedDebt",
+            "type": "u128"
+          },
+          {
+            "name": "rewardIsZero",
+            "type": "bool"
+          },
+          {
+            "name": "lastZeroMoment",
+            "type": "u64"
+          },
+          {
+            "name": "developerRewardPoolPda",
+            "type": "publicKey"
+          },
+          {
+            "name": "developerRewardPoolBump",
+            "type": "u8"
+          },
+          {
+            "name": "lastDevRewardPoolBalance",
+            "type": "u64"
+          },
+          {
+            "name": "liquidityPoolInitialBalance",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "AlreadyInitialized",
+      "msg": "Already initialized"
+    },
+    {
+      "code": 6001,
+      "name": "NotInitialized",
+      "msg": "GlobalState not initialized"
+    },
+    {
+      "code": 6002,
+      "name": "ContractPaused",
+      "msg": "Contract is paused"
+    },
+    {
+      "code": 6003,
+      "name": "Unauthorized",
+      "msg": "Not authorized"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidSolAmount",
+      "msg": "Invalid SOL amount"
+    },
+    {
+      "code": 6005,
+      "name": "InsufficientContractBalance",
+      "msg": "Insufficient contract balance"
+    },
+    {
+      "code": 6006,
+      "name": "InsufficientUserBalance",
+      "msg": "Insufficient user balance"
+    },
+    {
+      "code": 6007,
+      "name": "ReentrancyAttack",
+      "msg": "Attempted reentrancy attack"
+    },
+    {
+      "code": 6008,
+      "name": "InvalidAirdropInput",
+      "msg": "Invalid airdrop input"
+    },
+    {
+      "code": 6009,
+      "name": "Overflow",
+      "msg": "Overflow error"
+    }
+  ]
+}
