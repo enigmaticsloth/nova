@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   // 設置 CORS 標頭，僅允許指定來源
   res.setHeader("Access-Control-Allow-Origin", "https://enigmaticsloth.github.io");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, solana-client");
 
   // 處理 OPTIONS 預檢請求
   if (req.method === "OPTIONS") {
@@ -18,12 +18,12 @@ export default async function handler(req, res) {
     return;
   }
 
-  // QuickNode RPC URL
-  const quicknodeRpcUrl = 'https://intensive-omniscient-asphalt.solana-mainnet.quiknode.pro/61466a6e88d0e1f1f55ea00bf5ec117e22d16849';
+  // QuickNode RPC URL，確保有末尾的斜線
+  const quicknodeRpcUrl = 'https://intensive-omniscient-asphalt.solana-mainnet.quiknode.pro/61466a6e88d0e1f1f55ea00bf5ec117e22d16849/';
 
   try {
     // 日誌：記錄收到的請求
-    console.log("Proxy received request:", req.body);
+    console.log("Proxy received request:", JSON.stringify(req.body));
 
     // 轉發請求到 QuickNode RPC
     const response = await fetch(quicknodeRpcUrl, {
@@ -37,9 +37,14 @@ export default async function handler(req, res) {
     // 日誌：記錄 RPC 回應狀態
     console.log("Proxy forwarded request to RPC and received status:", response.status);
 
+    // 檢查 RPC 回應是否成功
+    if (!response.ok) {
+      throw new Error(`RPC Error: ${response.status} ${response.statusText}`);
+    }
+
     // 獲取回應數據
     const data = await response.json();
-    console.log("RPC response data:", data);
+    console.log("RPC response data:", JSON.stringify(data));
 
     // 檢查回應是否為有效的 JSON-RPC 回應
     if (data.jsonrpc !== "2.0") {
