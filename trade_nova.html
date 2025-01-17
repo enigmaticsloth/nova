@@ -201,8 +201,9 @@
   <!-- 再引入交易邏輯 -->
   <script src="tradeAnchor.js"></script>
   
-  <!-- 添加對調輸入欄位的功能 -->
+  <!-- 添加對調輸入欄位的功能及自動計算 NOVA 金額 -->
   <script>
+    // 對調輸入欄位功能
     document.getElementById('swapInputsBtn').addEventListener('click', function() {
       const solInput = document.getElementById('solInput');
       const novaInput = document.getElementById('novaInput');
@@ -225,7 +226,7 @@
       novaInput.placeholder = tempPlaceholder;
     });
 
-    // 添加 Connect Wallet 的功能
+    // Connect Wallet 的功能
     document.getElementById('connectWalletBtn').addEventListener('click', async () => {
       const walletStatus = document.getElementById('walletStatus');
       
@@ -264,6 +265,82 @@
         }
       }
     });
+
+    // 自動計算 NOVA 金額
+    document.getElementById('solInput').addEventListener('input', async function() {
+      const solAmount = parseFloat(this.value);
+      const novaInput = document.getElementById('novaInput');
+      const priceStatus = document.getElementById('priceStatus');
+
+      if (isNaN(solAmount) || solAmount <= 0) {
+        novaInput.value = '';
+        return;
+      }
+
+      // 假設 pricing.js 已經設置了一個全局變數 currentPrice，表示 1 SOL = X NOVA
+      // 如果沒有，您需要根據 pricing.js 的實現來獲取當前價格
+
+      // 這裡假設我們從 priceStatus 取得價格，例如 "1 SOL = 100 NOVA"
+      const priceText = priceStatus.textContent;
+      const priceMatch = priceText.match(/1 SOL\s*=\s*(\d+(\.\d+)?)\s*NOVA/i);
+
+      if (priceMatch && priceMatch[1]) {
+        const price = parseFloat(priceMatch[1]);
+        const novaAmount = solAmount * price;
+        novaInput.value = novaAmount.toFixed(5); // 保留 5 位小數
+      } else {
+        // 如果無法解析價格，可以嘗試從 pricing.js 獲取
+        // 例如，如果 pricing.js 提供了一個函數 getCurrentPrice()
+        if (typeof getCurrentPrice === 'function') {
+          const price = await getCurrentPrice();
+          if (price) {
+            const novaAmount = solAmount * price;
+            novaInput.value = novaAmount.toFixed(5);
+          } else {
+            novaInput.value = 'Error fetching price';
+          }
+        } else {
+          novaInput.value = 'Price not available';
+        }
+      }
+    });
+
+    // 如果您希望 NOVA 輸入改變時也能自動計算 SOL，您可以加入以下代碼：
+    
+    document.getElementById('novaInput').addEventListener('input', async function() {
+      const novaAmount = parseFloat(this.value);
+      const solInput = document.getElementById('solInput');
+      const priceStatus = document.getElementById('priceStatus');
+
+      if (isNaN(novaAmount) || novaAmount <= 0) {
+        solInput.value = '';
+        return;
+      }
+
+      // 假設 pricing.js 已經設置了一個全局變數 currentPrice，表示 1 SOL = X NOVA
+      const priceText = priceStatus.textContent;
+      const priceMatch = priceText.match(/1 SOL\s*=\s*(\d+(\.\d+)?)\s*NOVA/i);
+
+      if (priceMatch && priceMatch[1]) {
+        const price = parseFloat(priceMatch[1]);
+        const solAmount = novaAmount / price;
+        solInput.value = solAmount.toFixed(5);
+      } else {
+        // 如果無法解析價格，可以嘗試從 pricing.js 獲取
+        if (typeof getCurrentPrice === 'function') {
+          const price = await getCurrentPrice();
+          if (price) {
+            const solAmount = novaAmount / price;
+            solInput.value = solAmount.toFixed(5);
+          } else {
+            solInput.value = 'Error fetching price';
+          }
+        } else {
+          solInput.value = 'Price not available';
+        }
+      }
+    });
+    
   </script>
 </body>
 </html>
