@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Trade NOVA</title>
   <link rel="stylesheet" href="styles.css">
   <style>
-    /* Basic Styles */
+    /* 基本樣式調整 */
     body {
       font-family: Arial, sans-serif;
       background-color: #121212;
@@ -20,7 +20,7 @@
     .sidebar {
       width: 200px;
       padding: 1em;
-      /* Semi-transparent background */
+      /* 半透明背景 */
       background-color: rgba(30, 30, 30, 0.5);
     }
     .sidebar ul {
@@ -83,15 +83,12 @@
       cursor: pointer;
       background-color: #4CAF50;
       color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
     button:hover {
       background-color: #45a049;
     }
-    /* Semi-transparent status bars with fixed minimum height */
-    #walletStatus, #tradeStatus, #priceStatus, #warningStatus {
+    /* 半透明背景欄且固定最小高度 50px */
+    #walletStatus, #tradeStatus, #priceStatus {
       margin-top: 1em;
       padding: 0.5em;
       background-color: rgba(51, 51, 51, 0.5);
@@ -99,7 +96,7 @@
       white-space: pre-wrap;
       min-height: 50px;
     }
-    /* Additional Styles */
+    /* 新增的樣式 */
     #walletContainer {
       display: flex;
       align-items: center;
@@ -119,17 +116,14 @@
       width: 200px;
     }
     #swapInputsBtn {
-      padding: 0.6em;
-      font-size: 1.5em;
+      padding: 0.6em 1.2em;
+      font-size: 1em;
       border: none;
       border-radius: 5px;
       cursor: pointer;
       background-color: #4CAF50;
       color: white;
       height: 2.5em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
     #swapInputsBtn:hover {
       background-color: #45a049;
@@ -148,9 +142,9 @@
       }
     }
   </style>
-  <!-- Load Buffer polyfill -->
+  <!-- 1. 先載入 Buffer polyfill -->
   <script src="bufferPolyfill.js"></script>
-  <!-- Load Solana Web3.js -->
+  <!-- 2. 再載入 Solana Web3.js -->
   <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.84.1/lib/index.iife.min.js"></script>
 </head>
 <body>
@@ -172,20 +166,15 @@
         Please connect your wallet, then enter your desired amounts to swap.
       </p>
       
-      <!-- Wallet Connection Area -->
+      <!-- 錢包連接區域 -->
       <div id="walletContainer">
         <button id="connectWalletBtn">Connect Wallet</button>
         <div id="walletStatus">Please connect your wallet.</div>
       </div>
       
-      <!-- Warning Status Area -->
-      <div id="warningStatus" style="display: none; color: #ff4d4d;">
-        Please connect your wallet to proceed with the trade.
-      </div>
-      
       <div id="priceStatus">Loading price...</div>
       
-      <!-- Trading Area -->
+      <!-- 交易區域 -->
       <div class="swap-section">
         <div class="input-group">
           <label>You pay</label>
@@ -193,7 +182,7 @@
           <input type="number" id="solInput" placeholder="Enter SOL amount" />
         </div>
         
-        <button id="swapInputsBtn" title="Swap Inputs">↔</button>
+        <button id="swapInputsBtn" title="Swap Inputs">Swap</button>
         
         <div class="input-group">
           <label>You receive</label>
@@ -207,14 +196,13 @@
       <div id="tradeStatus"></div>
     </div>
   </div>
-  <!-- Load pricing.js -->
+  <!-- 先引入 pricing.js -->
   <script src="pricing.js"></script>
-  <!-- Load tradeAnchor.js as a module -->
-  <script type="module" src="tradeAnchor.js"></script>
+  <!-- 再引入交易邏輯 -->
+  <script src="tradeAnchor.js"></script>
   
-  <!-- Add Swap Inputs and Connect Wallet Functionality -->
+  <!-- 添加對調輸入欄位的功能 -->
   <script>
-    // Swap Inputs Functionality
     document.getElementById('swapInputsBtn').addEventListener('click', function() {
       const solInput = document.getElementById('solInput');
       const novaInput = document.getElementById('novaInput');
@@ -223,7 +211,7 @@
       solInput.value = novaInput.value;
       novaInput.value = tempValue;
       
-      // Swap label texts
+      // 交換標籤文字
       const solLabel = solInput.previousElementSibling;
       const novaLabel = novaInput.previousElementSibling;
       
@@ -231,54 +219,10 @@
       solLabel.textContent = novaLabel.textContent;
       novaLabel.textContent = tempLabel;
       
-      // Swap placeholders
+      // 交換浮水印
       const tempPlaceholder = solInput.placeholder;
       solInput.placeholder = novaInput.placeholder;
       novaInput.placeholder = tempPlaceholder;
-    });
-
-    // Auto-calculate NOVA when SOL is input
-    document.getElementById('solInput').addEventListener('input', function() {
-      const solAmount = parseFloat(this.value);
-      const novaInput = document.getElementById('novaInput');
-      
-      if (isNaN(solAmount) || solAmount <= 0) {
-        novaInput.value = '';
-        return;
-      }
-      
-      // Ensure pricing.js has fetched the prices
-      if (typeof window.CURRENT_NOVA_PRICE_USD !== 'number' || typeof window.SOL_USD_PRICE !== 'number') {
-        console.error('Price data not available.');
-        novaInput.value = 'Price not available';
-        return;
-      }
-      
-      // Calculate NOVA amount: NOVA = (SOL * SOL_USD_PRICE) / CURRENT_NOVA_PRICE_USD
-      const novaAmount = (solAmount * window.SOL_USD_PRICE) / window.CURRENT_NOVA_PRICE_USD;
-      novaInput.value = novaAmount.toFixed(5); // Keep 5 decimal places
-    });
-
-    // Auto-calculate SOL when NOVA is input
-    document.getElementById('novaInput').addEventListener('input', function() {
-      const novaAmount = parseFloat(this.value);
-      const solInput = document.getElementById('solInput');
-      
-      if (isNaN(novaAmount) || novaAmount <= 0) {
-        solInput.value = '';
-        return;
-      }
-      
-      // Ensure pricing.js has fetched the prices
-      if (typeof window.CURRENT_NOVA_PRICE_USD !== 'number' || typeof window.SOL_USD_PRICE !== 'number') {
-        console.error('Price data not available.');
-        solInput.value = 'Price not available';
-        return;
-      }
-      
-      // Calculate SOL amount: SOL = (NOVA * CURRENT_NOVA_PRICE_USD) / SOL_USD_PRICE
-      const solAmount = (novaAmount * window.CURRENT_NOVA_PRICE_USD) / window.SOL_USD_PRICE;
-      solInput.value = solAmount.toFixed(5); // Keep 5 decimal places
     });
   </script>
 </body>
