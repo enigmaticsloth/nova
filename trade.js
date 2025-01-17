@@ -59,6 +59,7 @@ async function connectWallet() {
 // 建立 or 取得 ATA
 async function prepareBuyerAtaIfNeeded(connection, userPubkey, mintPk, transaction) {
   const ataPubkey = await getAssociatedTokenAddress(mintPk, userPubkey, false, TOKEN_PROGRAM_ID);
+  console.log(">>> Derived ATA pubkey:", ataPubkey.toBase58()); // <--- 新增這行
   const ataInfo = await connection.getAccountInfo(ataPubkey);
   if (!ataInfo) {
     console.log("User ATA does not exist. Creating ATA...");
@@ -109,7 +110,7 @@ async function swapNOVA() {
   }
 
   try {
-    const connection = new Connection("https://api.mainnet-beta.solana.com", "confirmed");
+    const connection = new Connection("https://nova-enigmaticsloths-projects.vercel.app/api/rpc-proxy", "confirmed");
     const fromPubkey = new PublicKey(walletPublicKey);
 
     const solValue = parseFloat(solInput.value);
