@@ -76,10 +76,10 @@ async function connectWallet() {
     try {
       const resp = await window.solana.connect();
       walletPublicKey = resp.publicKey.toString();
-      walletStatus.innerText = `Wallet Connected: ${walletPublicKey}`;
+      walletStatus.innerText = Wallet Connected: ${walletPublicKey};
       console.log("Wallet connected:", walletPublicKey);
     } catch (err) {
-      walletStatus.innerText = `Connection Failed: ${err.message}`;
+      walletStatus.innerText = Connection Failed: ${err.message};
       console.error("Connection failed:", err);
     }
   } else {
@@ -91,12 +91,12 @@ async function connectWallet() {
 async function getRecentBlockhashWithRetry(connection, retries = 3) {
   for (let i = 0; i < retries; i++) {
     try {
-      console.log(`Fetching blockhash, attempt ${i + 1}`);
+      console.log(Fetching blockhash, attempt ${i + 1});
       const { blockhash } = await connection.getLatestBlockhash();
-      console.log(`Fetched blockhash: ${blockhash}`);
+      console.log(Fetched blockhash: ${blockhash});
       return blockhash;
     } catch (error) {
-      console.warn(`Attempt ${i + 1} failed: ${error.message}`);
+      console.warn(Attempt ${i + 1} failed: ${error.message});
       if (i === retries - 1) {
         console.error("All attempts to fetch blockhash failed:", error);
         throw error;
@@ -167,7 +167,7 @@ async function swapNOVA() {
       });
 
       transaction = new solanaWeb3.Transaction().add(instruction);
-      tradeStatus.innerText = `Executing Buy: ${solValue} SOL → Estimated NOVA...\n`;
+      tradeStatus.innerText = Executing Buy: ${solValue} SOL → Estimated NOVA...\n;
       console.log("Transaction Instructions:", transaction.instructions);
     }
 
@@ -187,7 +187,7 @@ async function swapNOVA() {
     // 發送交易
     console.log("Sending transaction...");
     const signature = await connection.sendRawTransaction(rawTransaction);
-    tradeStatus.innerText += `Transaction sent! Signature: ${signature}`;
+    tradeStatus.innerText += Transaction sent! Signature: ${signature};
     console.log("Transaction sent! Signature:", signature);
 
     // 確認交易
@@ -198,7 +198,7 @@ async function swapNOVA() {
 
   } catch (err) {
     console.error("Swap transaction error:", err);
-    tradeStatus.innerText = `Swap transaction error: ${err.message}`;
+    tradeStatus.innerText = Swap transaction error: ${err.message};
   }
 }
 
