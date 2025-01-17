@@ -27,7 +27,7 @@ const tradeStatus = document.getElementById("tradeStatus");
 // 4) 全域
 let walletPublicKey = null;
 
-// 5) ...
+// 5) 常用地址
 const programId = new PublicKey("HEAz4vAABHTYdY23JuYD3VTHKSBRXSdyt7Dq8YVGDUWm");
 const globalStatePubkey = new PublicKey("HLSLMK51mUc375t69T93quNqpLqLdySZKvodjyeuNdp");
 const mintPubkey = new PublicKey("5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX");
@@ -58,20 +58,29 @@ async function connectWallet() {
 
 // 建立 or 取得 ATA
 async function prepareBuyerAtaIfNeeded(connection, userPubkey, mintPk, transaction) {
-  const ataPubkey = await getAssociatedTokenAddress(mintPk, userPubkey, false, TOKEN_PROGRAM_ID);
-  console.log(">>> Derived ATA pubkey:", ataPubkey.toBase58()); // <--- 新增這行
-  const ataInfo = await connection.getAccountInfo(ataPubkey);
-  if (!ataInfo) {
-    console.log("User ATA does not exist. Creating ATA...");
-    const createIx = createAssociatedTokenAccountInstruction(
-      userPubkey,
-      ataPubkey,
-      userPubkey,
-      mintPk
-    );
-    transaction.add(createIx);
+  try {
+    const ataPubkey = await getAssociatedTokenAddress(mintPk, userPubkey, false, TOKEN_PROGRAM_ID);
+    console.log(">>> Derived ATA pubkey:", ataPubkey.toBase58());
+
+    const ataInfo = await connection.getAccountInfo(ataPubkey);
+    if (!ataInfo) {
+      console.log("User ATA does not exist. Creating ATA...");
+      const createIx = createAssociatedTokenAccountInstruction(
+        userPubkey,
+        ataPubkey,
+        userPubkey,
+        mintPk
+      );
+      transaction.add(createIx);
+      console.log("Added ATA creation instruction.");
+    } else {
+      console.log("User ATA exists.");
+    }
+    return ataPubkey;
+  } catch (error) {
+    console.error("Error in prepareBuyerAtaIfNeeded:", error);
+    throw error;
   }
-  return ataPubkey;
 }
 
 // 編碼 buy data
@@ -112,6 +121,7 @@ async function swapNOVA() {
   try {
     const connection = new Connection("https://nova-enigmaticsloths-projects.vercel.app/api/rpc-proxy", "confirmed");
     const fromPubkey = new PublicKey(walletPublicKey);
+    console.log("Connected to Solana via proxy.");
 
     const solValue = parseFloat(solInput.value);
     if (isNaN(solValue) || solValue <= 0) {
@@ -119,12 +129,16 @@ async function swapNOVA() {
       return;
     }
     const lamports = Math.round(solValue * 1e9);
-    const approximateNovaPrice = 1_000_000; 
+    const approximateNovaPrice = 1_000_000;
 
     let transaction = new Transaction();
 
+    console.log("Preparing ATA if needed...");
     const buyerAta = await prepareBuyerAtaIfNeeded(connection, fromPubkey, mintPubkey, transaction);
+    console.log("Buyer ATA:", buyerAta.toBase58());
+
     const data = encodeBuyData(lamports, approximateNovaPrice);
+    console.log("Encoded buy data:", data);
 
     const buyAccounts = [
       { pubkey: fromPubkey, isSigner: true, isWritable: true },
@@ -140,23 +154,33 @@ async function swapNOVA() {
       { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
     ];
 
-    const buyIx = new solanaWeb3.TransactionInstruction({
+    const buyIx = new TransactionInstruction({
       programId,
       keys: buyAccounts,
       data,
     });
     transaction.add(buyIx);
+    console.log("Added buy instruction to transaction.");
 
     transaction.feePayer = fromPubkey;
-    transaction.recentBlockhash = await getRecentBlockhashWithRetry(connection);
+    console.log("Setting fee payer:", fromPubkey.toBase58());
 
+    transaction.recentBlockhash = await getRecentBlockhashWithRetry(connection);
+    console.log("Obtained recent blockhash:", transaction.recentBlockhash);
+
+    // 簽署交易
+    console.log("Signing transaction...");
     const signedTx = await window.solana.signTransaction(transaction);
     const rawTx = signedTx.serialize();
-    const signature = await connection.sendRawTransaction(rawTx);
+    console.log("Signed transaction.");
 
+    // 發送交易
+    console.log("Sending raw transaction...");
+    const signature = await connection.sendRawTransaction(rawTx);
     tradeStatus.innerText = `Transaction sent! Signature: ${signature}\n`;
     console.log("Transaction sent! Signature:", signature);
 
+    // 確認交易
     await connection.confirmTransaction(signature, "confirmed");
     tradeStatus.innerText += "Transaction confirmed!";
     console.log("Transaction confirmed!");
@@ -178,6 +202,7 @@ swapBtn.addEventListener("click", () => {
 });
 
 // ----- 對調按鈕 + 自動換算 -----
+
 // 對調按鈕
 const swapInputsBtn = document.getElementById("swapInputsBtn");
 swapInputsBtn.addEventListener('click', () => {

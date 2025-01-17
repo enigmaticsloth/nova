@@ -1,7 +1,7 @@
 // api/rpc-proxy.js
 
 export default async function handler(req, res) {
-  // 設置 CORS 標頭，僅允許指定來源
+  // 設置 CORS 標頭，允許指定來源和標頭
   res.setHeader("Access-Control-Allow-Origin", "https://enigmaticsloth.github.io");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, solana-client");
