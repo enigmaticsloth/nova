@@ -18,7 +18,7 @@ let walletPublicKey = null;
 let activeField = null;  // "sol" or "nova"
 
 // Exchange contract address
-const exchangeContractAddress = "HEAz4vAABHTYdY23JuYD3VTHKSBRXSdyt7Dq8YVGDUWm"; // 確保這是正確的地址
+const exchangeContractAddress = "HEAz4vAABHTYdY23JuYD3VTHKSBRXSdyt7Dq8YVGDUWm"; // Replace with your exchange contract address
 
 // Debounce function to limit the rate of function calls
 function debounce(func, delay) {
@@ -76,10 +76,10 @@ async function connectWallet() {
     try {
       const resp = await window.solana.connect();
       walletPublicKey = resp.publicKey.toString();
-      walletStatus.innerText = Wallet Connected: ${walletPublicKey};
+      walletStatus.innerText = `Wallet Connected: ${walletPublicKey}`;
       console.log("Wallet connected:", walletPublicKey);
     } catch (err) {
-      walletStatus.innerText = Connection Failed: ${err.message};
+      walletStatus.innerText = `Connection Failed: ${err.message}`;
       console.error("Connection failed:", err);
     }
   } else {
@@ -91,12 +91,12 @@ async function connectWallet() {
 async function getRecentBlockhashWithRetry(connection, retries = 3) {
   for (let i = 0; i < retries; i++) {
     try {
-      console.log(Fetching blockhash, attempt ${i + 1});
+      console.log(`Fetching blockhash, attempt ${i + 1}`);
       const { blockhash } = await connection.getLatestBlockhash();
-      console.log(Fetched blockhash: ${blockhash});
+      console.log(`Fetched blockhash: ${blockhash}`);
       return blockhash;
     } catch (error) {
-      console.warn(Attempt ${i + 1} failed: ${error.message});
+      console.warn(`Attempt ${i + 1} failed: ${error.message}`);
       if (i === retries - 1) {
         console.error("All attempts to fetch blockhash failed:", error);
         throw error;
@@ -105,6 +105,7 @@ async function getRecentBlockhashWithRetry(connection, retries = 3) {
     }
   }
 }
+
 
 // Throttle function to limit the rate of function calls
 function throttle(func, limit) {
@@ -137,6 +138,7 @@ async function swapNOVA() {
 
   try {
     console.log("Starting swap transaction...");
+    // Use vercel
     const connection = new solanaWeb3.Connection(
       "https://nova-enigmaticsloths-projects.vercel.app/api/rpc-proxy",
       "confirmed"
@@ -151,54 +153,73 @@ async function swapNOVA() {
         return;
       }
       const lamports = Math.round(solValue * 1e9);
-      
-      // 替換為您的實際 Program ID
-      const programId = new solanaWeb3.PublicKey("HEAz4vAABHTYdY23JuYD3VTHKSBRXSdyt7Dq8YVGDUWm"); // <--- 替換此處
+      transaction = new solanaWeb3.Transaction().add(
+        solanaWeb3.SystemProgram.transfer({
+          fromPubkey,
+          toPubkey: new solanaWeb3.PublicKey(exchangeContractAddress),  // Exchange contract address
+          lamports: lamports,
+        })
+      );
+      tradeStatus.innerText = `Executing Buy: ${solValue} SOL → Estimated NOVA...\n`;
+    } else if (activeField === "nova") {
+      const novaValue = parseFloat(novaInput.value);
+      if (isNaN(novaValue) || novaValue <= 0) {
+        tradeStatus.innerText = "Please enter a valid NOVA amount.";
+        return;
+      }
 
-      // 指令數據，根據您的智能合約需求調整
-      const instruction = new solanaWeb3.TransactionInstruction({
-        keys: [
-          { pubkey: fromPubkey, isSigner: true, isWritable: true },
-          { pubkey: new solanaWeb3.PublicKey(exchangeContractAddress), isSigner: false, isWritable: true },
-          // 添加更多需要的帳戶
-        ],
-        programId: programId, // 使用正確的 Program ID
-        data: Buffer.from([0x01]), // 0x01 代表 "swap SOL to NOVA" 指令
-      });
+      // Assuming NOVA is an SPL Token, use @solana/spl-token to transfer NOVA
+      // Ensure you have included the SPL Token library in your HTML
+      const { Token, TOKEN_PROGRAM_ID } = splToken; // Assuming @solana/spl-token is loaded as splToken
+      const novaMintAddress = "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX"; // Replace with your NOVA Token Mint Address
 
-      transaction = new solanaWeb3.Transaction().add(instruction);
-      tradeStatus.innerText = Executing Buy: ${solValue} SOL → Estimated NOVA...\n;
-      console.log("Transaction Instructions:", transaction.instructions);
+      // Create Token instance
+      const novaToken = new Token(
+        connection,
+        new solanaWeb3.PublicKey(novaMintAddress),
+        TOKEN_PROGRAM_ID,
+        fromPubkey
+      );
+
+      // Get user's NOVA Token Account
+      const userTokenAccount = await novaToken.getOrCreateAssociatedAccountInfo(fromPubkey);
+
+      // Transfer NOVA to exchange contract address
+      transaction = new solanaWeb3.Transaction().add(
+        Token.createTransferInstruction(
+          TOKEN_PROGRAM_ID,
+          userTokenAccount.address,
+          new solanaWeb3.PublicKey(exchangeContractAddress),  // Exchange contract address
+          fromPubkey,
+          [],
+          novaValue * 1e9 // Assuming NOVA has 9 decimal places
+        )
+      );
+      tradeStatus.innerText = `Executing Sell: ${novaValue} NOVA → Estimated SOL...\n`;
     }
 
-    // 設置 fee payer
+    // Set fee payer
     transaction.feePayer = fromPubkey;
-    console.log("Fetching latest blockhash...");
+    // Get the latest blockhash
     const blockhash = await getRecentBlockhashWithRetry(connection);
-    console.log("Latest blockhash:", blockhash);
     transaction.recentBlockhash = blockhash;
 
-    // 簽名交易
-    console.log("Signing transaction...");
+    // Sign the transaction
     const signedTransaction = await window.solana.signTransaction(transaction);
+    // Serialize the transaction
     const rawTransaction = signedTransaction.serialize();
-    console.log("Raw transaction:", rawTransaction);
 
-    // 發送交易
-    console.log("Sending transaction...");
+    // Send the transaction
     const signature = await connection.sendRawTransaction(rawTransaction);
-    tradeStatus.innerText += Transaction sent! Signature: ${signature};
+    tradeStatus.innerText += `Transaction sent! Signature: ${signature}`;
     console.log("Transaction sent! Signature:", signature);
-
-    // 確認交易
-    console.log("Confirming transaction...");
+    // Confirm the transaction
     await connection.confirmTransaction(signature, 'confirmed');
     tradeStatus.innerText += "\nTransaction confirmed!";
-    console.log("Transaction confirmed!");
 
   } catch (err) {
     console.error("Swap transaction error:", err);
-    tradeStatus.innerText = Swap transaction error: ${err.message};
+    tradeStatus.innerText = `Swap transaction error: ${err.message}`;
   }
 }
 

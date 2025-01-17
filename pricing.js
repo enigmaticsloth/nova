@@ -20,12 +20,12 @@ async function fetchNOVA_Price() {
 
   try {
     const contractAddress = "5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX";
-    const url = https://api.geckoterminal.com/api/v2/simple/networks/solana/token_price/${contractAddress};
+    const url = `https://api.geckoterminal.com/api/v2/simple/networks/solana/token_price/${contractAddress}`;
     const response = await fetch(url, {
       headers: { Accept: "application/json;version=20230302" }
     });
     if (!response.ok) {
-      throw new Error(HTTP error ${response.status});
+      throw new Error(`HTTP error ${response.status}`);
     }
     const data = await response.json();
     console.log("GeckoTerminal API response:", data);
@@ -38,7 +38,7 @@ async function fetchNOVA_Price() {
     }
   } catch (err) {
     console.error("NOVA Price fetch error:", err);
-    updatePriceDisplay(Failed to fetch NOVA price. Error: ${err.message});
+    updatePriceDisplay(`Failed to fetch NOVA price. Error: ${err.message}`);
   }
 }
 
@@ -57,7 +57,7 @@ async function fetchSOL_Price() {
     const url = "https://api.binance.com/api/v3/ticker/price?symbol=SOLUSDT";
     const response = await fetch(url);
     if (!response.ok) {
-      throw new Error(Binance HTTP error ${response.status});
+      throw new Error(`Binance HTTP error ${response.status}`);
     }
     const data = await response.json();
     console.log("Binance SOL price response:", data);
@@ -70,7 +70,7 @@ async function fetchSOL_Price() {
     }
   } catch (err) {
     console.error("SOL Price fetch error:", err);
-    updatePriceDisplay(Failed to fetch SOL price. Error: ${err.message});
+    updatePriceDisplay(`Failed to fetch SOL price. Error: ${err.message}`);
   }
 }
 
@@ -80,7 +80,7 @@ function updatePriceDisplay(message) {
     if (message) {
       priceStatus.innerText = message;
     } else {
-      priceStatus.innerText = NOVA Price: $${window.CURRENT_NOVA_PRICE_USD.toFixed(6)} USD, SOL Price: $${window.SOL_USD_PRICE.toFixed(2)} USD;
+      priceStatus.innerText = `NOVA Price: $${window.CURRENT_NOVA_PRICE_USD.toFixed(6)} USD, SOL Price: $${window.SOL_USD_PRICE.toFixed(2)} USD`;
     }
   }
 }
