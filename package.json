@@ -16,9 +16,14 @@
     "url": "https://github.com/enigmaticsloth/NOVA/issues"
   },
   "homepage": "https://github.com/enigmaticsloth/NOVA#readme",
-  "description": "",
   "dependencies": {
     "@coral-xyz/anchor": "^0.30.1",
+    "@solana/spl-token": "^0.4.9",
     "@solana/web3.js": "^1.98.0"
-  }
+  },
+  "devDependencies": {
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1"
+  },
+  "description": ""
 }

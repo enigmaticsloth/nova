@@ -5,13 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Trade NOVA</title>
 
-  <!-- 載入主要 CSS (可放外部檔案，也可 inline) -->
+  <!-- (可選) 你的樣式檔，可自行修改或拿掉 -->
   <link rel="stylesheet" href="styles.css">
 
   <style>
-    /* ------------------------------------------------
-       這些是你原本的基本樣式
-       ------------------------------------------------ */
     body {
       font-family: Arial, sans-serif;
       background-color: #121212;
@@ -75,9 +72,6 @@
       width: 100%;
       box-sizing: border-box;
     }
-    input[type="number"] {
-      step: 0.00001;
-    }
     button {
       padding: 0.6em 1.2em;
       font-size: 1em;
@@ -99,12 +93,6 @@
       white-space: pre-wrap;
       min-height: 50px;
     }
-    #walletContainer {
-      display: flex;
-      align-items: center;
-      gap: 1em;
-      margin-top: 1em;
-    }
     .swap-section {
       display: flex;
       align-items: center;
@@ -117,100 +105,61 @@
       flex-direction: column;
       width: 200px;
     }
-    #swapInputsBtn {
-      padding: 0.6em 1.2em;
-      font-size: 1em;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      background-color: #4CAF50;
-      color: white;
-      height: 2.5em;
-    }
-    #swapInputsBtn:hover {
-      background-color: #45a049;
-    }
-    #swapBtn {
-      height: fit-content;
-      align-self: flex-end;
-    }
     @media (max-width: 600px) {
       .swap-section {
         flex-direction: column;
         align-items: stretch;
       }
-      #swapBtn {
-        align-self: stretch;
-      }
     }
   </style>
 
-  <!-- 1. bufferPolyfill -->
-  <script src="bufferPolyfill.js"></script>
-
-  <!-- 2. Solana Web3.js -->
+  <!-- 1) 載入 Solana Web3.js 的 IIFE 版本 (提供全域 solanaWeb3) -->
   <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.84.1/lib/index.iife.min.js"></script>
 
-  <!-- 3. @solana/spl-token UMD bundle (用來建立 / 檢查 ATA) -->
+  <!-- 2) 載入 SPL-Token UMD 版本 (提供全域 splToken) -->
   <script src="https://unpkg.com/@solana/spl-token@latest/dist/spl-token.umd.js"></script>
 </head>
 
 <body>
   <div class="main-container">
-    <!-- 左側選單 -->
     <div class="sidebar">
       <ul>
         <li><a href="index.html">Enigmatic Sloth</a></li>
-        <li><a href="nova.html">Nova</a></li>
-        <li><a href="trade_nova.html">Trade NOVA</a></li>
       </ul>
     </div>
-
-    <!-- 主要內容區 -->
     <div class="content">
       <div class="header">
-        <img src="Image/Nova.PNG" alt="Nova Logo">
+        <img src="Image/Nova.PNG" alt="Nova Logo" />
         <h1>Trade NOVA</h1>
       </div>
       <p>
         Welcome to the official NOVA Trading Platform.
         Please connect your wallet, then enter your desired amounts to swap.
       </p>
-      
-      <!-- 錢包連接區域 -->
+
       <div id="walletContainer">
         <button id="connectWalletBtn">Connect Wallet</button>
         <div id="walletStatus">Please connect your wallet.</div>
       </div>
-      
-      <!-- 動態顯示價格 -->
       <div id="priceStatus">Loading price...</div>
-      
-      <!-- 交易區域：可以輸入SOL或NOVA -->
+
       <div class="swap-section">
         <div class="input-group">
-          <label>You pay</label>
           <label for="solInput">SOL:</label>
           <input type="number" id="solInput" placeholder="Enter SOL amount" />
         </div>
-        
-        <button id="swapInputsBtn" title="Swap Inputs">Swap</button>
-        
         <div class="input-group">
-          <label>You receive</label>
           <label for="novaInput">NOVA:</label>
           <input type="number" id="novaInput" placeholder="Enter NOVA amount" />
         </div>
-        
         <button id="swapBtn">Swap</button>
       </div>
-      
+
       <div id="tradeStatus"></div>
     </div>
   </div>
 
-  <!-- 先引入 pricing.js (若要顯示動態價格; 若不需要，可刪) -->
-  <script src="pricing.js"></script>
-
-  <!-- 再引入交易邏輯 trade.js（完整） -->
-  <script>
+  <!-- 3) 最後載入 trade.js：要確保在 web3.js & spl-token.umd.js 之後 -->
+  <script src="dist/bundle.js"></script>
+</body>
+</html>
