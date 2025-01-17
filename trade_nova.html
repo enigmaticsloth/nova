@@ -1,200 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Trade NOVA (Anchor Version)</title>
-    <style>
-      body {
-        background-color: #121212;
-        color: #eee;
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-      }
-      .main-container {
-        display: flex;
-      }
-      .sidebar {
-        width: 200px;
-        padding: 1em;
-        background-color: rgba(30, 30, 30, 0.5);
-      }
-      .sidebar ul {
-        list-style: none;
-        padding: 0;
-      }
-      .sidebar li {
-        margin-bottom: 0.5em;
-      }
-      .sidebar a {
-        text-decoration: none;
-        color: #ccc;
-        font-weight: bold;
-      }
-      .sidebar a:hover {
-        color: white;
-      }
-      .content {
-        flex: 1;
-        padding: 2em;
-      }
-      .header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 1em;
-      }
-      .header img {
-        width: 50px;
-        height: 50px;
-        margin-right: 15px;
-      }
-      .header h1 {
-        margin: 0;
-        font-size: 2em;
-        color: white;
-      }
-      label {
-        display: block;
-        margin-top: 0.5em;
-        font-weight: bold;
-      }
-      input {
-        padding: 0.5em;
-        font-size: 1em;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        margin: 0.5em 0;
-        width: 100%;
-        box-sizing: border-box;
-      }
-      button {
-        padding: 0.6em 1.2em;
-        font-size: 1em;
-        margin: 0.5em 0;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        background-color: #4CAF50;
-        color: white;
-      }
-      button:hover {
-        background-color: #45a049;
-      }
-      #walletStatus, #tradeStatus, #priceStatus {
-        margin-top: 1em;
-        padding: 0.5em;
-        background-color: rgba(51, 51, 51, 0.5);
-        border-radius: 5px;
-        white-space: pre-wrap;
-        min-height: 50px;
-      }
-      #walletContainer {
-        display: flex;
-        align-items: center;
-        gap: 1em;
-        margin-top: 1em;
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trade NOVA</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* 基本樣式調整 */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #eee;
+      margin: 0;
+      padding: 0;
+    }
+    .main-container {
+      display: flex;
+    }
+    .sidebar {
+      width: 200px;
+      padding: 1em;
+      /* 半透明背景 */
+      background-color: rgba(30, 30, 30, 0.5);
+    }
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+    .sidebar li {
+      margin-bottom: 0.5em;
+    }
+    .sidebar a {
+      text-decoration: none;
+      color: #ccc;
+      font-weight: bold;
+    }
+    .sidebar a:hover {
+      color: white;
+    }
+    .content {
+      flex: 1;
+      padding: 2em;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1em;
+    }
+    .header img {
+      width: 50px;
+      height: 50px;
+      margin-right: 15px;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 2em;
+      color: white;
+    }
+    label {
+      display: block;
+      margin-top: 0.5em;
+      font-weight: bold;
+    }
+    input {
+      padding: 0.5em;
+      font-size: 1em;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin: 0.5em 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    input[type="number"] {
+      step: 0.00001;
+    }
+    button {
+      padding: 0.6em 1.2em;
+      font-size: 1em;
+      margin: 0.5em 0;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    /* 半透明背景欄且固定最小高度 50px */
+    #walletStatus, #tradeStatus, #priceStatus {
+      margin-top: 1em;
+      padding: 0.5em;
+      background-color: rgba(51, 51, 51, 0.5);
+      border-radius: 5px;
+      white-space: pre-wrap;
+      min-height: 50px;
+    }
+    /* 新增的樣式 */
+    #walletContainer {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+      margin-top: 1em;
+    }
+    .swap-section {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+      margin-top: 2em;
+      flex-wrap: wrap;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      width: 200px;
+    }
+    #swapInputsBtn {
+      padding: 0.6em 1.2em;
+      font-size: 1em;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      height: 2.5em;
+    }
+    #swapInputsBtn:hover {
+      background-color: #45a049;
+    }
+    #swapBtn {
+      height: fit-content;
+      align-self: flex-end;
+    }
+    @media (max-width: 600px) {
       .swap-section {
-        display: flex;
-        align-items: center;
-        gap: 1em;
-        margin-top: 2em;
-        flex-wrap: wrap;
-      }
-      .input-group {
-        display: flex;
         flex-direction: column;
-        width: 200px;
-      }
-      #swapInputsBtn {
-        padding: 0.6em 1.2em;
-        font-size: 1em;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        background-color: #4CAF50;
-        color: white;
-        height: 2.5em;
-      }
-      #swapInputsBtn:hover {
-        background-color: #45a049;
+        align-items: stretch;
       }
       #swapBtn {
-        height: fit-content;
-        align-self: flex-end;
+        align-self: stretch;
       }
-      @media (max-width: 600px) {
-        .swap-section {
-          flex-direction: column;
-          align-items: stretch;
-        }
-        #swapBtn {
-          align-self: stretch;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="main-container">
-      <!-- 側邊欄 -->
-      <div class="sidebar">
-        <ul>
-          <li><a href="index.html">Enigmatic Sloth</a></li>
-          <li><a href="nova.html">Nova</a></li>
-          <li><a href="trade_nova.html">Trade NOVA</a></li>
-        </ul>
+    }
+  </style>
+  <!-- 1. 先載入 Buffer polyfill -->
+  <script src="bufferPolyfill.js"></script>
+  <!-- 2. 再載入 Solana Web3.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.84.1/lib/index.iife.min.js"></script>
+</head>
+<body>
+  <div class="main-container">
+    <div class="sidebar">
+      <ul>
+        <li><a href="index.html">Enigmatic Sloth</a></li>
+        <li><a href="nova.html">Nova</a></li>
+        <li><a href="trade_nova.html">Trade NOVA</a></li>
+      </ul>
+    </div>
+    <div class="content">
+      <div class="header">
+        <img src="Image/Nova.PNG" alt="Nova Logo">
+        <h1>Trade NOVA</h1>
+      </div>
+      <p>
+        Welcome to the official NOVA Trading Platform.
+        Please connect your wallet, then enter your desired amounts to swap.
+      </p>
+      
+      <!-- 錢包連接區域 -->
+      <div id="walletContainer">
+        <button id="connectWalletBtn">Connect Wallet</button>
+        <div id="walletStatus">Please connect your wallet.</div>
       </div>
       
-      <!-- 內容區 -->
-      <div class="content">
-        <div class="header">
-          <img src="https://raw.githubusercontent.com/EnigmaticSloth/nova/gh-pages/Image/Nova.PNG" alt="Nova Logo" />
-          <h1>Trade NOVA (Anchor)</h1>
+      <div id="priceStatus">Loading price...</div>
+      
+      <!-- 交易區域 -->
+      <div class="swap-section">
+        <div class="input-group">
+          <label>You pay</label>
+          <label for="solInput">SOL:</label>
+          <input type="number" id="solInput" placeholder="Enter SOL amount" />
         </div>
         
-        <p>Welcome to the official NOVA Trading Platform using Anchor.  
-           Please connect your wallet, then enter your desired amounts to swap.</p>
+        <button id="swapInputsBtn" title="Swap Inputs">Swap</button>
         
-        <!-- 錢包連接區域 -->
-        <div id="walletContainer">
-          <button id="connectWalletBtn">Connect Wallet</button>
-          <div id="walletStatus">Please connect your wallet.</div>
+        <div class="input-group">
+          <label>You receive</label>
+          <label for="novaInput">NOVA:</label>
+          <input type="number" id="novaInput" placeholder="Enter NOVA amount" />
         </div>
         
-        <!-- 價格區 (可自行實作動態顯示) -->
-        <div id="priceStatus">NOVA Price: $0.00123, SOL Price: $20.00</div>
-        
-        <!-- 交易區域 -->
-        <div class="swap-section">
-          <div class="input-group">
-            <label>You pay</label>
-            <label for="solInput">SOL:</label>
-            <input type="number" id="solInput" placeholder="Enter SOL amount" />
-          </div>
-          
-          <button id="swapInputsBtn" title="Swap Inputs">Swap</button>
-          
-          <div class="input-group">
-            <label>You receive</label>
-            <label for="novaInput">NOVA:</label>
-            <input type="number" id="novaInput" placeholder="Enter NOVA amount" />
-          </div>
-          
-          <button id="swapBtn">Swap</button>
-        </div>
-        
-        <!-- 交易狀態顯示 -->
-        <div id="tradeStatus"></div>
+        <button id="swapBtn">Swap</button>
       </div>
+      
+      <div id="tradeStatus"></div>
     </div>
-
-    <!-- 你仍可以加上 buffer polyfill 與 web3.js (若需要) -->
-    <script src="bufferPolyfill.js"></script>
-    <!-- 這是官方 web3.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.84.1/lib/index.iife.min.js"></script>
-
-    <!-- 這裡假設你已經把 tradeAnchor.js 打包成可在瀏覽器運行的檔案 -->
-    <!-- 或使用 <script type="module" src="tradeAnchor.js"></script> (需瀏覽器支援 ES modules) -->
-    <script src="tradeAnchor.js"></script>
-  </body>
+  </div>
+  <!-- 先引入 pricing.js -->
+  <script src="pricing.js"></script>
+  <!-- 再引入交易邏輯 -->
+  <script src="tradeAnchor.js"></script>
+  
+  <!-- 添加對調輸入欄位的功能 -->
+  <script>
+    document.getElementById('swapInputsBtn').addEventListener('click', function() {
+      const solInput = document.getElementById('solInput');
+      const novaInput = document.getElementById('novaInput');
+      
+      const tempValue = solInput.value;
+      solInput.value = novaInput.value;
+      novaInput.value = tempValue;
+      
+      // 交換標籤文字
+      const solLabel = solInput.previousElementSibling;
+      const novaLabel = novaInput.previousElementSibling;
+      
+      const tempLabel = solLabel.textContent;
+      solLabel.textContent = novaLabel.textContent;
+      novaLabel.textContent = tempLabel;
+      
+      // 交換浮水印
+      const tempPlaceholder = solInput.placeholder;
+      solInput.placeholder = novaInput.placeholder;
+      novaInput.placeholder = tempPlaceholder;
+    });
+  </script>
+</body>
 </html>
