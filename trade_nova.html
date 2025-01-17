@@ -6,7 +6,7 @@
   <title>Trade NOVA</title>
   <link rel="stylesheet" href="styles.css">
   <style>
-    /* 基本樣式調整 */
+    /* Basic Styles */
     body {
       font-family: Arial, sans-serif;
       background-color: #121212;
@@ -20,7 +20,7 @@
     .sidebar {
       width: 200px;
       padding: 1em;
-      /* 半透明背景 */
+      /* Semi-transparent background */
       background-color: rgba(30, 30, 30, 0.5);
     }
     .sidebar ul {
@@ -87,7 +87,7 @@
     button:hover {
       background-color: #45a049;
     }
-    /* 半透明背景欄且固定最小高度 50px */
+    /* Semi-transparent status bars with fixed minimum height */
     #walletStatus, #tradeStatus, #priceStatus {
       margin-top: 1em;
       padding: 0.5em;
@@ -96,7 +96,7 @@
       white-space: pre-wrap;
       min-height: 50px;
     }
-    /* 新增的樣式 */
+    /* Additional Styles */
     #walletContainer {
       display: flex;
       align-items: center;
@@ -142,9 +142,9 @@
       }
     }
   </style>
-  <!-- 1. 先載入 Buffer polyfill -->
+  <!-- 1. Load Buffer polyfill -->
   <script src="bufferPolyfill.js"></script>
-  <!-- 2. 再載入 Solana Web3.js -->
+  <!-- 2. Load Solana Web3.js -->
   <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.84.1/lib/index.iife.min.js"></script>
 </head>
 <body>
@@ -166,7 +166,7 @@
         Please connect your wallet, then enter your desired amounts to swap.
       </p>
       
-      <!-- 錢包連接區域 -->
+      <!-- Wallet Connection Area -->
       <div id="walletContainer">
         <button id="connectWalletBtn">Connect Wallet</button>
         <div id="walletStatus">Please connect your wallet.</div>
@@ -174,7 +174,7 @@
       
       <div id="priceStatus">Loading price...</div>
       
-      <!-- 交易區域 -->
+      <!-- Trading Area -->
       <div class="swap-section">
         <div class="input-group">
           <label>You pay</label>
@@ -196,14 +196,14 @@
       <div id="tradeStatus"></div>
     </div>
   </div>
-  <!-- 先引入 pricing.js -->
+  <!-- Load pricing.js -->
   <script src="pricing.js"></script>
-  <!-- 再引入交易邏輯 -->
-  <script src="tradeAnchor.js"></script>
+  <!-- Load tradeAnchor.js as a module -->
+  <script type="module" src="tradeAnchor.js"></script>
   
-  <!-- 添加對調輸入欄位的功能及 Connect Wallet 的功能 -->
+  <!-- Add Swap Inputs and Connect Wallet Functionality -->
   <script>
-    // 對調輸入欄位功能
+    // Swap Inputs Functionality
     document.getElementById('swapInputsBtn').addEventListener('click', function() {
       const solInput = document.getElementById('solInput');
       const novaInput = document.getElementById('novaInput');
@@ -212,7 +212,7 @@
       solInput.value = novaInput.value;
       novaInput.value = tempValue;
       
-      // 交換標籤文字
+      // Swap label texts
       const solLabel = solInput.previousElementSibling;
       const novaLabel = novaInput.previousElementSibling;
       
@@ -220,52 +220,55 @@
       solLabel.textContent = novaLabel.textContent;
       novaLabel.textContent = tempLabel;
       
-      // 交換浮水印
+      // Swap placeholders
       const tempPlaceholder = solInput.placeholder;
       solInput.placeholder = novaInput.placeholder;
       novaInput.placeholder = tempPlaceholder;
     });
 
-    // Connect Wallet 的功能
-    document.getElementById('connectWalletBtn').addEventListener('click', async () => {
-      const walletStatus = document.getElementById('walletStatus');
+    // Auto-calculate NOVA when SOL is input
+    document.getElementById('solInput').addEventListener('input', function() {
+      const solAmount = parseFloat(this.value);
+      const novaInput = document.getElementById('novaInput');
       
-      try {
-        // 檢查是否有注入 Solana 物件（例如 Phantom）
-        const { solana } = window;
-
-        if (solana && solana.isPhantom) {
-          // 請求錢包連接
-          const response = await solana.connect();
-          walletStatus.textContent = `Connected: ${response.publicKey.toString()}`;
-          
-          // 你可以在此處添加更多與錢包相關的操作，例如獲取餘額
-          console.log('Connected with public key:', response.publicKey.toString());
-        } else {
-          // 如果沒有安裝 Phantom 錢包，提示用戶下載
-          walletStatus.innerHTML = 'Solana wallet not found. Please install <a href="https://phantom.app/" target="_blank" style="color: #4CAF50; text-decoration: underline;">Phantom Wallet</a>.';
-          alert('Solana 物件未找到！請安裝 Phantom Wallet 👻');
-        }
-      } catch (err) {
-        console.error('Connection error:', err);
-        walletStatus.textContent = 'Failed to connect wallet.';
+      if (isNaN(solAmount) || solAmount <= 0) {
+        novaInput.value = '';
+        return;
       }
+      
+      // Ensure pricing.js has fetched the prices
+      if (typeof window.CURRENT_NOVA_PRICE_USD !== 'number' || typeof window.SOL_USD_PRICE !== 'number') {
+        console.error('Price data not available.');
+        novaInput.value = 'Price not available';
+        return;
+      }
+      
+      // Calculate NOVA amount: NOVA = SOL * (SOL_USD_PRICE / CURRENT_NOVA_PRICE_USD)
+      const novaAmount = solAmount * (window.SOL_USD_PRICE / window.CURRENT_NOVA_PRICE_USD);
+      novaInput.value = novaAmount.toFixed(5); // Keep 5 decimal places
     });
 
-    // 自動連接已經連接的錢包（可選）
-    window.addEventListener('load', async () => {
-      const { solana } = window;
-
-      if (solana && solana.isPhantom) {
-        try {
-          const response = await solana.connect({ onlyIfTrusted: true });
-          document.getElementById('walletStatus').textContent = `Connected: ${response.publicKey.toString()}`;
-          console.log('Already connected with public key:', response.publicKey.toString());
-        } catch (err) {
-          console.log('Not connected to wallet yet.');
-        }
+    // Auto-calculate SOL when NOVA is input
+    document.getElementById('novaInput').addEventListener('input', function() {
+      const novaAmount = parseFloat(this.value);
+      const solInput = document.getElementById('solInput');
+      
+      if (isNaN(novaAmount) || novaAmount <= 0) {
+        solInput.value = '';
+        return;
       }
+      
+      // Ensure pricing.js has fetched the prices
+      if (typeof window.CURRENT_NOVA_PRICE_USD !== 'number' || typeof window.SOL_USD_PRICE !== 'number') {
+        console.error('Price data not available.');
+        solInput.value = 'Price not available';
+        return;
+      }
+      
+      // Calculate SOL amount: SOL = NOVA * (CURRENT_NOVA_PRICE_USD / SOL_USD_PRICE)
+      const solAmount = novaAmount * (window.CURRENT_NOVA_PRICE_USD / window.SOL_USD_PRICE);
+      solInput.value = solAmount.toFixed(5); // Keep 5 decimal places
     });
   </script>
 </body>
-</html> 
+</html>
