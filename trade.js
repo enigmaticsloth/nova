@@ -18,7 +18,7 @@ let walletPublicKey = null;
 let activeField = null;  // "sol" or "nova"
 
 // Exchange contract address
-const exchangeContractAddress = "HEAz4vAABHTYdY23JuYD3VTHKSBRXSdyt7Dq8YVGDUWm"; // Replace with your exchange contract address
+const exchangeContractAddress = "HEAz4vAABHTYdY23JuYD3VTHKSBRXSdyt7Dq8YVGDUWm"; // 確保這是正確的地址
 
 // Debounce function to limit the rate of function calls
 function debounce(func, delay) {
@@ -106,7 +106,6 @@ async function getRecentBlockhashWithRetry(connection, retries = 3) {
   }
 }
 
-
 // Throttle function to limit the rate of function calls
 function throttle(func, limit) {
   let lastFunc;
@@ -153,15 +152,18 @@ async function swapNOVA() {
       }
       const lamports = Math.round(solValue * 1e9);
       
-      // 這裡假設您使用智能合約指令
+      // 替換為您的實際 Program ID
+      const programId = new solanaWeb3.PublicKey("HEAz4vAABHTYdY23JuYD3VTHKSBRXSdyt7Dq8YVGDUWm"); // <--- 替換此處
+
+      // 指令數據，根據您的智能合約需求調整
       const instruction = new solanaWeb3.TransactionInstruction({
         keys: [
           { pubkey: fromPubkey, isSigner: true, isWritable: true },
           { pubkey: new solanaWeb3.PublicKey(exchangeContractAddress), isSigner: false, isWritable: true },
           // 添加更多需要的帳戶
         ],
-        programId: new solanaWeb3.PublicKey("您的智能合約程序ID"),
-        data: Buffer.from([/* 指令數據，例如: 0x01 表示 swapSOLToNOVA */]),
+        programId: programId, // 使用正確的 Program ID
+        data: Buffer.from([0x01]), // 0x01 代表 "swap SOL to NOVA" 指令
       });
 
       transaction = new solanaWeb3.Transaction().add(instruction);
