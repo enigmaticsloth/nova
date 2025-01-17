@@ -4,144 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Trade NOVA</title>
+  <!-- 引用外部 CSS -->
   <link rel="stylesheet" href="styles.css">
-  <style>
-    /* 基本樣式調整 */
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #121212;
-      color: #eee;
-      margin: 0;
-      padding: 0;
-    }
-    .main-container {
-      display: flex;
-    }
-    .sidebar {
-      width: 200px;
-      padding: 1em;
-      /* 半透明背景 */
-      background-color: rgba(30, 30, 30, 0.5);
-    }
-    .sidebar ul {
-      list-style: none;
-      padding: 0;
-    }
-    .sidebar li {
-      margin-bottom: 0.5em;
-    }
-    .sidebar a {
-      text-decoration: none;
-      color: #ccc;
-      font-weight: bold;
-    }
-    .sidebar a:hover {
-      color: white;
-    }
-    .content {
-      flex: 1;
-      padding: 2em;
-    }
-    .header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 1em;
-    }
-    .header img {
-      width: 50px;
-      height: 50px;
-      margin-right: 15px;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 2em;
-      color: white;
-    }
-    label {
-      display: block;
-      margin-top: 0.5em;
-      font-weight: bold;
-    }
-    input {
-      padding: 0.5em;
-      font-size: 1em;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      margin: 0.5em 0;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    input[type="number"] {
-      step: 0.00001;
-    }
-    button {
-      padding: 0.6em 1.2em;
-      font-size: 1em;
-      margin: 0.5em 0;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      background-color: #4CAF50;
-      color: white;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    /* 半透明背景欄且固定最小高度 50px */
-    #walletStatus, #tradeStatus, #priceStatus {
-      margin-top: 1em;
-      padding: 0.5em;
-      background-color: rgba(51, 51, 51, 0.5);
-      border-radius: 5px;
-      white-space: pre-wrap;
-      min-height: 50px;
-    }
-    /* 新增的樣式 */
-    #walletContainer {
-      display: flex;
-      align-items: center;
-      gap: 1em;
-      margin-top: 1em;
-    }
-    .swap-section {
-      display: flex;
-      align-items: center;
-      gap: 1em;
-      margin-top: 2em;
-      flex-wrap: wrap;
-    }
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      width: 200px;
-    }
-    #swapInputsBtn {
-      padding: 0.6em 1.2em;
-      font-size: 1em;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      background-color: #4CAF50;
-      color: white;
-      height: 2.5em;
-    }
-    #swapInputsBtn:hover {
-      background-color: #45a049;
-    }
-    #swapBtn {
-      height: fit-content;
-      align-self: flex-end;
-    }
-    @media (max-width: 600px) {
-      .swap-section {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      #swapBtn {
-        align-self: stretch;
-      }
-    }
-  </style>
+  
   <!-- 1. 先載入 Buffer polyfill -->
   <script src="bufferPolyfill.js"></script>
   <!-- 2. 再載入 Solana Web3.js -->
@@ -182,7 +47,8 @@
           <input type="number" id="solInput" placeholder="Enter SOL amount" />
         </div>
         
-        <button id="swapInputsBtn" title="Swap Inputs">Swap</button>
+        <!-- 將按鈕文字更改為左右箭頭 -->
+        <button id="swapInputsBtn" title="Swap Inputs">⇄</button>
         
         <div class="input-group">
           <label>You receive</label>
@@ -196,6 +62,7 @@
       <div id="tradeStatus"></div>
     </div>
   </div>
+  
   <!-- 先引入 pricing.js -->
   <script src="pricing.js"></script>
   <!-- 再引入交易邏輯 -->
