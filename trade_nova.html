@@ -58,9 +58,19 @@
       color: white;
     }
     label {
-      display: inline-block;
-      width: 80px;
+      display: block;
       margin-top: 0.5em;
+      font-weight: bold;
+    }
+    .label-with-balance {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .label-with-balance span.balance {
+      margin-left: 10px;
+      color: #4CAF50;
+      font-weight: normal;
     }
     input {
       padding: 0.5em;
@@ -68,7 +78,8 @@
       border-radius: 5px;
       border: 1px solid #ccc;
       margin: 0.5em 0;
-      width: 200px;
+      width: 100%;
+      box-sizing: border-box;
     }
     input[type="number"] {
       step: 0.00001;
@@ -82,6 +93,10 @@
       cursor: pointer;
       background-color: #4CAF50;
       color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 2.5em; /* 確保與輸入欄位等高 */
     }
     button:hover {
       background-color: #45a049;
@@ -95,10 +110,61 @@
       white-space: pre-wrap;
       min-height: 50px;
     }
+    /* 新增的樣式 */
+    #walletContainer {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+      margin-top: 1em;
+    }
+    .swap-section {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+      margin-top: 2em;
+      flex-wrap: wrap;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      width: 200px;
+    }
+    #swapInputsBtn {
+      padding: 0.6em 1.2em;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      height: 2.5em; /* 與輸入欄位等高 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #swapInputsBtn:hover {
+      background-color: #45a049;
+    }
+    #swapBtn {
+      height: fit-content;
+      align-self: flex-end;
+    }
+    @media (max-width: 600px) {
+      .swap-section {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      #swapBtn {
+        align-self: stretch;
+      }
+      #swapInputsBtn {
+        align-self: center;
+      }
+    }
   </style>
-  <!-- 1. 先載入 Buffer polyfill -->
+  <!-- 先載入 Buffer polyfill -->
   <script src="bufferPolyfill.js"></script>
-  <!-- 2. 再載入 Solana Web3.js -->
+  <!-- 再載入 Solana Web3.js -->
   <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.84.1/lib/index.iife.min.js"></script>
 </head>
 <body>
@@ -119,20 +185,42 @@
         Welcome to the official NOVA Trading Platform.
         Please connect your wallet, then enter your desired amounts to swap.
       </p>
-      <button id="connectWalletBtn">Connect Wallet</button>
-      <div id="walletStatus">Please connect your wallet.</div>
-      <br>
+      
+      <!-- 錢包連接區域 -->
+      <div id="walletContainer">
+        <button id="connectWalletBtn">Connect Wallet</button>
+        <div id="walletStatus">Please connect your wallet.</div>
+      </div>
+      
       <div id="priceStatus">Loading price...</div>
-      <br>
-      <div>
-        <label for="solInput">SOL:</label>
-        <input type="number" id="solInput" placeholder="Enter SOL amount" />
+      
+      <!-- 交易區域 -->
+      <div class="swap-section">
+        <div class="input-group">
+          <label>You pay</label>
+          <div class="label-with-balance">
+            <label for="solInput">SOL:</label>
+            <span class="balance" id="solBalance">0</span>
+          </div>
+          <input type="number" id="solInput" placeholder="Enter SOL amount" />
+        </div>
+        
+        <button id="swapInputsBtn" title="Swap Inputs" aria-label="Swap Inputs">
+          &#8646; <!-- 左右箭頭圖案 -->
+        </button>
+        
+        <div class="input-group">
+          <label>You receive</label>
+          <div class="label-with-balance">
+            <label for="novaInput">NOVA:</label>
+            <span class="balance" id="novaBalance">0</span>
+          </div>
+          <input type="number" id="novaInput" placeholder="Enter NOVA amount" />
+        </div>
+        
+        <button id="swapBtn">Swap</button>
       </div>
-      <div>
-        <label for="novaInput">NOVA:</label>
-        <input type="number" id="novaInput" placeholder="Estimated NOVA" />
-      </div>
-      <button id="swapBtn">Swap</button>
+      
       <div id="tradeStatus"></div>
     </div>
   </div>
@@ -140,5 +228,73 @@
   <script src="pricing.js"></script>
   <!-- 再引入交易邏輯 -->
   <script src="trade.js"></script>
+  
+  <!-- 添加對調輸入欄位的功能 -->
+  <script>
+    document.getElementById('swapInputsBtn').addEventListener('click', function() {
+      const solInput = document.getElementById('solInput');
+      const novaInput = document.getElementById('novaInput');
+      
+      // 交換輸入值
+      const tempValue = solInput.value;
+      solInput.value = novaInput.value;
+      novaInput.value = tempValue;
+      
+      // 交換標籤文字和餘額
+      const solLabel = solInput.previousElementSibling.querySelector('label');
+      const novaLabel = novaInput.previousElementSibling.querySelector('label');
+      
+      const tempLabel = solLabel.textContent;
+      solLabel.textContent = novaLabel.textContent;
+      novaLabel.textContent = tempLabel;
+      
+      // 交換餘額
+      const solBalance = document.getElementById('solBalance').textContent;
+      const novaBalance = document.getElementById('novaBalance').textContent;
+      
+      document.getElementById('solBalance').textContent = novaBalance;
+      document.getElementById('novaBalance').textContent = solBalance;
+      
+      // 交換浮水印
+      const tempPlaceholder = solInput.placeholder;
+      solInput.placeholder = novaInput.placeholder;
+      novaInput.placeholder = tempPlaceholder;
+    });
+
+    // 模擬獲取餘額的函數，實際應根據您的應用程式來獲取餘額
+    function updateBalances(solBalance, novaBalance) {
+      document.getElementById('solBalance').textContent = solBalance;
+      document.getElementById('novaBalance').textContent = novaBalance;
+    }
+
+    // 假設從錢包獲取到的餘額
+    // 您需要根據實際情況來調整這部分代碼
+    document.getElementById('connectWalletBtn').addEventListener('click', async function() {
+      // 連接錢包的邏輯
+      // 例如，使用 Solana Web3.js 連接錢包並獲取餘額
+      try {
+        // 假設使用 Phantom 錢包
+        if (window.solana && window.solana.isPhantom) {
+          const response = await window.solana.connect();
+          document.getElementById('walletStatus').textContent = `Connected: ${response.publicKey.toString()}`;
+          
+          // 獲取 SOL 餘額
+          const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
+          const balance = await connection.getBalance(response.publicKey);
+          const solBalance = balance / solanaWeb3.LAMPORTS_PER_SOL;
+          
+          // 假設 NOVA 的餘額通過某種方式獲取
+          const novaBalance = 100; // 這裡應替換為實際獲取的 NOVA 餘額
+          
+          updateBalances(solBalance, novaBalance);
+        } else {
+          alert('Phantom Wallet not found. Please install it.');
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById('walletStatus').textContent = 'Failed to connect wallet.';
+      }
+    });
+  </script>
 </body>
 </html>
