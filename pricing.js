@@ -1,5 +1,3 @@
-// pricing.js
-
 // Default NOVA and SOL prices
 window.CURRENT_NOVA_PRICE_USD = 0.00123;
 window.SOL_USD_PRICE = 20;

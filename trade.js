@@ -1,9 +1,6 @@
-/************************************************************
- * trade.js (Webpack 會打包此檔案)
- ************************************************************/
 console.log("trade.js loaded via Webpack!");
 
-// 1) 從 @solana/web3.js import 需要的類別
+// 1) 從 @solana/web3.js import
 import {
   Connection,
   PublicKey,
@@ -12,14 +9,14 @@ import {
   TransactionInstruction
 } from '@solana/web3.js';
 
-// 2) 從 @solana/spl-token import 需要的函式
+// 2) 從 @solana/spl-token import
 import {
   TOKEN_PROGRAM_ID,
   getAssociatedTokenAddress,
   createAssociatedTokenAccountInstruction
 } from '@solana/spl-token';
 
-// 3) DOM 元素
+// 3) DOM
 const connectWalletBtn = document.getElementById("connectWalletBtn");
 const walletStatus = document.getElementById("walletStatus");
 const solInput = document.getElementById("solInput");
@@ -27,10 +24,10 @@ const novaInput = document.getElementById("novaInput");
 const swapBtn = document.getElementById("swapBtn");
 const tradeStatus = document.getElementById("tradeStatus");
 
-// 4) 全域變數
+// 4) 全域
 let walletPublicKey = null;
 
-// 5) 你的 Program / PDA
+// 5) ...
 const programId = new PublicKey("HEAz4vAABHTYdY23JuYD3VTHKSBRXSdyt7Dq8YVGDUWm");
 const globalStatePubkey = new PublicKey("HLSLMK51mUc375t69T93quNqpLqLdySZKvodjyeuNdp");
 const mintPubkey = new PublicKey("5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX");
@@ -40,10 +37,9 @@ const liquidityPoolPdaPubkey = new PublicKey("C7sSvpgZvRPVqLqfLSeDb3ErHWhMQYM3fv
 const developerRewardPoolPubkey = new PublicKey("9WHRVWCiWeCC8Lhb4ohk3e2wdoZpALh6xNcnteP6E75o");
 const feeRecipientPubkey = new PublicKey("7MaisRjGojZVb9gS6B1UZqBtFqajAArTkwnXhp3Syubk");
 
-// 6) Anchor discriminator for buy()
 const BUY_METHOD_DISCM = new Uint8Array([0x6c, 0x65, 0xdf, 0xc4, 0x13, 0xfa, 0x24, 0xf5]);
 
-// 7) connectWallet
+// 連接 Phantom
 async function connectWallet() {
   if (window.solana && window.solana.isPhantom) {
     try {
@@ -60,7 +56,7 @@ async function connectWallet() {
   }
 }
 
-// 8) prepareBuyerAtaIfNeeded
+// 建立 or 取得 ATA
 async function prepareBuyerAtaIfNeeded(connection, userPubkey, mintPk, transaction) {
   const ataPubkey = await getAssociatedTokenAddress(mintPk, userPubkey, false, TOKEN_PROGRAM_ID);
   const ataInfo = await connection.getAccountInfo(ataPubkey);
@@ -77,7 +73,7 @@ async function prepareBuyerAtaIfNeeded(connection, userPubkey, mintPk, transacti
   return ataPubkey;
 }
 
-// 9) encodeBuyData
+// 編碼 buy data
 function encodeBuyData(solAmountU64, currentNovaPriceU64) {
   const buffer = new Uint8Array(16);
   const dv = new DataView(buffer.buffer);
@@ -90,7 +86,7 @@ function encodeBuyData(solAmountU64, currentNovaPriceU64) {
   return finalData;
 }
 
-// 10) getRecentBlockhashWithRetry
+// 取得 blockhash
 async function getRecentBlockhashWithRetry(connection, retries = 3) {
   for (let i = 0; i < retries; i++) {
     try {
@@ -99,12 +95,12 @@ async function getRecentBlockhashWithRetry(connection, retries = 3) {
     } catch (error) {
       console.warn(`Attempt ${i + 1} failed: ${error.message}`);
       if (i === retries - 1) throw error;
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
 }
 
-// 11) swapNOVA (示範買)
+// SwapNOVA (買)
 async function swapNOVA() {
   console.log("swapNOVA function triggered!");
   if (!walletPublicKey) {
@@ -143,7 +139,7 @@ async function swapNOVA() {
       { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
     ];
 
-    const buyIx = new TransactionInstruction({
+    const buyIx = new solanaWeb3.TransactionInstruction({
       programId,
       keys: buyAccounts,
       data,
@@ -169,7 +165,7 @@ async function swapNOVA() {
   }
 }
 
-// 12) 綁定按鈕事件
+// 綁定按鈕事件
 connectWalletBtn.addEventListener("click", () => {
   console.log("Connect Wallet button clicked!");
   connectWallet();
@@ -179,3 +175,46 @@ swapBtn.addEventListener("click", () => {
   console.log("Swap button clicked!");
   swapNOVA();
 });
+
+// ----- 對調按鈕 + 自動換算 -----
+// 對調按鈕
+const swapInputsBtn = document.getElementById("swapInputsBtn");
+swapInputsBtn.addEventListener('click', () => {
+  const tmp = solInput.value;
+  solInput.value = novaInput.value;
+  novaInput.value = tmp;
+  console.log("Swapped input values (SOL<->NOVA)");
+});
+
+// 自動更新 NOVA
+function updateNovaFromSOL() {
+  const solVal = parseFloat(solInput.value);
+  console.log("updateNovaFromSOL() triggered. solVal=", solVal,
+    "SOL_USD_PRICE=", window.SOL_USD_PRICE,
+    "CURRENT_NOVA_PRICE_USD=", window.CURRENT_NOVA_PRICE_USD);
+
+  if (!solInput.value || isNaN(solVal) || solVal <= 0) {
+    novaInput.value = "";
+    return;
+  }
+  const novaVal = solVal * (window.SOL_USD_PRICE / window.CURRENT_NOVA_PRICE_USD);
+  novaInput.value = novaVal.toFixed(5);
+}
+
+// 自動更新 SOL
+function updateSolFromNova() {
+  const novaVal = parseFloat(novaInput.value);
+  console.log("updateSolFromNova() triggered. novaVal=", novaVal,
+    "SOL_USD_PRICE=", window.SOL_USD_PRICE,
+    "CURRENT_NOVA_PRICE_USD=", window.CURRENT_NOVA_PRICE_USD);
+
+  if (!novaInput.value || isNaN(novaVal) || novaVal <= 0) {
+    solInput.value = "";
+    return;
+  }
+  const solVal = novaVal * (window.CURRENT_NOVA_PRICE_USD / window.SOL_USD_PRICE);
+  solInput.value = solVal.toFixed(5);
+}
+
+solInput.addEventListener('input', updateNovaFromSOL);
+novaInput.addEventListener('input', updateSolFromNova);

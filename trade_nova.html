@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Trade NOVA</title>
 
-  <!-- (可選) 你的樣式檔，可自行修改或拿掉 -->
   <link rel="stylesheet" href="styles.css">
 
   <style>
@@ -105,19 +104,18 @@
       flex-direction: column;
       width: 200px;
     }
-    @media (max-width: 600px) {
-      .swap-section {
-        flex-direction: column;
-        align-items: stretch;
-      }
+    #swapInputsBtn {
+      font-size: 1.5em; 
+      color: white; 
+      background: none; 
+      border: none; 
+      cursor: pointer; 
+    }
+    #swapInputsBtn:hover {
+      background-color: transparent;
+      color: #ffdc82; 
     }
   </style>
-
-  <!-- 1) 載入 Solana Web3.js 的 IIFE 版本 (提供全域 solanaWeb3) -->
-  <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.84.1/lib/index.iife.min.js"></script>
-
-  <!-- 2) 載入 SPL-Token UMD 版本 (提供全域 splToken) -->
-  <script src="https://unpkg.com/@solana/spl-token@latest/dist/spl-token.umd.js"></script>
 </head>
 
 <body>
@@ -141,25 +139,47 @@
         <button id="connectWalletBtn">Connect Wallet</button>
         <div id="walletStatus">Please connect your wallet.</div>
       </div>
+
+      <!-- 顯示價格 -->
       <div id="priceStatus">Loading price...</div>
 
-      <div class="swap-section">
-        <div class="input-group">
-          <label for="solInput">SOL:</label>
-          <input type="number" id="solInput" placeholder="Enter SOL amount" />
-        </div>
-        <div class="input-group">
-          <label for="novaInput">NOVA:</label>
-          <input type="number" id="novaInput" placeholder="Enter NOVA amount" />
-        </div>
-        <button id="swapBtn">Swap</button>
-      </div>
-
-      <div id="tradeStatus"></div>
-    </div>
+      <!-- swap 區域 -->
+<div class="swap-section">
+  <div class="input-group">
+    <label>SOL:</label>
+    <!-- 支援至小數點後6位 -->
+    <input 
+      type="number" 
+      id="solInput" 
+      placeholder="Enter SOL amount" 
+      step="0.000001" 
+      min="0" 
+    />
   </div>
 
-  <!-- 3) 最後載入 trade.js：要確保在 web3.js & spl-token.umd.js 之後 -->
+  <button id="swapInputsBtn">↔</button>
+
+  <div class="input-group">
+    <label>NOVA:</label>
+    <!-- 同樣支援至小數點後6位 -->
+    <input 
+      type="number" 
+      id="novaInput" 
+      placeholder="Enter NOVA amount"
+      step="0.000001"
+      min="0"
+    />
+  </div>
+
+  <button id="swapBtn">Swap</button>
+</div>
+
+<div id="tradeStatus"></div>
+
+  <!-- 先引入 pricing.js -->
+  <script src="pricing.js"></script>
+
+  <!-- 再引入 Webpack 打包後的 bundle.js -->
   <script src="dist/bundle.js"></script>
 </body>
 </html>
