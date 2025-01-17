@@ -83,6 +83,9 @@
       cursor: pointer;
       background-color: #4CAF50;
       color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     button:hover {
       background-color: #45a049;
@@ -116,14 +119,17 @@
       width: 200px;
     }
     #swapInputsBtn {
-      padding: 0.6em 1.2em;
-      font-size: 1em;
+      padding: 0.6em;
+      font-size: 1.5em;
       border: none;
       border-radius: 5px;
       cursor: pointer;
       background-color: #4CAF50;
       color: white;
       height: 2.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     #swapInputsBtn:hover {
       background-color: #45a049;
@@ -187,7 +193,7 @@
           <input type="number" id="solInput" placeholder="Enter SOL amount" />
         </div>
         
-        <button id="swapInputsBtn" title="Swap Inputs">Swap</button>
+        <button id="swapInputsBtn" title="Swap Inputs">↔</button>
         
         <div class="input-group">
           <label>You receive</label>
@@ -244,7 +250,7 @@
           warningStatus.style.display = 'none';
           console.log('Connected with public key:', response.publicKey.toString());
           
-          // Optionally, you can trigger any other functions after successful connection
+          // Optionally, trigger any other functions after successful connection
         } catch (err) {
           console.error('Connection error:', err);
           walletStatus.textContent = 'Failed to connect wallet.';
