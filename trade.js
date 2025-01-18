@@ -173,7 +173,6 @@ async function swapNOVA() {
   }
 
   try {
-    // 依你的設定，此處使用自訂的 RPC Proxy URL
     const connection = new Connection("https://nova-enigmaticsloths-projects.vercel.app/api/rpc-proxy", "confirmed");
     const fromPubkey = new PublicKey(walletPublicKey);
     console.log("Connected to Solana via proxy.");
@@ -183,9 +182,7 @@ async function swapNOVA() {
       tradeStatus.innerText = "Please enter a valid SOL amount.";
       return;
     }
-    // 將 SOL 轉換為 lamports (1 SOL = 1e9 lamports)
     const lamports = Math.round(solValue * 1e9);
-    // 此處設定 NOVA 價格，範例中以 1,000,000 近似
     const approximateNovaPrice = 1_000_000;
 
     let transaction = new Transaction();
@@ -194,12 +191,9 @@ async function swapNOVA() {
     const buyerAta = await prepareBuyerAtaIfNeeded(connection, fromPubkey, mintPubkey, transaction);
     console.log("Buyer ATA:", buyerAta.toBase58());
 
-    // 編碼買入指令資料（先序列化參數，再組合 discriminator）
     const data = encodeBuyDataWithBorsh(lamports, approximateNovaPrice);
     console.log("Encoded buy data:", data);
-    // 注意：前 8 byte 應該為 [28, 43, 80, 163, 53, 73, 88, 8] (即 0x1c2b50a335495808)
 
-    // 按照合約端 Buy 結構要求的順序組裝帳戶（順序必須正確）
     const buyAccounts = [
       { pubkey: fromPubkey, isSigner: true, isWritable: true },
       { pubkey: globalStatePubkey, isSigner: false, isWritable: true },
@@ -238,8 +232,18 @@ async function swapNOVA() {
     tradeStatus.innerText = `Transaction sent! Signature: ${signature}\n`;
     console.log("Transaction sent! Signature:", signature);
 
-    // 等待交易確認
-    await connection.confirmTransaction(signature, "confirmed");
+    // 等待確認交易
+    const confirmation = await connection.confirmTransaction(signature, "confirmed");
+    console.log("Transaction confirmation result:", confirmation);
+
+    // 取得解析後的交易資訊以便打印 log
+    const parsedTx = await connection.getParsedTransaction(signature);
+    if (parsedTx && parsedTx.meta) {
+      console.log("Parsed transaction logs:", parsedTx.meta.logMessages);
+    } else {
+      console.log("No parsed transaction logs available.");
+    }
+
     tradeStatus.innerText += "Transaction confirmed!";
     console.log("Transaction confirmed!");
   } catch (err) {
@@ -250,8 +254,20 @@ async function swapNOVA() {
     } else {
       tradeStatus.innerText = `Swap transaction error: ${err.message}`;
     }
+    // 若有 signature，可以再試著抓取 parsed transaction 詳細資訊
+    if (err.signature) {
+      try {
+        const parsedTx = await connection.getParsedTransaction(err.signature);
+        if (parsedTx && parsedTx.meta) {
+          console.error("Detailed parsed logs:", parsedTx.meta.logMessages);
+        }
+      } catch (parseErr) {
+        console.error("Error parsing transaction logs:", parseErr);
+      }
+    }
   }
 }
+
 
 // ---------------------
 // 綁定按鈕事件
