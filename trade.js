@@ -3,11 +3,8 @@
 import { Connection, PublicKey, Transaction, TransactionInstruction, SystemProgram } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction } from '@solana/spl-token';
 import * as borsh from 'borsh';
-import BN from 'bn.js';
 
-// 將所有程式碼放在 DOMContentLoaded 中以確保 DOM 完全載入
 document.addEventListener("DOMContentLoaded", () => {
-
   // =====================
   // DOM 元素取得
   // =====================
@@ -40,39 +37,45 @@ document.addEventListener("DOMContentLoaded", () => {
   const PROGRAM_NAME = "nova";
   const BUY_METHOD_NAME = "buy";
 
-  // 全域變數儲存 discriminator（必須動態計算，切勿硬編碼）
+  // 全域變數儲存 discriminator（必須動態計算）
   let BUY_METHOD_DISCM;
 
   // =====================
-  // 定義 Borsh 序列化結構與 schema（使用純物件定義）
+  // 定義 Borsh 序列化結構與 schema
   // =====================
-  // 使用 BN.js 表示 u64 欄位
-  function getBuyInstructionSchema() {
-    return {
+  // 注意：我們這裡直接使用 BigInt 表示 u64，而非 BN.js
+  class BuyInstruction {
+    constructor(fields) {
+      this.solAmount = fields.solAmount;         // BigInt
+      this.currentNovaPrice = fields.currentNovaPrice; // BigInt
+    }
+  }
+
+  const BuyInstructionSchema = new Map([
+    [BuyInstruction, {
       kind: 'struct',
       fields: [
         ['solAmount', 'u64'],
-        ['currentNovaPrice', 'u64'],
-      ],
-    };
-  }
+        ['currentNovaPrice', 'u64']
+      ]
+    }]
+  ]);
 
   // =====================
-  // 利用 Borsh 序列化 BuyInstruction 參數（使用 BN 表示 u64）
+  // 利用 Borsh 序列化 BuyInstruction 參數（使用 BigInt 表示 u64）
   // =====================
   function serializeBuyData(solAmount, currentNovaPrice) {
-    // 將傳入的數值轉成 BN 實例（以字串方式處理）
-    const solBN = new BN(solAmount.toString());
-    const novaBN = new BN(currentNovaPrice.toString());
-    console.log("solBN:", solBN.toString());
-    console.log("novaBN:", novaBN.toString());
-    const instructionData = {
-      solAmount: solBN,
-      currentNovaPrice: novaBN,
-    };
+    // 將傳入的數值轉為 BigInt
+    const solBigInt = BigInt(solAmount);
+    const novaBigInt = BigInt(currentNovaPrice);
+    console.log("solBigInt:", solBigInt.toString());
+    console.log("novaBigInt:", novaBigInt.toString());
+    const instructionData = new BuyInstruction({
+      solAmount: solBigInt,
+      currentNovaPrice: novaBigInt,
+    });
     console.log("Instruction Data:", instructionData);
-    const schema = getBuyInstructionSchema();
-    return borsh.serialize(schema, instructionData);
+    return borsh.serialize(BuyInstructionSchema, instructionData);
   }
 
   // =====================
@@ -204,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const data = encodeBuyDataWithBorsh(lamports, approximateNovaPrice);
       console.log("Encoded buy data:", data);
-      // 注意：第一個 8 byte 應正確為 Uint8Array(8) [28,43,80,163,53,73,88,8]
+      // 注意：前 8 個 byte 應正確為 Uint8Array(8) [28, 43, 80, 163, 53, 73, 88, 8]
 
       const buyAccounts = [
         { pubkey: fromPubkey, isSigner: true, isWritable: true },
