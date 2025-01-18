@@ -20,7 +20,7 @@ const swapInputsBtn = document.getElementById("swapInputsBtn");
 // ---------------------
 let walletPublicKey = null;
 
-// 以下地址（及帳戶順序）請依你的部署實際設定調整；帳戶順序必須與智能合約端的 Buy 指令一致
+// 以下地址（及帳戶順序）請依你的實際部署調整；帳戶順序必須與智能合約端 Buy 指令一致
 const programId = new PublicKey("HEAz4vAABHTYdY23JuYD3VTHKSBRXSdyt7Dq8YVGDUWm");
 const globalStatePubkey = new PublicKey("HLSLMK51mUc375t69T93quNqpLqLdySZKvodjyeuNdp");
 const mintPubkey = new PublicKey("5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX");
@@ -70,7 +70,7 @@ async function getDiscriminator(programName, instructionName) {
   const message = `${programName}:${instructionName}`;
   const encoder = new TextEncoder();
   const data = encoder.encode(message);
-  // 使用瀏覽器 SubtleCrypto API 執行 SHA-256
+  // 使用 SubtleCrypto API 執行 SHA-256
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   const discriminator = hashArray.slice(0, 8);
@@ -81,8 +81,7 @@ async function getDiscriminator(programName, instructionName) {
 async function initializeDiscriminator() {
   BUY_METHOD_DISCM = await getDiscriminator(PROGRAM_NAME, BUY_METHOD_NAME);
   console.log("Buy Instruction Discriminator:", BUY_METHOD_DISCM);
-  // 此處請確認輸出：期望結果應為
-  // Uint8Array(8) [28, 43, 80, 163, 53, 73, 88, 8]
+  // 預期輸出：Uint8Array(8) [28, 43, 80, 163, 53, 73, 88, 8]
 }
 
 // ---------------------
@@ -170,7 +169,7 @@ async function swapNOVA() {
   }
 
   try {
-    // 依你的設定，此處使用自訂的 RPC Proxy URL
+    // 使用你設定的 RPC Proxy URL（請確認此 URL 正確且可用）
     const connection = new Connection("https://nova-enigmaticsloths-projects.vercel.app/api/rpc-proxy", "confirmed");
     const fromPubkey = new PublicKey(walletPublicKey);
     console.log("Connected to Solana via proxy.");
@@ -182,7 +181,7 @@ async function swapNOVA() {
     }
     // 將 SOL 轉換為 lamports (1 SOL = 1e9 lamports)
     const lamports = Math.round(solValue * 1e9);
-    // 此處設定 NOVA 價格，範例中以 1,000,000 近似
+    // 此處設定 NOVA 價格參數，範例中以 1,000,000 為近似價格
     const approximateNovaPrice = 1_000_000;
 
     let transaction = new Transaction();
@@ -194,9 +193,9 @@ async function swapNOVA() {
     // 編碼買入指令資料（先序列化參數，再組合 discriminator）
     const data = encodeBuyDataWithBorsh(lamports, approximateNovaPrice);
     console.log("Encoded buy data:", data);
-    // 注意：前 8 byte 應該為 [28, 43, 80, 163, 53, 73, 88, 8] (即 0x1c2b50a335495808)
+    // 注意：前 8 個 byte 應該等於 Uint8Array [28, 43, 80, 163, 53, 73, 88, 8]
 
-    // 按照合約端 Buy 結構要求的順序組裝帳戶（順序必須正確）
+    // 組裝帳戶列表，順序需與合約端 Buy 結構完全一致
     const buyAccounts = [
       { pubkey: fromPubkey, isSigner: true, isWritable: true },
       { pubkey: globalStatePubkey, isSigner: false, isWritable: true },
