@@ -4,7 +4,6 @@ import { Connection, PublicKey, Transaction, TransactionInstruction, SystemProgr
 import { TOKEN_PROGRAM_ID, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction } from '@solana/spl-token';
 import * as borsh from 'borsh';
 
-// 將所有程式碼包在 DOMContentLoaded 中，確保 DOM 內容都已生成
 document.addEventListener("DOMContentLoaded", () => {
   // =====================
   // DOM 元素取得
@@ -44,7 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // =====================
   // 定義 Borsh 序列化 schema（使用 plain object）
   // =====================
-  // 這裡使用 schema 的 Map，key 為 Object（因為我們用 plain object 來表示指令資料）
   const BuyInstructionSchema = new Map([
     [Object, {
       kind: 'struct',
@@ -59,12 +57,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // 利用 Borsh 序列化 BuyInstruction 資料（直接使用 plain object）
   // =====================
   function serializeBuyData(solAmount, currentNovaPrice) {
-    // 將傳入的數值轉為 BigInt（用於 u64），請確保這兩個值是整數
+    // 將傳入的數值轉為 BigInt（例如 10000000 轉成 10000000n）
     const solBigInt = BigInt(solAmount);
     const novaBigInt = BigInt(currentNovaPrice);
     console.log("solBigInt:", solBigInt.toString());
     console.log("novaBigInt:", novaBigInt.toString());
-    // instructionData 為一個 plain object
+    // 使用 plain object 作為資料
     const instructionData = {
       solAmount: solBigInt,
       currentNovaPrice: novaBigInt,
