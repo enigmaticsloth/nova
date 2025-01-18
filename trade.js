@@ -20,7 +20,7 @@ const swapInputsBtn = document.getElementById("swapInputsBtn");
 // =====================
 let walletPublicKey = null;
 
-// 下列地址與帳戶順序需與智能合約端 Buy 指令的 #[derive(Accounts)] 定義一致，請依照實際部署調整
+// 以下地址與帳戶順序需與智能合約端 Buy 指令的 #[derive(Accounts)] 定義一致，請依照實際部署調整
 const programId = new PublicKey("HEAz4vAABHTYdY23JuYD3VTHKSBRXSdyt7Dq8YVGDUWm");
 const globalStatePubkey = new PublicKey("HLSLMK51mUc375t69T93quNqpLqLdySZKvodjyeuNdp");
 const mintPubkey = new PublicKey("5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX");
@@ -30,11 +30,11 @@ const liquidityPoolPdaPubkey = new PublicKey("C7sSvpgZvRPVqLqfLSeDb3ErHWhMQYM3fv
 const developerRewardPoolPubkey = new PublicKey("9WHRVWCiWeCC8Lhb4ohk3e2wdoZpALh6xNcnteP6E75o");
 const feeRecipientPubkey = new PublicKey("7MaisRjGojZVb9gS6B1UZqBtFqajAArTkwnXhp3Syubk");
 
-// 指令名稱與 program 名稱（必須與合約端一致）
+// 指令名稱與 program 名稱（必須與合約端定義一致）
 const PROGRAM_NAME = "nova";
 const BUY_METHOD_NAME = "buy";
 
-// 全域變數儲存 discriminator（切勿硬編碼）
+// 全域變數儲存 discriminator（切勿硬編碼）——將由 initializeDiscriminator() 動態計算得到
 let BUY_METHOD_DISCM;
 
 // =====================
@@ -70,6 +70,7 @@ async function getDiscriminator(programName, instructionName) {
   const message = `${programName}:${instructionName}`;
   const encoder = new TextEncoder();
   const data = encoder.encode(message);
+  // 使用 SubtleCrypto 進行 SHA-256 計算
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   const discriminator = hashArray.slice(0, 8);
@@ -80,7 +81,7 @@ async function getDiscriminator(programName, instructionName) {
 async function initializeDiscriminator() {
   BUY_METHOD_DISCM = await getDiscriminator(PROGRAM_NAME, BUY_METHOD_NAME);
   console.log("Buy Instruction Discriminator:", BUY_METHOD_DISCM);
-  // 預期輸出: Uint8Array(8) [28, 43, 80, 163, 53, 73, 88, 8]
+  // 期望輸出: Uint8Array(8) [28, 43, 80, 163, 53, 73, 88, 8]
 }
 
 // =====================
@@ -185,7 +186,7 @@ async function swapNOVA() {
       return;
     }
     const lamports = Math.round(solValue * 1e9);
-    const approximateNovaPrice = 1_000_000; // 請依實際情況調整 NOVA 價格
+    const approximateNovaPrice = 1_000_000; // 根據實際情況調整 NOVA 價格
 
     let transaction = new Transaction();
 
@@ -193,10 +194,10 @@ async function swapNOVA() {
     const buyerAta = await prepareBuyerAtaIfNeeded(connection, fromPubkey, mintPubkey, transaction);
     console.log("Buyer ATA:", buyerAta.toBase58());
 
-    // 編碼買入指令資料：使用動態計算的 discriminator 與 Borsh 序列化參數
+    // 編碼買入指令資料：利用動態計算的 discriminator 與 Borsh 序列化參數
     const data = encodeBuyDataWithBorsh(lamports, approximateNovaPrice);
     console.log("Encoded buy data:", data);
-    // 注意：第一個 8 byte 應正確為 [28, 43, 80, 163, 53, 73, 88, 8]
+    // 注意：第一個 8 byte 應正確為 Uint8Array(8) [28, 43, 80, 163, 53, 73, 88, 8]
 
     // 組裝帳戶列表，順序必須與合約端的 #[derive(Accounts)] 定義一致
     const buyAccounts = [
@@ -241,7 +242,7 @@ async function swapNOVA() {
     const confirmation = await connection.confirmTransaction(signature, "confirmed");
     console.log("Transaction confirmation result:", confirmation);
 
-    // 嘗試取得解析後的交易詳細 log
+    // 嘗試取得解析後的交易詳細日誌
     const parsedTx = await connection.getParsedTransaction(signature);
     if (parsedTx && parsedTx.meta) {
       console.log("Parsed transaction logs:", parsedTx.meta.logMessages);
@@ -259,7 +260,7 @@ async function swapNOVA() {
     } else {
       tradeStatus.innerText = `Swap transaction error: ${err.message}`;
     }
-    // 如果錯誤物件包含 signature，嘗試抓取 parsed transaction log
+    // 如果錯誤物件包含 signature，嘗試取得解析後日誌
     if (err.signature) {
       try {
         const parsedTx = await connection.getParsedTransaction(err.signature);
