@@ -4,6 +4,7 @@ import { Connection, PublicKey, Transaction, TransactionInstruction, SystemProgr
 import { TOKEN_PROGRAM_ID, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction } from '@solana/spl-token';
 import * as borsh from 'borsh';
 
+// 將所有程式碼包在 DOMContentLoaded 中，確保 DOM 內容都已生成
 document.addEventListener("DOMContentLoaded", () => {
   // =====================
   // DOM 元素取得
@@ -41,18 +42,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let BUY_METHOD_DISCM;
 
   // =====================
-  // 定義 Borsh 序列化結構與 schema（使用 BigInt 來表示 u64）
+  // 定義 Borsh 序列化 schema（使用 plain object）
   // =====================
-  class BuyInstruction {
-    constructor(fields) {
-      // 這裡期望傳入的 fields.solAmount 與 fields.currentNovaPrice 已轉成 BigInt
-      this.solAmount = fields.solAmount;         // BigInt
-      this.currentNovaPrice = fields.currentNovaPrice; // BigInt
-    }
-  }
-
+  // 這裡使用 schema 的 Map，key 為 Object（因為我們用 plain object 來表示指令資料）
   const BuyInstructionSchema = new Map([
-    [BuyInstruction, {
+    [Object, {
       kind: 'struct',
       fields: [
         ['solAmount', 'u64'],
@@ -62,18 +56,19 @@ document.addEventListener("DOMContentLoaded", () => {
   ]);
 
   // =====================
-  // 利用 Borsh 序列化 BuyInstruction 參數（使用 BigInt 表示 u64）
+  // 利用 Borsh 序列化 BuyInstruction 資料（直接使用 plain object）
   // =====================
   function serializeBuyData(solAmount, currentNovaPrice) {
-    // 將傳入的數值轉為 BigInt（注意：這裡假設傳入的 solAmount 與 currentNovaPrice 為整數數值）
+    // 將傳入的數值轉為 BigInt（用於 u64），請確保這兩個值是整數
     const solBigInt = BigInt(solAmount);
     const novaBigInt = BigInt(currentNovaPrice);
     console.log("solBigInt:", solBigInt.toString());
     console.log("novaBigInt:", novaBigInt.toString());
-    const instructionData = new BuyInstruction({
+    // instructionData 為一個 plain object
+    const instructionData = {
       solAmount: solBigInt,
       currentNovaPrice: novaBigInt,
-    });
+    };
     console.log("Instruction Data:", instructionData);
     return borsh.serialize(BuyInstructionSchema, instructionData);
   }
@@ -98,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =====================
-  // 封裝編碼函式：組合 discriminator 與 Borsh 序列化後的資料
+  // 封裝編碼函式：組合 discriminator 與序列化後的資料
   // =====================
   function encodeBuyDataWithBorsh(solAmount, currentNovaPrice) {
     if (!BUY_METHOD_DISCM) {
