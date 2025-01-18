@@ -1,20 +1,29 @@
 const path = require('path');
 
 module.exports = {
-  entry: './trade.js',        // 你的主程式檔
+  entry: './trade.js',
   output: {
-    filename: 'bundle.js',    // 打包後輸出檔名
-    path: path.resolve(__dirname, 'dist'), // 輸出資料夾
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+    // 移除 library 屬性，因為不需要暴露為全域變數
   },
   mode: 'development',
+  target: 'web',
   module: {
     rules: [
       {
         test: /\.m?js$/,
-        resolve: {
-          fullySpecified: false, 
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+          },
         },
       },
     ],
+  },
+  resolve: {
+    extensions: ['.js'],
   },
 };

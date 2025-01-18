@@ -144,42 +144,44 @@
       <div id="priceStatus">Loading price...</div>
 
       <!-- swap 區域 -->
-<div class="swap-section">
-  <div class="input-group">
-    <label>SOL:</label>
-    <!-- 支援至小數點後6位 -->
-    <input 
-      type="number" 
-      id="solInput" 
-      placeholder="Enter SOL amount" 
-      step="0.000001" 
-      min="0" 
-    />
+      <div class="swap-section">
+        <div class="input-group">
+          <label>SOL:</label>
+          <!-- 支援至小數點後6位 -->
+          <input 
+            type="number" 
+            id="solInput" 
+            placeholder="Enter SOL amount" 
+            step="0.000001" 
+            min="0" 
+          />
+        </div>
+
+        <button id="swapInputsBtn">↔</button>
+
+        <div class="input-group">
+          <label>NOVA:</label>
+          <!-- 同樣支援至小數點後6位 -->
+          <input 
+            type="number" 
+            id="novaInput" 
+            placeholder="Enter NOVA amount"
+            step="0.000001"
+            min="0"
+          />
+        </div>
+
+        <button id="swapBtn">Swap</button>
+      </div>
+
+      <div id="tradeStatus"></div>
+
+      <!-- 先引入 pricing.js -->
+      <script src="pricing.js"></script>
+
+      <!-- 再引入 Webpack 打包後的 bundle.js -->
+      <script src="dist/bundle.js?v=1.0.0"></script>
+    </div>
   </div>
-
-  <button id="swapInputsBtn">↔</button>
-
-  <div class="input-group">
-    <label>NOVA:</label>
-    <!-- 同樣支援至小數點後6位 -->
-    <input 
-      type="number" 
-      id="novaInput" 
-      placeholder="Enter NOVA amount"
-      step="0.000001"
-      min="0"
-    />
-  </div>
-
-  <button id="swapBtn">Swap</button>
-</div>
-
-<div id="tradeStatus"></div>
-
-  <!-- 先引入 pricing.js -->
-  <script src="pricing.js"></script>
-
-  <!-- 再引入 Webpack 打包後的 bundle.js -->
-  <script src="dist/bundle.js"></script>
 </body>
 </html>
