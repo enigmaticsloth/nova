@@ -1,3 +1,10 @@
+// trade.js
+
+import { Connection, PublicKey, Transaction, TransactionInstruction, SystemProgram } from '@solana/web3.js';
+import { TOKEN_PROGRAM_ID, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction } from '@solana/spl-token';
+import * as borsh from 'borsh';
+import BN from 'bn.js';
+
 document.addEventListener("DOMContentLoaded", () => {
   // =====================
   // DOM 元素取得
@@ -37,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // =====================
   // 定義 Borsh 序列化結構與 schema
   // =====================
-  // 為了支援 u64 型別，我們將使用 BN.js 表示大數
+  // 我們使用 BN.js 來表示 u64
   class BuyInstruction {
     constructor(fields) {
       this.solAmount = fields.solAmount;         // BN 實例
@@ -59,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 利用 Borsh 序列化 BuyInstruction 參數（使用 BN 表示 u64）
   // =====================
   function serializeBuyData(solAmount, currentNovaPrice) {
-    // 將傳入數值轉成 BN 實例
+    // 將傳入數值轉成 BN 實例（確保以字串轉換）
     const solBN = new BN(solAmount.toString());
     const novaBN = new BN(currentNovaPrice.toString());
     console.log("solBN:", solBN.toString());
@@ -88,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function initializeDiscriminator() {
     BUY_METHOD_DISCM = await getDiscriminator(PROGRAM_NAME, BUY_METHOD_NAME);
     console.log("Buy Instruction Discriminator:", BUY_METHOD_DISCM);
-    // 預期輸出：Uint8Array(8) [28, 43, 80, 163, 53, 73, 88, 8]
+    // 預期輸出: Uint8Array(8) [28, 43, 80, 163, 53, 73, 88, 8]
   }
 
   // =====================
@@ -180,7 +187,6 @@ document.addEventListener("DOMContentLoaded", () => {
       tradeStatus.innerText = "Please connect your wallet first.";
       return;
     }
-
     try {
       const connection = new Connection("https://nova-enigmaticsloths-projects.vercel.app/api/rpc-proxy", "confirmed");
       const fromPubkey = new PublicKey(walletPublicKey);
@@ -192,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       const lamports = Math.round(solValue * 1e9);
-      const approximateNovaPrice = 1_000_000; // 請依實際情況調整 NOVA 價格
+      const approximateNovaPrice = 1_000_000;
 
       let transaction = new Transaction();
 
@@ -202,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const data = encodeBuyDataWithBorsh(lamports, approximateNovaPrice);
       console.log("Encoded buy data:", data);
-      // 注意：前 8 byte 應正確為 Uint8Array(8) [28, 43, 80, 163, 53, 73, 88, 8]
+      // 注意：第一個 8 byte 應正確為 Uint8Array(8) [28, 43, 80, 163, 53, 73, 88, 8]
 
       const buyAccounts = [
         { pubkey: fromPubkey, isSigner: true, isWritable: true },
