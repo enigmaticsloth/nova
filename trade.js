@@ -3,6 +3,7 @@
 import { Connection, PublicKey, Transaction, TransactionInstruction, SystemProgram } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction } from '@solana/spl-token';
 import * as borsh from 'borsh';
+import BN from 'bn.js'; // 新增 BN 的導入
 
 // =====================
 // DOM 元素取得
@@ -42,8 +43,8 @@ let BUY_METHOD_DISCM;
 // =====================
 class BuyInstruction {
   constructor(fields) {
-    this.solAmount = fields.solAmount;
-    this.currentNovaPrice = fields.currentNovaPrice;
+    this.solAmount = fields.solAmount; // 應該是 BN 實例
+    this.currentNovaPrice = fields.currentNovaPrice; // 應該是 BN 實例
   }
 }
 
@@ -59,7 +60,10 @@ const BuyInstructionSchema = new Map([
 
 // 利用 Borsh 序列化 BuyInstruction 參數
 function serializeBuyData(solAmount, currentNovaPrice) {
-  const instructionData = new BuyInstruction({ solAmount, currentNovaPrice });
+  const instructionData = new BuyInstruction({ 
+    solAmount: new BN(solAmount), 
+    currentNovaPrice: new BN(currentNovaPrice) 
+  });
   return borsh.serialize(BuyInstructionSchema, instructionData);
 }
 
