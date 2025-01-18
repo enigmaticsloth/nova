@@ -3,7 +3,7 @@
 import { Connection, PublicKey, Transaction, TransactionInstruction, SystemProgram } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction } from '@solana/spl-token';
 import * as borsh from 'borsh';
-import BN from 'bn.js'; // 新增 BN 的導入
+import BN from 'bn.js'; // 新增 BN.js
 
 // =====================
 // DOM 元素取得
@@ -16,12 +16,15 @@ const swapBtn = document.getElementById("swapBtn");
 const tradeStatus = document.getElementById("tradeStatus");
 const swapInputsBtn = document.getElementById("swapInputsBtn");
 
+console.log("DOM fully loaded. Checking elements:");
+console.log("connectWalletBtn:", connectWalletBtn);
+console.log("walletStatus:", walletStatus);
+
 // =====================
 // 全域變數與常數設定
 // =====================
 let walletPublicKey = null;
 
-// 下列地址與帳戶順序請依照合約端 Buy 指令 #[derive(Accounts)] 定義調整
 const programId = new PublicKey("HEAz4vAABHTYdY23JuYD3VTHKSBRXSdyt7Dq8YVGDUWm");
 const globalStatePubkey = new PublicKey("HLSLMK51mUc375t69T93quNqpLqLdySZKvodjyeuNdp");
 const mintPubkey = new PublicKey("5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX");
@@ -31,11 +34,10 @@ const liquidityPoolPdaPubkey = new PublicKey("C7sSvpgZvRPVqLqfLSeDb3ErHWhMQYM3fv
 const developerRewardPoolPubkey = new PublicKey("9WHRVWCiWeCC8Lhb4ohk3e2wdoZpALh6xNcnteP6E75o");
 const feeRecipientPubkey = new PublicKey("7MaisRjGojZVb9gS6B1UZqBtFqajAArTkwnXhp3Syubk");
 
-// 指令名稱與 program 名稱（必須與合約端定義一致）
 const PROGRAM_NAME = "nova";
 const BUY_METHOD_NAME = "buy";
 
-// 全域變數儲存 discriminator（絕對不要硬編碼，必須動態計算）
+// 全域變數儲存 discriminator（必須動態計算，切勿硬編碼）
 let BUY_METHOD_DISCM;
 
 // =====================
@@ -43,8 +45,9 @@ let BUY_METHOD_DISCM;
 // =====================
 class BuyInstruction {
   constructor(fields) {
-    this.solAmount = fields.solAmount; // 應該是 BN 實例
-    this.currentNovaPrice = fields.currentNovaPrice; // 應該是 BN 實例
+    // 這裡我們要求傳入的數值透過 BN.js 表示，因為 u64 需要大數支持
+    this.solAmount = fields.solAmount;         // BN 實例
+    this.currentNovaPrice = fields.currentNovaPrice; // BN 實例
   }
 }
 
@@ -58,12 +61,20 @@ const BuyInstructionSchema = new Map([
   }]
 ]);
 
-// 利用 Borsh 序列化 BuyInstruction 參數
+// =====================
+// 利用 Borsh 序列化 BuyInstruction 參數（確保使用 BN 表示 u64 ）
+// =====================
 function serializeBuyData(solAmount, currentNovaPrice) {
-  const instructionData = new BuyInstruction({ 
-    solAmount: new BN(solAmount), 
-    currentNovaPrice: new BN(currentNovaPrice) 
+  // 將傳入的數值轉為 BN 實例
+  const solBN = new BN(solAmount);
+  const novaBN = new BN(currentNovaPrice);
+  console.log("solBN:", solBN.toString());
+  console.log("novaBN:", novaBN.toString());
+  const instructionData = new BuyInstruction({
+    solAmount: solBN,
+    currentNovaPrice: novaBN,
   });
+  console.log("Instruction Data:", instructionData);
   return borsh.serialize(BuyInstructionSchema, instructionData);
 }
 
@@ -74,14 +85,12 @@ async function getDiscriminator(programName, instructionName) {
   const message = `${programName}:${instructionName}`;
   const encoder = new TextEncoder();
   const data = encoder.encode(message);
-  // 使用 SubtleCrypto API 計算 SHA-256
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   const discriminator = hashArray.slice(0, 8);
   return new Uint8Array(discriminator);
 }
 
-// 初始化時計算 buy 指令的 discriminator
 async function initializeDiscriminator() {
   BUY_METHOD_DISCM = await getDiscriminator(PROGRAM_NAME, BUY_METHOD_NAME);
   console.log("Buy Instruction Discriminator:", BUY_METHOD_DISCM);
@@ -125,7 +134,7 @@ async function connectWallet() {
 }
 
 // =====================
-// 檢查或建立使用者的 ATA
+// 檢查或建立 ATA
 // =====================
 async function prepareBuyerAtaIfNeeded(connection, userPubkey, mintPk, transaction) {
   try {
@@ -179,7 +188,6 @@ async function swapNOVA() {
   }
 
   try {
-    // 使用自訂的 RPC Proxy URL（請根據您的環境修改）
     const connection = new Connection("https://nova-enigmaticsloths-projects.vercel.app/api/rpc-proxy", "confirmed");
     const fromPubkey = new PublicKey(walletPublicKey);
     console.log("Connected to Solana via proxy.");
@@ -198,24 +206,22 @@ async function swapNOVA() {
     const buyerAta = await prepareBuyerAtaIfNeeded(connection, fromPubkey, mintPubkey, transaction);
     console.log("Buyer ATA:", buyerAta.toBase58());
 
-    // 編碼買入指令資料：動態計算的 discriminator 與 Borsh 序列化參數組合
     const data = encodeBuyDataWithBorsh(lamports, approximateNovaPrice);
     console.log("Encoded buy data:", data);
     // 注意：第一個 8 byte 應正確為 Uint8Array(8) [28, 43, 80, 163, 53, 73, 88, 8]
 
-    // 組裝帳戶列表，請確保順序與合約端一致
     const buyAccounts = [
-      { pubkey: fromPubkey, isSigner: true, isWritable: true },             // buyer
-      { pubkey: globalStatePubkey, isSigner: false, isWritable: true },         // global_state
-      { pubkey: buyerAta, isSigner: false, isWritable: true },                  // buyer_nova_account
-      { pubkey: novaTreasuryPubkey, isSigner: false, isWritable: true },          // nova_treasury
-      { pubkey: mintAuthorityPubkey, isSigner: false, isWritable: false },        // mint_authority
-      { pubkey: mintPubkey, isSigner: false, isWritable: true },                  // mint
-      { pubkey: liquidityPoolPdaPubkey, isSigner: false, isWritable: true },      // liquidity_pool_pda
-      { pubkey: feeRecipientPubkey, isSigner: false, isWritable: true },          // fee_recipient
-      { pubkey: developerRewardPoolPubkey, isSigner: false, isWritable: true },   // developer_reward_pool
-      { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },           // token_program
-      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false }     // system_program
+      { pubkey: fromPubkey, isSigner: true, isWritable: true },
+      { pubkey: globalStatePubkey, isSigner: false, isWritable: true },
+      { pubkey: buyerAta, isSigner: false, isWritable: true },
+      { pubkey: novaTreasuryPubkey, isSigner: false, isWritable: true },
+      { pubkey: mintAuthorityPubkey, isSigner: false, isWritable: false },
+      { pubkey: mintPubkey, isSigner: false, isWritable: true },
+      { pubkey: liquidityPoolPdaPubkey, isSigner: false, isWritable: true },
+      { pubkey: feeRecipientPubkey, isSigner: false, isWritable: true },
+      { pubkey: developerRewardPoolPubkey, isSigner: false, isWritable: true },
+      { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false }
     ];
 
     const buyIx = new TransactionInstruction({
@@ -242,11 +248,9 @@ async function swapNOVA() {
     tradeStatus.innerText = `Transaction sent! Signature: ${signature}\n`;
     console.log("Transaction sent! Signature:", signature);
 
-    // 等待交易確認
     const confirmation = await connection.confirmTransaction(signature, "confirmed");
     console.log("Transaction confirmation result:", confirmation);
 
-    // 取得解析後的交易詳細 log
     const parsedTx = await connection.getParsedTransaction(signature);
     if (parsedTx && parsedTx.meta) {
       console.log("Parsed transaction logs:", parsedTx.meta.logMessages);
@@ -282,10 +286,8 @@ async function swapNOVA() {
 // =====================
 connectWalletBtn.addEventListener("click", async () => {
   console.log("Connect Wallet button clicked!");
-  // 先初始化 discriminator
   await initializeDiscriminator();
   console.log("After initialization, BUY_METHOD_DISCM:", BUY_METHOD_DISCM);
-  // 再呼叫連接錢包
   connectWallet();
 });
 
