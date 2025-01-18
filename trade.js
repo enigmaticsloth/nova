@@ -3,8 +3,8 @@
 import { Connection, PublicKey, Transaction, TransactionInstruction, SystemProgram } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction } from '@solana/spl-token';
 import * as borsh from 'borsh';
-import BN from 'bn.js';
 
+// 把所有程式碼包在 DOMContentLoaded 中以確保 DOM 可用
 document.addEventListener("DOMContentLoaded", () => {
   // =====================
   // DOM 元素取得
@@ -38,17 +38,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const PROGRAM_NAME = "nova";
   const BUY_METHOD_NAME = "buy";
 
-  // 全域變數儲存 discriminator（必須動態計算，切勿硬編碼）
+  // 全域變數儲存 discriminator（必須動態計算）
   let BUY_METHOD_DISCM;
 
   // =====================
   // 定義 Borsh 序列化結構與 schema
   // =====================
-  // 我們使用 BN.js 來表示 u64
+  // 使用原生 BigInt 表示 u64
   class BuyInstruction {
     constructor(fields) {
-      this.solAmount = fields.solAmount;         // BN 實例
-      this.currentNovaPrice = fields.currentNovaPrice; // BN 實例
+      this.solAmount = fields.solAmount;         // BigInt
+      this.currentNovaPrice = fields.currentNovaPrice; // BigInt
     }
   }
 
@@ -63,17 +63,17 @@ document.addEventListener("DOMContentLoaded", () => {
   ]);
 
   // =====================
-  // 利用 Borsh 序列化 BuyInstruction 參數（使用 BN 表示 u64）
+  // 利用 Borsh 序列化 BuyInstruction 參數（使用 BigInt 表示 u64）
   // =====================
   function serializeBuyData(solAmount, currentNovaPrice) {
-    // 將傳入數值轉成 BN 實例（確保以字串轉換）
-    const solBN = new BN(solAmount.toString());
-    const novaBN = new BN(currentNovaPrice.toString());
-    console.log("solBN:", solBN.toString());
-    console.log("novaBN:", novaBN.toString());
+    // 將數值轉成 BigInt（需確保數值為整數）
+    const solBigInt = BigInt(solAmount);
+    const novaBigInt = BigInt(currentNovaPrice);
+    console.log("solBigInt:", solBigInt.toString());
+    console.log("novaBigInt:", novaBigInt.toString());
     const instructionData = new BuyInstruction({
-      solAmount: solBN,
-      currentNovaPrice: novaBN,
+      solAmount: solBigInt,
+      currentNovaPrice: novaBigInt,
     });
     console.log("Instruction Data:", instructionData);
     return borsh.serialize(BuyInstructionSchema, instructionData);
