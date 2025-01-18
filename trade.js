@@ -20,7 +20,7 @@ const swapInputsBtn = document.getElementById("swapInputsBtn");
 // ---------------------
 let walletPublicKey = null;
 
-// 根據您的部署設定，請確認以下地址與順序與合約端定義一致
+// 以下地址請依你的實際部署調整，帳戶順序必須與合約端 Buy 結構一致
 const programId = new PublicKey("HEAz4vAABHTYdY23JuYD3VTHKSBRXSdyt7Dq8YVGDUWm");
 const globalStatePubkey = new PublicKey("HLSLMK51mUc375t69T93quNqpLqLdySZKvodjyeuNdp");
 const mintPubkey = new PublicKey("5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX");
@@ -30,11 +30,11 @@ const liquidityPoolPdaPubkey = new PublicKey("C7sSvpgZvRPVqLqfLSeDb3ErHWhMQYM3fv
 const developerRewardPoolPubkey = new PublicKey("9WHRVWCiWeCC8Lhb4ohk3e2wdoZpALh6xNcnteP6E75o");
 const feeRecipientPubkey = new PublicKey("7MaisRjGojZVb9gS6B1UZqBtFqajAArTkwnXhp3Syubk");
 
-// 指令名稱與 program 名稱（與合約中一致）
+// 指令名稱與 program 名稱（與合約中一致）：
 const PROGRAM_NAME = "nova";
 const BUY_METHOD_NAME = "buy";
 
-// 全域變數儲存 discriminator
+// 全域變數儲存 discriminator (長度 8)
 let BUY_METHOD_DISCM;
 
 // ---------------------
@@ -70,13 +70,14 @@ async function getDiscriminator(programName, instructionName) {
   const message = `${programName}:${instructionName}`;
   const encoder = new TextEncoder();
   const data = encoder.encode(message);
+  // 使用 SubtleCrypto API 進行 SHA-256 計算
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   const discriminator = hashArray.slice(0, 8);
   return new Uint8Array(discriminator);
 }
 
-// 初始化時先計算 buy 指令的 discriminator
+// 初始化時計算買入指令的 discriminator
 async function initializeDiscriminator() {
   BUY_METHOD_DISCM = await getDiscriminator(PROGRAM_NAME, BUY_METHOD_NAME);
   console.log("Buy Instruction Discriminator:", BUY_METHOD_DISCM);
@@ -135,7 +136,7 @@ async function prepareBuyerAtaIfNeeded(connection, userPubkey, mintPk, transacti
     }
     return ataPubkey;
   } catch (error) {
-    console.error("Error in preparing ATA:", error);
+    console.error("Error preparing ATA:", error);
     throw error;
   }
 }
@@ -167,6 +168,7 @@ async function swapNOVA() {
   }
 
   try {
+    // 這裡用自訂的 RPC Proxy URL 連接（根據你的設定）
     const connection = new Connection("https://nova-enigmaticsloths-projects.vercel.app/api/rpc-proxy", "confirmed");
     const fromPubkey = new PublicKey(walletPublicKey);
     console.log("Connected to Solana via proxy.");
@@ -178,7 +180,7 @@ async function swapNOVA() {
     }
     // 將 SOL 轉換為 lamports (1 SOL = 1e9 lamports)
     const lamports = Math.round(solValue * 1e9);
-    // 此處您可以根據實際情況設定 NOVA 價格參數，範例中以 1,000,000 來近似
+    // 此處設定 NOVA 價格參數，範例中以 1,000,000 近似
     const approximateNovaPrice = 1_000_000;
 
     let transaction = new Transaction();
@@ -187,11 +189,11 @@ async function swapNOVA() {
     const buyerAta = await prepareBuyerAtaIfNeeded(connection, fromPubkey, mintPubkey, transaction);
     console.log("Buyer ATA:", buyerAta.toBase58());
 
-    // 使用 Borsh 序列化並組合 discriminator
+    // 編碼買入指令的資料 (使用 Borsh 序列化與 discriminator 組合)
     const data = encodeBuyDataWithBorsh(lamports, approximateNovaPrice);
     console.log("Encoded buy data:", data);
 
-    // 按照合約端 Buy 結構的順序組裝帳戶
+    // 按合約端 Buy 結構要求的順序組裝帳戶 (順序必須正確)
     const buyAccounts = [
       { pubkey: fromPubkey, isSigner: true, isWritable: true },
       { pubkey: globalStatePubkey, isSigner: false, isWritable: true },
@@ -238,7 +240,7 @@ async function swapNOVA() {
     console.error("Swap transaction error:", err);
     if (err.logs) {
       console.error("Transaction logs:", err.logs);
-      tradeStatus.innerText = `Swap transaction error: ${err.message}\nLogs: ${err.logs.join('\n')}`;
+      tradeStatus.innerText = `Swap transaction error: ${err.message}\nLogs:\n${err.logs.join('\n')}`;
     } else {
       tradeStatus.innerText = `Swap transaction error: ${err.message}`;
     }
@@ -248,7 +250,6 @@ async function swapNOVA() {
 // ---------------------
 // 綁定按鈕事件
 // ---------------------
-
 connectWalletBtn.addEventListener("click", async () => {
   console.log("Connect Wallet button clicked!");
   // 初始化 discriminator
@@ -269,7 +270,7 @@ swapInputsBtn.addEventListener('click', () => {
 });
 
 // ---------------------
-// 自動更新換算（SOL 與 NOVA 相互換算）
+// 自動換算函式（SOL 與 NOVA 相互換算）
 // ---------------------
 function updateNovaFromSOL() {
   const solVal = parseFloat(solInput.value);
