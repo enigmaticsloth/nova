@@ -41,11 +41,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let BUY_METHOD_DISCM;
 
   // =====================
-  // 定義 Borsh 序列化結構與 schema
+  // 定義 Borsh 序列化結構與 schema（使用 BigInt 來表示 u64）
   // =====================
-  // 注意：我們這裡直接使用 BigInt 表示 u64，而非 BN.js
   class BuyInstruction {
     constructor(fields) {
+      // 這裡期望傳入的 fields.solAmount 與 fields.currentNovaPrice 已轉成 BigInt
       this.solAmount = fields.solAmount;         // BigInt
       this.currentNovaPrice = fields.currentNovaPrice; // BigInt
     }
@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 利用 Borsh 序列化 BuyInstruction 參數（使用 BigInt 表示 u64）
   // =====================
   function serializeBuyData(solAmount, currentNovaPrice) {
-    // 將傳入的數值轉為 BigInt
+    // 將傳入的數值轉為 BigInt（注意：這裡假設傳入的 solAmount 與 currentNovaPrice 為整數數值）
     const solBigInt = BigInt(solAmount);
     const novaBigInt = BigInt(currentNovaPrice);
     console.log("solBigInt:", solBigInt.toString());
@@ -207,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const data = encodeBuyDataWithBorsh(lamports, approximateNovaPrice);
       console.log("Encoded buy data:", data);
-      // 注意：前 8 個 byte 應正確為 Uint8Array(8) [28, 43, 80, 163, 53, 73, 88, 8]
+      // 注意：前 8 個 byte 應正確為 Uint8Array(8) [28,43,80,163,53,73,88,8]
 
       const buyAccounts = [
         { pubkey: fromPubkey, isSigner: true, isWritable: true },
