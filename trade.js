@@ -1,13 +1,7 @@
 console.log("trade.js loaded via Webpack!");
 
-// 1) 從 @solana/web3.js import
-import {
-  Connection,
-  PublicKey,
-  Transaction,
-  SystemProgram,
-  TransactionInstruction
-} from '@solana/web3.js';
+// 1) 從 @solana/web3.js import 作為命名空間 solanaWeb3
+import * as solanaWeb3 from '@solana/web3.js';
 
 // 2) 從 @solana/spl-token import
 import {
@@ -28,14 +22,14 @@ const tradeStatus = document.getElementById("tradeStatus");
 let walletPublicKey = null;
 
 // 5) 常用地址
-const programId = new PublicKey("HEAz4vAABHTYdY23JuYD3VTHKSBRXSdyt7Dq8YVGDUWm");
-const globalStatePubkey = new PublicKey("HLSLMK51mUc375t69T93quNqpLqLdySZKvodjyeuNdp");
-const mintPubkey = new PublicKey("5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX");
-const mintAuthorityPubkey = new PublicKey("AfqG9eh244LzXTEBo4UDepa2pKKTopvZHWmX4sFadch7");
-const novaTreasuryPubkey = new PublicKey("4fuD8ELTbhRBcnG61WnSVe9TCdkVAhJLKteYz51yMnKH");
-const liquidityPoolPdaPubkey = new PublicKey("C7sSvpgZvRPVqLqfLSeDb3ErHWhMQYM3fvbRgSWBwVkF");
-const developerRewardPoolPubkey = new PublicKey("9WHRVWCiWeCC8Lhb4ohk3e2wdoZpALh6xNcnteP6E75o");
-const feeRecipientPubkey = new PublicKey("7MaisRjGojZVb9gS6B1UZqBtFqajAArTkwnXhp3Syubk");
+const programId = new solanaWeb3.PublicKey("HEAz4vAABHTYdY23JuYD3VTHKSBRXSdyt7Dq8YVGDUWm");
+const globalStatePubkey = new solanaWeb3.PublicKey("HLSLMK51mUc375t69T93quNqpLqLdySZKvodjyeuNdp");
+const mintPubkey = new solanaWeb3.PublicKey("5vjrnc823W14QUvomk96N2yyJYyG92Ccojyku64vofJX");
+const mintAuthorityPubkey = new solanaWeb3.PublicKey("AfqG9eh244LzXTEBo4UDepa2pKKTopvZHWmX4sFadch7");
+const novaTreasuryPubkey = new solanaWeb3.PublicKey("4fuD8ELTbhRBcnG61WnSVe9TCdkVAhJLKteYz51yMnKH");
+const liquidityPoolPdaPubkey = new solanaWeb3.PublicKey("C7sSvpgZvRPVqLqfLSeDb3ErHWhMQYM3fvbRgSWBwVkF");
+const developerRewardPoolPubkey = new solanaWeb3.PublicKey("9WHRVWCiWeCC8Lhb4ohk3e2wdoZpALh6xNcnteP6E75o");
+const feeRecipientPubkey = new solanaWeb3.PublicKey("7MaisRjGojZVb9gS6B1UZqBtFqajAArTkwnXhp3Syubk");
 
 const BUY_METHOD_DISCM = new Uint8Array([0x6c, 0x65, 0xdf, 0xc4, 0x13, 0xfa, 0x24, 0xf5]);
 
@@ -119,8 +113,8 @@ async function swapNOVA() {
   }
 
   try {
-    const connection = new Connection("https://nova-enigmaticsloths-projects.vercel.app/api/rpc-proxy", "confirmed");
-    const fromPubkey = new PublicKey(walletPublicKey);
+    const connection = new solanaWeb3.Connection("https://nova-enigmaticsloths-projects.vercel.app/api/rpc-proxy", "confirmed");
+    const fromPubkey = new solanaWeb3.PublicKey(walletPublicKey);
     console.log("Connected to Solana via proxy.");
 
     const solValue = parseFloat(solInput.value);
@@ -131,7 +125,7 @@ async function swapNOVA() {
     const lamports = Math.round(solValue * 1e9);
     const approximateNovaPrice = 1_000_000;
 
-    let transaction = new Transaction();
+    let transaction = new solanaWeb3.Transaction();
 
     console.log("Preparing ATA if needed...");
     const buyerAta = await prepareBuyerAtaIfNeeded(connection, fromPubkey, mintPubkey, transaction);
@@ -151,10 +145,10 @@ async function swapNOVA() {
       { pubkey: feeRecipientPubkey, isSigner: false, isWritable: true },
       { pubkey: developerRewardPoolPubkey, isSigner: false, isWritable: true },
       { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+      { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false },
     ];
 
-    const buyIx = new TransactionInstruction({
+    const buyIx = new solanaWeb3.TransactionInstruction({
       programId,
       keys: buyAccounts,
       data,
