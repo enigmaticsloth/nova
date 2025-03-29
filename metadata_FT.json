@@ -1,0 +1,15 @@
+{
+  "name": "FUCKTRUMP",
+  "symbol": "FUCKTRUMP",
+  "description": "A token to express a viewpoint",
+  "image": "https://raw.githubusercontent.com/enigmaticsloth/nova/refs/heads/main/Image/IMG_1760.JPG",
+  "attributes": [],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://raw.githubusercontent.com/enigmaticsloth/nova/refs/heads/main/Image/IMG_1760.JPG",
+        "type": "image/jpeg"
+      }
+    ]
+  }
+}
